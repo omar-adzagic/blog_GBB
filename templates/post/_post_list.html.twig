@@ -1,0 +1,13 @@
+<div class="row">
+    {% if posts|length > 0 %}
+        {% for post in posts %}
+            <div class="col-12 col-sm-6 col-xl-4 mb-4">
+                {{ include('post/_post.html.twig', {post: post}) }}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col">
+            There's nothing here yet!
+        </div>
+    {% endif %}
+</div>

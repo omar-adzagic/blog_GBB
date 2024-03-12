@@ -1,0 +1,27 @@
+{{ form_label(form.name, 'Your Name', {'label_attr': {'class': 'form-label'}}) }}
+{{ form_widget(form.name, {'attr': {'class': 'form-control mb-3'}}) }}
+
+{#{{ form_label(form.bio, 'Bio', {'label_attr': {'class': 'form-label'}}) }}#}
+{#{{ form_widget(form.bio, {'attr': {'class': 'form-control mb-3'}}) }}#}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        {{ form_label(form.websiteUrl, 'Website URL', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.websiteUrl, {'attr': {'class': 'form-control'}}) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        {{ form_label(form.company, 'Company', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.company, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="col-md-6">
+        {{ form_label(form.location, 'Location', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.location, {'attr': {'class': 'form-control'}}) }}
+    </div>
+</div>
+
+{{ form_label(form.dateOfBirth, 'Date of birth', {'label_attr': {'class': 'form-label'}}) }}
+{{ form_widget(form.dateOfBirth, {'attr': {'class': 'form-control mb-3'}}) }}

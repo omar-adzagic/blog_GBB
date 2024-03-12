@@ -1,0 +1,5 @@
+<div class="{% if app.request.get('_route') == route %}text-primary border-bottom border-primary{% else %}text-secondary{% endif %} pb-2 {% if classes is defined %}{{ classes }}{% endif %}">
+    <a href="{% block path %}{% endblock %}" class="text-decoration-none">
+        {% block content %}{% endblock %}
+    </a>
+</div>

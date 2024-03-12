@@ -1,0 +1,38 @@
+{% embed 'shared/_tabs.html.twig' %}
+    {% block tabs %}
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            {% embed 'shared/_tab.html.twig' with { route: 'app_post' } only %}
+                {% block content %}
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="all-posts-tab" data-toggle="tab" href="#allPosts" role="tab" aria-controls="allPosts" aria-selected="true">
+                            All Posts
+                        </a>
+                    </li>
+                {% endblock %}
+                {% block path %}{% endblock %}
+            {% endembed %}
+
+            {% embed 'shared/_tab.html.twig' with { route: 'app_post_topliked', classes: 'ml-2' } only %}
+                {% block content %}
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="top-liked-tab" data-toggle="tab" href="#topLiked" role="tab" aria-controls="topLiked" aria-selected="false">
+                            Top Liked
+                        </a>
+                    </li>
+                {% endblock %}
+                {% block path %}{% endblock %}
+            {% endembed %}
+
+            {% embed 'shared/_tab.html.twig' with { route: 'app_post_follows', classes: 'ml-2' } only %}
+                {% block content %}
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="follows-tab" data-toggle="tab" href="#follows" role="tab" aria-controls="follows" aria-selected="false">
+                            From People You Follow
+                        </a>
+                    </li>
+                {% endblock %}
+                {% block path %}{% endblock %}
+            {% endembed %}
+        </ul>
+    {% endblock %}
+{% endembed %}
