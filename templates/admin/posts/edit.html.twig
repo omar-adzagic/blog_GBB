@@ -1,0 +1,11 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block title %}Editing a Post{% endblock %}
+
+{% block bread %}
+    → <a href="{{ path('admin_post_index') }}">Admin Posts</a> → Edit
+{% endblock %}
+
+{% block body %}
+    {{ include ('post/_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profile Image{% endblock %}
+
+{% block bread %}
+    → Profile Image
+{% endblock %}
+
+{% block body %}
+    {{ include('settings_profile/_settings_profile_tabs.html.twig') }}
+
+    <div class="d-flex align-items-center">
+        {{ include('shared/_avatar.html.twig', {'size': 32, profile: app.user.userProfile}) }}
+
+        <div class="ms-3">
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'} }) }}
+            <label for="{{ form.profileImage.vars.id }}" class="btn btn-secondary cursor-pointer">
+                Change
+                {{ form_widget(form.profileImage, {'attr': {'class': 'visually-hidden'}}) }}
+            </label>
+            {{ form_errors(form.profileImage) }}
+        </div>
+    </div>
+
+    <div>
+        <button type="submit" class="btn btn-primary w-100 mt-3 mb-2">Save Changes</button>
+    </div>
+
+    {{ form_end(form) }}
+{% endblock %}

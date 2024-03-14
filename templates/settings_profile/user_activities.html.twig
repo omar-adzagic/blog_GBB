@@ -1,0 +1,27 @@
+<div class="row d-flex flex-column container">
+    {% if activities|length > 0 %}
+        {% for activity in activities %}
+            <div class="col-12 col-sm-8 my-2 w-100 py-3 px-4 border border-info rounded">
+                <span class="mr-1">
+                    {% if activity.type == 'like' %}
+                        <i class="bi bi-heart-fill text-danger mr-1"></i>
+                        <span>You liked</span>
+                    {% endif %}
+                    {% if activity.type == 'favorite' %}
+                        <i class="bi bi-star-fill text-warning mr-1"></i>
+                        <span>You favored</span>
+                    {% endif %}
+                </span>
+                <a href="{{ path('app_post_show', { slug: activity.post_slug }) }}" class="text-decoration-none">
+                    {{ activity.post_title }}
+                </a>
+                <span>post at: </span>
+                <span>{{ activity.created_at | date('d/m/Y H:i:s') }}</span>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col">
+            There's nothing here yet!
+        </div>
+    {% endif %}
+</div>

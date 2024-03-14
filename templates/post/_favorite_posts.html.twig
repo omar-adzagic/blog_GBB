@@ -1,0 +1,13 @@
+<div class="row">
+    {% if userFavorites|length > 0 %}
+        {% for userFavorite in userFavorites %}
+            <div class="col-12 col-sm-6 col-xl-4 mb-4">
+                {{ include('post/_post.html.twig', {post: userFavorite.post}) }}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col">
+            There's nothing here yet!
+        </div>
+    {% endif %}
+</div>

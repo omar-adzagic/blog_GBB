@@ -3,10 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\CommentRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=CommentRepository::class)
+ * @ORM\Table(name="comments")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Comment
 {
@@ -65,23 +68,28 @@ class Comment
         return $this->created_at;
     }
 
-    /**
-     * @ORM\PrePersist
-     */
-    public function setCreatedAt(): void
-    {
-        $this->created_at = new DateTimeImmutable();
-    }
-
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updated_at;
     }
 
     /**
+     * @ORM\PrePersist
+     */
+    public function prePersist(): void
+    {
+        $this->created_at = new DateTimeImmutable();
+
+        // If the updated_at field is not set, initialize it as well.
+        if ($this->updated_at === null) {
+            $this->updated_at = new DateTimeImmutable();
+        }
+    }
+
+    /**
      * @ORM\PreUpdate
      */
-    public function setUpdatedAt(): void
+    public function preUpdate(): void
     {
         $this->updated_at = new DateTimeImmutable();
     }

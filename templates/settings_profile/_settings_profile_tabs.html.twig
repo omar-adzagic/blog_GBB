@@ -1,0 +1,39 @@
+{% embed 'shared/_tabs.html.twig' %}
+    {% block tabs %}
+        {% embed 'shared/_tab.html.twig' with { route: 'app_profile', classes: 'nav-item' } %}
+            {% block content %}
+                <span class="mx-2">Profile</span>
+            {% endblock %}
+            {% block path %}
+                {{ path('app_profile') }}
+            {% endblock %}
+        {% endembed %}
+
+{#        {% embed 'shared/_tab.html.twig' with { route: 'app_profile_settings', params: {'tab': 'image'}, classes: 'nav-item ms-2' } %}#}
+{#            {% block content %}#}
+{#                Profile Image#}
+{#            {% endblock %}#}
+{#            {% block path %}#}
+{#                {{ path('app_profile_settings', {'tab': 'image'}) }}#}
+{#            {% endblock %}#}
+{#        {% endembed %}#}
+
+        {% embed 'shared/_tab.html.twig' with { route: 'app_favorite_posts', classes: 'nav-item ms-2' } %}
+            {% block content %}
+                Favorite Posts
+            {% endblock %}
+            {% block path %}
+                {{ path('app_favorite_posts') }}
+            {% endblock %}
+        {% endembed %}
+
+        {% embed 'shared/_tab.html.twig' with { route: 'app_user_activities', classes: 'nav-item ms-2' } %}
+            {% block content %}
+                User Activities
+            {% endblock %}
+            {% block path %}
+                {{ path('app_user_activities') }}
+            {% endblock %}
+        {% endembed %}
+    {% endblock %}
+{% endembed %}

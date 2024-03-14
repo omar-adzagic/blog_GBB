@@ -82,18 +82,6 @@ class UserProfile
         return $this;
     }
 
-    public function getCompany(): ?string
-    {
-        return $this->company;
-    }
-
-    public function setCompany(?string $company): self
-    {
-        $this->company = $company;
-
-        return $this;
-    }
-
     public function getLocation(): ?string
     {
         return $this->location;
@@ -140,5 +128,21 @@ class UserProfile
         $this->image = $image;
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWebsiteUrl()
+    {
+        return $this->websiteUrl;
+    }
+
+    /**
+     * @param mixed $websiteUrl
+     */
+    public function setWebsiteUrl($websiteUrl): void
+    {
+        $this->websiteUrl = $websiteUrl;
     }
 }

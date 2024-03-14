@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Post;
 use Doctrine\DBAL\Types\BooleanType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -16,7 +17,9 @@ class PostType extends AbstractType
         $builder
             ->add('title')
             ->add('content', TextareaType::class)
-            ->add('is_published', BooleanType::class);
+            ->add('is_published', CheckboxType::class, [
+                'label'    => 'Published?'
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

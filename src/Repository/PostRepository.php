@@ -53,8 +53,62 @@ class PostRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->leftJoin('p.comments', 'c')
             ->addSelect('c')
+            ->leftJoin('p.user', 'u')
+            ->addSelect('u')
+            ->leftJoin('p.likedByUsers', 'l')
+            ->addSelect('l')
+            ->orderBy('p.created_at', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function findAllByUser($user): array
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.user', 'u')
+            ->addSelect('u')
+            ->where('u = :user')
+            ->setParameter(
+                'user',
+                $user instanceof User ? $user->getId() : $user
+            )
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllWithCommentCountQueryBuilder($currentUserId)
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select(
+                'p.id',
+                'u.id AS user_id',
+                'u.email AS user_email',
+                'p.title',
+                'p.content',
+                'p.image',
+                'p.slug',
+                'p.is_published',
+                'p.created_at',
+                '(SELECT COUNT(l2) FROM App\Entity\UserLike l2 WHERE l2.post = p.id) AS totalLikes',
+                '(SELECT COUNT(c2) FROM App\Entity\Comment c2 WHERE c2.post = p.id) AS totalComments'
+            )
+            ->innerJoin('p.user', 'u')
+            ->leftJoin('p.comments', 'c');
+
+        if ($currentUserId) {
+            // Add conditional likes information to the query
+            $qb->addSelect(
+                "(SELECT COUNT(l) FROM App\Entity\UserLike l WHERE l.post = p AND l.user = :currentUserId) AS isLikedByCurrentUser"
+            )
+            ->addSelect(
+                "(SELECT COUNT(f) FROM App\Entity\UserFavorite f WHERE f.post = p AND f.user = :currentUserId) AS isFavoredByCurrentUser"
+            )
+            ->setParameter('currentUserId', $currentUserId);
+        }
+
+        $qb->orderBy('p.created_at', 'DESC');
+
+        return $qb;
     }
 
     // /**

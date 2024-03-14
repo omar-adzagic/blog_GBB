@@ -1,27 +1,52 @@
-{{ form_label(form.name, 'Your Name', {'label_attr': {'class': 'form-label'}}) }}
-{{ form_widget(form.name, {'attr': {'class': 'form-control mb-3'}}) }}
+{% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+    <div class="d-flex justify-content-end col-md-6">
+        <a href="{{ path('app_profile_edit', {'id': app.user.id}) }}" class="btn btn-primary">
+            <i class="bi bi-pencil-square"></i> Edit
+        </a>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-md-6 d-flex flex-column">
+            <div class="mb-2">
+                Profile Image
+            </div>
+            {{ include('shared/_avatar.html.twig', { profile: app.user.userProfile, size: 64 }) }}
+        </div>
+    </div>
+{% endif %}
+
+<div class="row mb-2">
+    <div class="col-md-6">
+        {{ form_label(form.name, 'Your Name', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.name, {'attr': {'readonly': readonly, 'class': 'form-control'}}) }}
+    </div>
+</div>
 
 {#{{ form_label(form.bio, 'Bio', {'label_attr': {'class': 'form-label'}}) }}#}
 {#{{ form_widget(form.bio, {'attr': {'class': 'form-control mb-3'}}) }}#}
 
-<div class="row mb-3">
+<div class="row mb-2">
     <div class="col-md-6">
         {{ form_label(form.websiteUrl, 'Website URL', {'label_attr': {'class': 'form-label'}}) }}
-        {{ form_widget(form.websiteUrl, {'attr': {'class': 'form-control'}}) }}
+        {{ form_widget(form.websiteUrl, {'attr': {'readonly': readonly, 'class': 'form-control'}}) }}
     </div>
 </div>
 
-<div class="row mb-3">
-    <div class="col-md-6">
-        {{ form_label(form.company, 'Company', {'label_attr': {'class': 'form-label'}}) }}
-        {{ form_widget(form.company, {'attr': {'class': 'form-control'}}) }}
-    </div>
+<div class="row mb-2">
+{#    <div class="col-md-6">#}
+{#        {{ form_label(form.company, 'Company', {'label_attr': {'class': 'form-label'}}) }}#}
+{#        {{ form_widget(form.company, {'attr': {'class': 'form-control'}}) }}#}
+{#    </div>#}
 
     <div class="col-md-6">
         {{ form_label(form.location, 'Location', {'label_attr': {'class': 'form-label'}}) }}
-        {{ form_widget(form.location, {'attr': {'class': 'form-control'}}) }}
+        {{ form_widget(form.location, {'attr': {'readonly': readonly, 'class': 'form-control'}}) }}
     </div>
 </div>
 
-{{ form_label(form.dateOfBirth, 'Date of birth', {'label_attr': {'class': 'form-label'}}) }}
-{{ form_widget(form.dateOfBirth, {'attr': {'class': 'form-control mb-3'}}) }}
+<div class="row mb-2">
+    <div class="col-md-6">
+        {{ form_label(form.dateOfBirth, 'Date of birth', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.dateOfBirth, {'attr': {'readonly': readonly, 'class': 'form-control mb-3'}}) }}
+    </div>
+</div>

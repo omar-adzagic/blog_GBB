@@ -1,0 +1,54 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block title %}Admin - Posts{% endblock %}
+
+{% block header_text %}
+    Posts Management
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-3 px-0">
+        {% if posts|length > 0 %}
+        <table id="postsTable" class="table table-striped" style="width:100%">
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {# Your posts data here #}
+                {% for post in posts %}
+                    <tr style="cursor: pointer;" onclick="window.location.href='{{ path('admin_post_show', {'post': post.id}) }}'; event.stopPropagation();">
+                        <td>{{ post.title }}</td>
+                        <td>{{ post.user.email }}</td>
+                        <td>{{ post.createdAt|date('Y-m-d') }}</td>
+                        <td>
+                            <div style="cursor: pointer;">
+                                <a href="{{ path('admin_post_edit', {post: post.id}) }}">
+                                    <span class="text-primary">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </span>
+                                </a>
+                            </div>
+                            <div style="cursor: pointer;">
+                                <a href="{{ path('admin_post_delete', {post: post.id}) }}">
+                                    <span class="text-danger" >
+                                        <i class="bi bi-archive delete-comment"></i> Delete
+                                    </span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <div class="d-flex justify-content-center lead">
+                There are no posts.
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

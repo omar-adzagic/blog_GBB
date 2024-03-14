@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block bread %}
+    → Profile
+{% endblock %}
+
+{% block body %}
+    {{ include('settings_profile/_settings_profile_tabs.html.twig') }}
+
+    {% if tab is defined %}
+        {% if tab in ['basic', 'image'] %}
+            {{ form_start(form) }}
+            {{ include(templatePart, {'readonly': true}) }}
+{#            <div>#}
+{#                <button type="submit" class="btn btn-primary btn-block shadow-sm mt-4 mb-2">#}
+{#                    Save Settings#}
+{#                </button>#}
+{#            </div>#}
+            {{ form_end(form) }}
+        {% else %}
+            {{ include(templatePart) }}
+        {% endif %}
+    {% endif %}
+{% endblock %}

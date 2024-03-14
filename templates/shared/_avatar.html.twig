@@ -1,0 +1,8 @@
+{% if profile and profile.image %}
+    <img src="{{ profiles ~ profile.image }}"
+         style="height: {{size}}px; width: {{size}}px;"
+         class="d-inline-block rounded-circle border border-2 border-white" />
+{% else %}
+    <div style="height: {{size}}px; width: {{size}}px; font-size: 1.25rem;"
+         class="d-inline-block bg-secondary rounded-circle border border-2 border-white"></div>
+{% endif %}

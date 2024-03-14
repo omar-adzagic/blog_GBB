@@ -6,6 +6,7 @@ use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity
@@ -46,14 +47,19 @@ class Post
     private $comments;
 
     /**
-     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="likedPosts")
+     * @ORM\OneToMany(targetEntity="App\Entity\UserLike", mappedBy="post")
      */
     private $likedByUsers;
 
     /**
-     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="favoredPosts")
+     * @ORM\OneToMany(targetEntity="App\Entity\UserFavorite", mappedBy="post")
      */
     private $favoredByUsers;
+
+    /**
+     * @ORM\Column(type="string", length=255, unique=true)
+     */
+    private $slug;
 
     /**
      * @ORM\Column(type="boolean", options={"default":0})
@@ -75,14 +81,45 @@ class Post
      */
     private $content;
 
+    /**
+     * @ORM\OneToMany(targetEntity=PostTag::class, mappedBy="post")
+     */
+    private $postTags;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
         $this->likedByUsers = new ArrayCollection();
         $this->favoredByUsers = new ArrayCollection();
+        $this->postTags = new ArrayCollection();
     }
 
-    // Getters and Setters
+    public function getPostTags(): Collection
+    {
+        return $this->postTags;
+    }
+
+    public function addPostTag(PostTag $postTag): self
+    {
+        if (!$this->postTags->contains($postTag)) {
+            $this->postTags[] = $postTag;
+            $postTag->setPost($this); // Ensure the backward reference is correctly set
+        }
+
+        return $this;
+    }
+
+    public function removePostTag(PostTag $postTag): self
+    {
+        if ($this->postTags->removeElement($postTag)) {
+            // set the owning side to null (unless already changed)
+            if ($postTag->getPost() === $this) {
+                $postTag->setPost(null); // Correctly nullify the reference if this is the post being removed
+            }
+        }
+
+        return $this;
+    }
 
     public function getId(): ?int
     {
@@ -163,17 +200,17 @@ class Post
         return $this->likedByUsers;
     }
 
-    public function addLikedByUser(User $likedByUser): self
+    public function addLikedByUser(UserInterface $likedByUser): self
     {
         if (!$this->likedByUsers->contains($likedByUser)) {
             $this->likedByUsers[] = $likedByUser;
-            $likedByUser->addLikedPost($this);
+            $this->addUserLike($likedByUser);
         }
 
         return $this;
     }
 
-    public function removeLikedByUser(User $likedByUser): self
+    public function removeLikedByUser(UserInterface $likedByUser): self
     {
         if ($this->likedByUsers->removeElement($likedByUser)) {
             $likedByUser->removeLikedPost($this);
@@ -190,7 +227,7 @@ class Post
         return $this->favoredByUsers;
     }
 
-    public function addFavoredByUser(User $favoredByUser): self
+    public function addFavoredByUser(UserInterface $favoredByUser): self
     {
         if (!$this->favoredByUsers->contains($favoredByUser)) {
             $this->favoredByUsers[] = $favoredByUser;
@@ -200,11 +237,23 @@ class Post
         return $this;
     }
 
-    public function removeFavoredByUser(User $favoredByUser): self
+    public function removeFavoredByUser(UserInterface $favoredByUser): self
     {
         if ($this->favoredByUsers->removeElement($favoredByUser)) {
             $favoredByUser->removeFavoredPost($this);
         }
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
 
         return $this;
     }

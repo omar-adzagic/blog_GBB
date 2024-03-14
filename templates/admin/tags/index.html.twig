@@ -1,0 +1,50 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block title %}Admin - Tags{% endblock %}
+
+{% block header_text %}
+    Tags Management
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-3 px-0">
+        {% if tags|length > 0 %}
+            <table id="tagsTable" class="table table-striped" style="width:100%">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for tag in tags %}
+                    <tr style="cursor: pointer;" onclick="window.location.href='{{ path('admin_tag_show', {'tag': tag.id}) }}'; event.stopPropagation();">
+                        <td>{{ tag.name }}</td>
+                        <td>{{ tag.createdAt|date('Y-m-d') }}</td>
+                        <td>
+                            <div style="cursor: pointer;">
+                                <a href="{{ path('admin_tag_edit', {tag: tag.id}) }}">
+                                    <span class="text-primary">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </span>
+                                </a>
+                            </div>
+                            <div style="cursor: pointer;">
+                                <a href="{{ path('admin_tag_delete', {tag: tag.id}) }}">
+                                    <span class="text-danger" >
+                                        <i class="bi bi-archive delete-comment"></i> Delete
+                                    </span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="d-flex justify-content-center lead">
+                There are no tags.
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

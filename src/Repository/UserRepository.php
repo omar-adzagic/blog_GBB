@@ -64,32 +64,46 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->flush();
     }
 
-    // /**
-    //  * @return User[] Returns an array of User objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findUserWithFavoredPosts(int $userId): ?User
     {
         return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('u.id', 'ASC')
-            ->setMaxResults(10)
+            ->leftJoin('u.userFavorites', 'uf')
+            ->addSelect('uf')
+            ->leftJoin('uf.post', 'p') // Assuming `post` is the property in UserFavorite that references the Post entity
+            ->addSelect('p')
+            ->where('u.id = :userId')
+            ->setParameter('userId', $userId)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getOneOrNullResult();
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?User
+    public function findUserActivities(int $userId)
     {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $em = $this->getEntityManager();
+        $conn = $em->getConnection();
+
+        $sql = "
+            SELECT 
+                activity.type, 
+                activity.user_id, 
+                activity.post_id, 
+                posts.title AS post_title,
+                posts.slug as post_slug,
+                activity.created_at
+            FROM
+                (SELECT 'like' AS type, user_id, post_id, created_at 
+                 FROM user_likes
+                 UNION ALL
+                 SELECT 'favorite' AS type, user_id, post_id,created_at 
+                 FROM user_favorites) AS activity
+            JOIN posts ON activity.post_id = posts.id
+            WHERE activity.user_id = :userId
+            ORDER BY activity.created_at DESC
+        ";
+
+        $stmt = $conn->prepare($sql);
+        $result = $stmt->executeQuery(['userId' => $userId]);
+
+        return $result->fetchAllAssociative();
     }
-    */
 }

@@ -8,6 +8,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use App\Entity\UserLike;
+use App\Entity\UserFavorite;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -20,6 +22,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="integer")
      */
     private $id;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $username;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
@@ -48,27 +55,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $comments;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Post::class, inversedBy="likedByUsers")
-     * @ORM\JoinTable(name="user_likes",
-     *       joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
-     *       inverseJoinColumns={@ORM\JoinColumn(name="post_id", referencedColumnName="id")}
-     *  )
+     * @ORM\OneToMany(targetEntity=UserLike::class, mappedBy="user")
      */
-    private $likedPosts;
+    private $userLikes;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Post::class, inversedBy="favoredByUsers")
-     * @ORM\JoinTable(name="user_favorites",
-     *       joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
-     *       inverseJoinColumns={@ORM\JoinColumn(name="post_id", referencedColumnName="id")}
-     *  )
+     * @ORM\OneToMany(targetEntity=UserFavorite::class, mappedBy="user", cascade={"persist", "remove"})
      */
-    private $favoredPosts;
-
-    /**
-     * @ORM\Column(type="string", length=500, nullable=true)
-     */
-    private $image_path;
+    private $userFavorites;
 
     /**
      * @ORM\OneToOne(targetEntity="UserProfile", mappedBy="user", cascade={"persist", "remove"})
@@ -80,7 +74,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->posts = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->likedPosts = new ArrayCollection();
-        $this->favoredPosts = new ArrayCollection();
+        $this->userFavorites = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -113,10 +107,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @deprecated since Symfony 5.3, use getUserIdentifier instead
      */
-    public function getUsername(): string
-    {
-        return (string) $this->email;
-    }
+//    public function getUsername(): string
+//    {
+//        return (string) $this->email;
+//    }
 
     /**
      * @see UserInterface
@@ -237,21 +231,52 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getLikedPosts(): Collection
     {
-        return $this->likedPosts;
+        return $this->likedPosts ?? new ArrayCollection();
     }
 
     public function addLikedPost(Post $likedPost): self
     {
-        if (!$this->likedPosts->contains($likedPost)) {
-            $this->likedPosts[] = $likedPost;
-        }
+        $userLike = new UserLike();
+        $userLike->setPost($likedPost);
+        $userLike->setUser($this);
+        // Assuming you want to set createdAt or updatedAt, you can do it inside UserLike's constructor or explicitly here
+
+        $this->addUserLike($userLike); // Utilize the modified/additional method
 
         return $this;
     }
 
     public function removeLikedPost(Post $likedPost): self
     {
-        $this->likedPosts->removeElement($likedPost);
+        // Find the UserLike instance in the collection
+        foreach ($this->userLikes as $userLike) {
+            if ($userLike->getPost() === $likedPost) {
+                $this->removeUserLike($userLike);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    public function addUserLike(UserLike $userLike): self
+    {
+        if (!$this->userLikes->contains($userLike)) {
+            $this->userLikes[] = $userLike;
+            $userLike->setUser($this); // Set the inverse side
+        }
+
+        return $this;
+    }
+
+    public function removeUserLike(UserLike $userLike): self
+    {
+        if ($this->userLikes->removeElement($userLike)) {
+            // Check and set the owning side to null
+            if ($userLike->getUser() === $this) {
+                $userLike->setUser(null);
+            }
+        }
 
         return $this;
     }
@@ -261,13 +286,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getFavoredPosts(): Collection
     {
-        return $this->favoredPosts;
+        $favoredPosts = new ArrayCollection();
+        foreach ($this->userFavorites as $userFavorite) {
+            // Assuming UserFavorite has a method getPost() that returns the associated Post entity
+            $favoredPosts->add($userFavorite->getPost());
+        }
+        return $favoredPosts;
     }
 
     public function addFavoredPost(Post $favoredPost): self
     {
-        if (!$this->favoredPosts->contains($favoredPost)) {
-            $this->favoredPosts[] = $favoredPost;
+        if (!$this->userFavorites->contains($favoredPost)) {
+            $this->userFavorites[] = $favoredPost;
         }
 
         return $this;
@@ -275,19 +305,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeFavoredPost(Post $favoredPost): self
     {
-        $this->favoredPosts->removeElement($favoredPost);
-
-        return $this;
-    }
-
-    public function getImagePath(): ?string
-    {
-        return $this->image_path;
-    }
-
-    public function setImagePath(?string $image_path): self
-    {
-        $this->image_path = $image_path;
+        $this->userFavorites->removeElement($favoredPost);
 
         return $this;
     }
@@ -307,5 +325,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->userProfile = $userProfile;
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
+     * @param mixed $username
+     */
+    public function setUsername($username): void
+    {
+        $this->username = $username;
     }
 }

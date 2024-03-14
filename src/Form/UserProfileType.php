@@ -16,8 +16,7 @@ class UserProfileType extends AbstractType
             ->add('name')
 //            ->add('bio')
             ->add('websiteUrl')
-//            ->add('twitterUsername')
-            ->add('company')
+//            ->add('company')
             ->add('location')
             ->add(
                 'dateOfBirth',
@@ -32,7 +31,7 @@ class UserProfileType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-//            'data_class' => UserProfile::class,
+            'data_class' => UserProfile::class,
         ]);
     }
 }

@@ -3,6 +3,259 @@
 {% block title %}All Posts{% endblock %}
 
 {% block body %}
-    {{ include('post/_post_tabs.html.twig') }}
-    {{ include ('post/_post_list.html.twig') }}
+    <div class="filter-container my-3">
+        <div class="form-group col-6 px-0">
+            <input type="text" id="titleFilter" class="form-control" placeholder="Filter by title...">
+        </div>
+    </div>
+
+    <div id="postsContainer" class="row"></div>
+    <div id="paginationContainer" class="d-flex justify-content-end"></div>
+{% endblock %}
+
+{% block body_javascripts %}
+    <script>
+        function updatePagination(total, page, limit) {
+            const totalPages = Math.ceil(total / limit);
+            const paginationContainer = document.getElementById('paginationContainer');
+
+            // Clear existing pagination
+            paginationContainer.innerHTML = '';
+
+            // Create the navigation structure
+            const nav = document.createElement('nav');
+            nav.setAttribute('aria-label', 'Page navigation');
+            const ul = document.createElement('ul');
+            ul.className = 'pagination';
+
+            // Generate pagination items
+            for (let i = 1; i <= totalPages; i++) {
+                const li = document.createElement('li');
+                li.className = 'page-item';
+                if (i === page) {
+                    li.classList.add('active');
+                }
+
+                const a = document.createElement('a');
+                a.className = 'page-link js-pagination-link';
+                a.href = '#';
+                a.textContent = i;
+                a.setAttribute('data-page', i);
+                a.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Here, call your function to fetch and update the data for the selected page
+                    console.log(`Page ${i} clicked`);
+                    // For example: fetchData(i); where fetchData is your function to update the content
+                    const url = '/posts'
+                    fetchPosts(url, i)
+                });
+
+                li.appendChild(a);
+                ul.appendChild(li);
+            }
+
+            // Append the pagination to the navigation element and then to the container
+            nav.appendChild(ul);
+            paginationContainer.appendChild(nav);
+        }
+
+        function fetchPosts(url, page=1, title='') {
+            // Perform the AJAX request
+            url += `?page=${page}`
+
+            if (title) {
+                url += `&title=${encodeURIComponent(title)}`;
+            }
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(res => {
+                    console.log('HALO', res)
+
+                    const postsContainer = document.getElementById('postsContainer');
+
+                    postsContainer.innerHTML = ''; // This line clears the postsContainer
+
+                    const {
+                        posts,
+                        is_authenticated,
+                        total,
+                        page,
+                        limit
+                    } = res;
+
+                    updatePagination(total, page, limit);
+
+                    posts.forEach(post => {
+                        // Create the main div for the post
+                        const postDiv = document.createElement('div');
+                        postDiv.classList.add('col-12', 'col-sm-6', 'col-xl-4', 'mb-4');
+
+                        // Create the title and link
+                        const titleDiv = document.createElement('div');
+                        titleDiv.classList.add('h2');
+                        const titleLink = document.createElement('a');
+                        titleLink.setAttribute('href', `/post/${post.slug}`);
+                        titleLink.classList.add('text-decoration-none');
+                        titleLink.textContent = post.title;
+                        titleDiv.appendChild(titleLink);
+
+                        // Create the content div
+                        const contentDiv = document.createElement('div');
+                        contentDiv.classList.add('lead', 'text-justify', 'my-2');
+                        contentDiv.textContent = post.content;
+
+                        // Append the title and content to the main post div
+                        postDiv.appendChild(titleDiv);
+                        postDiv.appendChild(contentDiv);
+
+                        // More elements like author, like/unlike buttons, etc., would be similarly created and appended here
+
+                        const infoDiv = document.createElement('div');
+                        infoDiv.classList.add('px-3', 'py-2', 'border', 'rounded');
+
+                        const authorDiv = document.createElement('div');
+                        authorDiv.classList.add('my-2');
+                        const authorText = document.createElement('div');
+                        authorText.classList.add('small', 'text-secondary');
+                        authorText.innerHTML = `Author: <a href="/profile/${post.user_id}" class="text-decoration-none">${post.user_email}</a>`;
+                        authorDiv.appendChild(authorText);
+
+                        const dateDiv = document.createElement('div');
+                        dateDiv.classList.add('small', 'text-secondary');
+                        const postDate = new Date(post.created_at); // Assuming post.createdAt is in a format that Date() constructor can parse
+                        const formattedDate = postDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); // Format date as "M j, Y"
+                        dateDiv.textContent = `Written: ${formattedDate}`;
+
+                        authorDiv.appendChild(dateDiv);
+                        infoDiv.appendChild(authorDiv);
+
+                        // Append the author and date info to the main post div
+                        postDiv.appendChild(infoDiv);
+
+                        if (is_authenticated) {
+                            // Create form
+                            const form = document.createElement('form');
+                            form.setAttribute('method', 'post');
+                            form.classList.add('d-flex', 'align-items-center');
+
+                            // Decide whether to generate a Like or Unlike form based on whether the user has liked the post
+                            if (post.isLikedByCurrentUser === '1') {
+                                form.setAttribute('action', `/unlike/${post.id}`);
+                                form.innerHTML = `
+                                    <button type="submit" class="btn btn-link text-decoration-none px-0">
+                                        Unlike <span class="px-2 rounded bg-light">${parseInt(post.totalLikes)}</span>
+                                        <i class="bi bi-heart-fill text-danger"></i>
+                                    </button>
+                                `;
+                            } else {
+                                form.setAttribute('action', `/like/${post.id}`);
+                                form.innerHTML = `
+                                    <button type="submit" class="btn btn-link text-decoration-none px-0">
+                                        Like <span class="px-2 rounded bg-light">${parseInt(post.totalLikes)}</span>
+                                        <i class="bi bi-heart text-danger"></i>
+                                    </button>
+                                `;
+                            }
+
+                            // Append the form to the main post div
+                            infoDiv.appendChild(form);
+
+                            // Dynamically generate Add to Favorites / Remove from Favorites section
+                            const favoriteForm = document.createElement('div');
+                            favoriteForm.classList.add('d-flex', 'align-items-center');
+
+                            if (post.isFavoredByCurrentUser === '1') {
+                                favoriteForm.innerHTML = `
+                                <a href="/remove-favorite/${post.id}" class="text-decoration-none d-flex align-items-center">
+                                    Remove from Favorites
+                                </a>
+                                <span class="ml-2">
+                                    <i class="bi bi-star-fill text-warning lead"></i>
+                                </span>
+                            `;
+                            } else {
+                                favoriteForm.innerHTML = `
+                                <a href="/favorite/${post.id}" class="text-decoration-none d-flex align-items-center">
+                                    Add to Favorites
+                                </a>
+                                <span class="ml-2">
+                                    <i class="bi bi-star text-warning lead"></i>
+                                </span>
+                            `;
+                            }
+
+                            // Append the favoriteForm to the postDiv
+                            infoDiv.appendChild(favoriteForm);
+
+                            const actionDiv = document.createElement('div');
+                            actionDiv.classList.add('my-2', 'd-flex');
+
+                            // Edit section
+                            // if (post.canEdit) {
+                            const editDiv = document.createElement('div');
+                            const editLink = document.createElement('a');
+                            editLink.setAttribute('href', `/post/${post.id}/edit`);
+                            editLink.classList.add('mr-1', 'text-decoration-none');
+                            editLink.textContent = 'Edit';
+
+                            const editIcon = document.createElement('i');
+                            editIcon.classList.add('bi', 'bi-pencil-square', 'text-info');
+
+                            editDiv.appendChild(editLink);
+                            editDiv.appendChild(editIcon);
+                            actionDiv.appendChild(editDiv);
+                            // }
+
+                            // Comment section
+                            const commentDiv = document.createElement('div');
+                            commentDiv.classList.add('ml-2');
+
+                            const commentLink = document.createElement('a');
+                            commentLink.setAttribute('href', `/post/${post.id}/comment`);
+                            commentLink.classList.add('text-decoration-none');
+                            commentLink.innerHTML = `Comment <span class="px-1 rounded bg-light">${post.totalComments}</span>`;
+
+                            commentDiv.appendChild(commentLink);
+                            actionDiv.appendChild(commentDiv);
+
+                            // Append the actionDiv to the postDiv
+                            infoDiv.appendChild(actionDiv);
+                        }
+
+                        // Append the constructed post div to the posts container
+                        postsContainer.appendChild(postDiv);
+                    });
+
+                    // console.log('postsContainer', postsContainer)
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleFilterInput = document.getElementById('titleFilter');
+            fetchPosts('/posts', 1, titleFilterInput.value);
+
+            titleFilterInput.addEventListener('keyup', function() {
+                fetchPosts('/posts', 1, this.value);
+            });
+
+            document.querySelectorAll('.js-pagination-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault(); // Prevent default link action
+
+                    let page = this.getAttribute('data-page'); // Get the page number
+                    let url = '/posts'; // Construct the URL
+
+                    fetchPosts(url, parseInt(page) + 1)
+                });
+            });
+        });
+    </script>
+
 {% endblock %}
