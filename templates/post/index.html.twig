@@ -5,7 +5,7 @@
 {% block body %}
     <div class="filter-container my-3">
         <div class="form-group col-6 px-0">
-            <input type="text" id="titleFilter" class="form-control" placeholder="Filter by title...">
+            <input type="text" id="titleFilter" class="form-control" placeholder="Filter by title..." />
         </div>
     </div>
 
@@ -28,30 +28,32 @@
             const ul = document.createElement('ul');
             ul.className = 'pagination';
 
-            // Generate pagination items
-            for (let i = 1; i <= totalPages; i++) {
-                const li = document.createElement('li');
-                li.className = 'page-item';
-                if (i === page) {
-                    li.classList.add('active');
+            if (totalPages > 1) {
+                // Generate pagination items
+                for (let i = 1; i <= totalPages; i++) {
+                    const li = document.createElement('li');
+                    li.className = 'page-item';
+                    if (i === page) {
+                        li.classList.add('active');
+                    }
+
+                    const a = document.createElement('a');
+                    a.className = 'page-link js-pagination-link';
+                    a.href = '#';
+                    a.textContent = i;
+                    a.setAttribute('data-page', i);
+                    a.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        // Here, call your function to fetch and update the data for the selected page
+                        console.log(`Page ${i} clicked`);
+                        // For example: fetchData(i); where fetchData is your function to update the content
+                        const url = '/posts'
+                        fetchPosts(url, i)
+                    });
+
+                    li.appendChild(a);
+                    ul.appendChild(li);
                 }
-
-                const a = document.createElement('a');
-                a.className = 'page-link js-pagination-link';
-                a.href = '#';
-                a.textContent = i;
-                a.setAttribute('data-page', i);
-                a.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    // Here, call your function to fetch and update the data for the selected page
-                    console.log(`Page ${i} clicked`);
-                    // For example: fetchData(i); where fetchData is your function to update the content
-                    const url = '/posts'
-                    fetchPosts(url, i)
-                });
-
-                li.appendChild(a);
-                ul.appendChild(li);
             }
 
             // Append the pagination to the navigation element and then to the container
@@ -75,15 +77,13 @@
                     return response.json();
                 })
                 .then(res => {
-                    console.log('HALO', res)
-
                     const postsContainer = document.getElementById('postsContainer');
-
                     postsContainer.innerHTML = ''; // This line clears the postsContainer
 
                     const {
                         posts,
                         is_authenticated,
+                        auth_id,
                         total,
                         page,
                         limit
@@ -196,25 +196,29 @@
                             const actionDiv = document.createElement('div');
                             actionDiv.classList.add('my-2', 'd-flex');
 
+                            console.log('post', post)
                             // Edit section
-                            // if (post.canEdit) {
-                            const editDiv = document.createElement('div');
-                            const editLink = document.createElement('a');
-                            editLink.setAttribute('href', `/post/${post.id}/edit`);
-                            editLink.classList.add('mr-1', 'text-decoration-none');
-                            editLink.textContent = 'Edit';
+                            if (post.user_id === auth_id) {
+                                const editDiv = document.createElement('div');
+                                const editLink = document.createElement('a');
+                                editLink.setAttribute('href', `/post/${post.id}/edit`);
+                                editLink.classList.add('mr-2', 'text-decoration-none');
+                                const editLinkSpan = document.createElement('span');
+                                editLinkSpan.classList.add('mr-1');
+                                editLinkSpan.textContent = 'Edit';
 
-                            const editIcon = document.createElement('i');
-                            editIcon.classList.add('bi', 'bi-pencil-square', 'text-info');
+                                const editIcon = document.createElement('i');
+                                editIcon.classList.add('mr-2', 'bi', 'bi-pencil-square', 'text-primary');
+                                editLink.appendChild(editLinkSpan);
+                                editLink.appendChild(editIcon);
 
-                            editDiv.appendChild(editLink);
-                            editDiv.appendChild(editIcon);
-                            actionDiv.appendChild(editDiv);
-                            // }
+                                editDiv.appendChild(editLink);
+                                // editDiv.appendChild(editIcon);
+                                actionDiv.appendChild(editDiv);
+                            }
 
                             // Comment section
                             const commentDiv = document.createElement('div');
-                            commentDiv.classList.add('ml-2');
 
                             const commentLink = document.createElement('a');
                             commentLink.setAttribute('href', `/post/${post.id}/comment`);

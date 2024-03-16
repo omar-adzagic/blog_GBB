@@ -73,11 +73,15 @@
                 {% endif %}
             </div>
             <div class="my-2 d-flex">
+                {% if post.user.id == app.user.id %}
+                    <div>
+                        <a href="{{ path('app_post_edit', { post: post.id }) }}" class="mr-2 text-decoration-none">
+                            Edit
+                            <i class="bi bi-pencil-square text-primary"></i>
+                        </a>
+                    </div>
+                {% endif %}
                 <div>
-                    <a href="{{ path('app_post_edit', { post: post.id }) }}" class="mr-1 text-decoration-none">Edit</a>
-                    <i class="bi bi-pencil-square text-info"></i>
-                </div>
-                <div class="ml-2">
                     <a href="{{ path('app_post_comment', { post: post.id }) }}" class="text-decoration-none">
                         Comment <span class="px-1 rounded bg-light">{{ post.comments.count }}</span>
                     </a>

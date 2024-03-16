@@ -1,0 +1,13 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+<div>{{ form_errors(form) }}</div>
+
+<div class="mb-3">
+    {{ form_label(form.name, 'Please enter the name', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.name, {'attr': {'class': 'form-control shadow-sm'}}) }}
+    {{ form_errors(form.name) }}
+</div>
+
+<div>
+    <button type="submit" class="btn btn-primary w-100 mt-4 mb-2">Save!</button>
+</div>
+{{ form_end(form) }}

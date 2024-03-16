@@ -2,10 +2,15 @@
 
 namespace App\Entity;
 
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ * @ORM\Table(uniqueConstraints={
+ *      @ORM\UniqueConstraint(name="post_tags_unique", columns={"post_id", "tag_id"})
+ *  })
+ * @ORM\HasLifecycleCallbacks()
  */
 class PostTag
 {
@@ -38,8 +43,6 @@ class PostTag
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
-
-    // Getters and setters...
 
     /**
      * @return mixed
@@ -95,5 +98,21 @@ class PostTag
     public function setTag($tag): void
     {
         $this->tag = $tag;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersist(): void
+    {
+        $this->createdAt = new DateTimeImmutable();
     }
 }

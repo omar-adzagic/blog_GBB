@@ -9,7 +9,6 @@ use App\Form\ProfileImageType;
 use App\Repository\PostRepository;
 use App\Repository\UserFavoriteRepository;
 use App\Repository\UserRepository;
-use PDO;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;

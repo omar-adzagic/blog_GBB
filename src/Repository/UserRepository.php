@@ -64,6 +64,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->flush();
     }
 
+    public function findAllWithoutUserLatest(int $userId): array
+    {
+        return $this->createQueryBuilder('u')
+            ->orderBy('u.created_at', 'DESC')
+            ->where('u.id != :userId')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findUserWithFavoredPosts(int $userId): ?User
     {
         return $this->createQueryBuilder('u')
@@ -87,16 +97,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
                 activity.type, 
                 activity.user_id, 
                 activity.post_id, 
-                posts.title AS post_title,
-                posts.slug as post_slug,
+                post.title AS post_title,
+                post.slug as post_slug,
                 activity.created_at
             FROM
                 (SELECT 'like' AS type, user_id, post_id, created_at 
-                 FROM user_likes
+                 FROM user_like
                  UNION ALL
                  SELECT 'favorite' AS type, user_id, post_id,created_at 
-                 FROM user_favorites) AS activity
-            JOIN posts ON activity.post_id = posts.id
+                 FROM user_favorite) AS activity
+            JOIN post ON activity.post_id = post.id
             WHERE activity.user_id = :userId
             ORDER BY activity.created_at DESC
         ";

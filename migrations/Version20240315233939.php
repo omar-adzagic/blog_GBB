@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20240313233449 extends AbstractMigration
+final class Version20240315233939 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,12 +20,12 @@ final class Version20240313233449 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE user ADD username VARCHAR(255) NOT NULL, DROP image_path');
+        $this->addSql('CREATE INDEX title_index ON post (title)');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE user ADD image_path VARCHAR(500) DEFAULT NULL, DROP username');
+        $this->addSql('DROP INDEX title_index ON post');
     }
 }

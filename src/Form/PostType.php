@@ -3,9 +3,13 @@
 namespace App\Form;
 
 use App\Entity\Post;
+use App\Entity\PostTag;
+use App\Entity\Tag;
 use Doctrine\DBAL\Types\BooleanType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -18,7 +22,10 @@ class PostType extends AbstractType
             ->add('title')
             ->add('content', TextareaType::class)
             ->add('is_published', CheckboxType::class, [
-                'label'    => 'Published?'
+                'label' => 'Published?'
+            ])
+            ->add('postTags', HiddenType::class, [
+                'mapped' => false,
             ]);
     }
 

@@ -9,22 +9,25 @@ use App\Form\CommentType;
 use App\Form\PostType;
 use App\Repository\CommentRepository;
 use App\Repository\PostRepository;
-use App\Services\PostService;
+use App\Services\PostManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class PostController extends AbstractController
 {
     /**
      * @Route("/", name="app_post")
      */
-    public function index(PostRepository $posts): Response
+    public function index(PostRepository $postRepository): Response
     {
-        return $this->render('post/index.html.twig', ['posts' => $posts->findAllWithComments()]);
+        $posts = $postRepository->findPublishedWithComments();
+        return $this->render('post/index.html.twig', ['posts' => $posts]);
     }
 
     /**
@@ -44,8 +47,13 @@ class PostController extends AbstractController
         // Query to get all posts (or you might modify it to get a QueryBuilder instance)
         $queryBuilder = $postRepository->findAllWithCommentCountQueryBuilder($userId);
 
+        // Ensure that only published posts are considered.
+        $queryBuilder->where('p.is_published = 1');
+
+        // Add a conditional search by title if it's provided
         if (!empty($title)) {
-            $queryBuilder->where('p.title LIKE :title')->setParameter('title', '%' . $title . '%');
+            // Use andWhere to add to the existing where condition
+            $queryBuilder->andWhere('p.title LIKE :title')->setParameter('title', '%' . $title . '%');
         }
 
         // Get current page from query parameters, default is 1 if not set
@@ -65,6 +73,7 @@ class PostController extends AbstractController
         $responseData = [
             'posts' => $posts,
             'is_authenticated' => $this->isGranted('IS_AUTHENTICATED_REMEMBERED'),
+            'auth_id' => $userId,
             'total' => $pagination->getTotalItemCount(),
             'page' => $currentPage,
             'limit' => $limit,
@@ -127,9 +136,10 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/post/add", name="app_post_add", priority=2)
+     * @Route("/post/create", name="app_post_create", priority=2)
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function add(Request $request, PostRepository $posts, PostService $postService): Response // * @IsGranted("ROLE_WRITER")
+    public function create(Request $request, PostRepository $posts, PostManager $postManager): Response
     {
         $form = $this->createForm(PostType::class, new Post());
         $form->handleRequest($request);
@@ -137,27 +147,45 @@ class PostController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $post = $form->getData();
             $post->setUser($this->getUser());
-            $slug = $postService->generateSlug($post->getTitle());
+            $slug = $postManager->generateSlug($post->getTitle());
             $post->setSlug($slug);
             $posts->add($post, true);
             $this->addFlash('success', 'Your post has been added.');
             return $this->redirectToRoute('app_post');
         }
 
-        return $this->renderForm('post/add.html.twig', ['form' => $form]);
+        return $this->renderForm('post/create.html.twig', ['form' => $form]);
     }
 
     /**
      * @Route("/post/{post}/edit", name="app_post_edit")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function edit(Post $post, Request $request, PostRepository $posts): Response // * @IsGranted("EDIT", subject="post")
+    public function edit(
+        Post $post, Request $request, PostRepository $posts,
+        EntityManagerInterface $entityManager,
+        PostManager $postManager
+    ): Response // * @IsGranted("EDIT", subject="post")
     {
+        $authUserId = $this->getUser()->getId();
+
+        if ($post->getUser()->getId() !== $authUserId) {
+            // Throw an AccessDeniedException
+            throw new AccessDeniedException('You do not have permission to edit this post.');
+        }
+
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $posts->add($form->getData(), true);
-            # TODO: ADD SLUG
+            // Set slug before persisting entity changes
+            $slug = $postManager->generateSlug($post->getTitle());
+            $post->setSlug($slug);
+
+            // If $posts->add() method already handles persisting and flushing,
+            // there's no need to call $entityManager->persist() and flush() again.
+            $posts->add($post, true);
+
             $this->addFlash('success', 'Your post has been updated.');
             return $this->redirectToRoute('app_post');
         }
@@ -167,6 +195,7 @@ class PostController extends AbstractController
 
     /**
      * @Route("/post/{post}/comment", name="app_post_comment")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function addComment(Post $post, Request $request, CommentRepository $comments): Response // * @IsGranted("ROLE_COMMENTER")
     {

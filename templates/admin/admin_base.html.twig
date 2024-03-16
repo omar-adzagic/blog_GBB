@@ -19,25 +19,39 @@
     {% endblock %}
 </head>
 <body>
-<div class="container">
+<div class="" style="margin: auto; width: 80%">
     <header>
         <!-- Admin navigation bar or header content -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-lg mt-2 navbar-light bg-light rounded" style="border: 1px solid #89c2d9">
             <div class="container-fluid">
-                <a class="navbar-brand" href="{{ path('admin_panel_index') }}">Admin Panel</a>
+                <a class="navbar-brand text-primary" href="{{ path('app_post') }}">
+                    <i class="bi bi-house"></i>
+                </a>
+                <a class="navbar-brand text-primary" href="{{ path('admin_panel_index') }}">
+                    <i class="bi bi-speedometer"></i>
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="collapse navbar-collapse d-flex justify-content-between" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
-                        <a class="nav-link active" aria-current="page" href="{{ path('admin_post_index') }}">Posts</a>
-                        <a class="nav-link" href="{{ path('admin_tag_index') }}">Tags</a>
-                        <a class="nav-link" href="{{ path('admin_user_index') }}">Users</a>
+                        <a class="nav-link {{ app.request.attributes.get('_route') == 'admin_post_index' ? 'active' : '' }}"
+                           aria-current="page"
+                           href="{{ path('admin_post_index') }}">Posts</a>
+                        <a class="nav-link {{ app.request.attributes.get('_route') == 'admin_tag_index' ? 'active' : '' }}"
+                           href="{{ path('admin_tag_index') }}">Tags</a>
+                        <a class="nav-link {{ app.request.attributes.get('_route') == 'admin_user_index' ? 'active' : '' }}"
+                           href="{{ path('admin_user_index') }}">Users</a>
+                    </div>
+                    <div class="ml-2 text-primary">
+                        <a href="{{ path('app_logout') }}" class="text-decoration-none">
+                            Logout
+                            <i class="bi bi-box-arrow-right"></i>
+                        </a>
                     </div>
                 </div>
             </div>
         </nav>
-
     </header>
 
     <div>

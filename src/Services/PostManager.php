@@ -7,7 +7,7 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Post;
 
-class PostService
+class PostManager
 {
     private $entityManager;
     private $slugify;

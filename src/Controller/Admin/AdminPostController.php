@@ -9,10 +9,13 @@ use App\Form\CommentType;
 use App\Form\PostType;
 use App\Repository\CommentRepository;
 use App\Repository\PostRepository;
+use App\Services\PostManager;
+use App\Services\TagManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @Route("/admin")
@@ -30,6 +33,48 @@ class AdminPostController extends AbstractController
         return $this->render('admin/posts/index.html.twig', [
             'posts' => $posts
         ]);
+    }
+
+    /**
+     * @Route("/posts/create", name="admin_post_create")
+     */
+    public function create(
+        Request $request,
+        PostRepository $postRepository,
+        TagManager $tagManager,
+        PostManager $postManager
+    ) {
+        $form = $this->createForm(PostType::class, new Post());
+        $form->handleRequest($request);
+        $post = $form->getData();
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Assuming the form modifies the $post object directly
+            $post->setUser($this->getUser());
+            $slug = $postManager->generateSlug($post->getTitle());
+            $post->setSlug($slug);
+            $postRepository->add($post, true); // Assuming there's a save method to persist and flush the Post entity
+
+            $requestPostTagIds = explode(',', $request->request->get('postTags', ''));
+            $submittedTagIds = array_map(function ($tagIdString) {return (int) $tagIdString; }, $requestPostTagIds);
+            $submittedTagIds = array_filter($submittedTagIds);
+
+            if (count($submittedTagIds)) {
+                $tagManager->addTagsToPost($post, $submittedTagIds, $this->getUser());
+            }
+
+            $this->addFlash('success', 'Post has been created.');
+            return $this->redirectToRoute('admin_post_index');
+        }
+
+        // Initially, no tags are associated with the new post, so no need to serialize post tags here
+        return $this->renderForm(
+            'admin/posts/create.html.twig',
+            [
+                'form' => $form,
+                'post' => $post
+            ]
+        );
     }
 
     /**
@@ -63,20 +108,49 @@ class AdminPostController extends AbstractController
     /**
      * @Route("/posts/{post}/edit", name="admin_post_edit")
      */
-    public function edit(Post $post, Request $request, PostRepository $postRepository)
+    public function edit(
+        int $post,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        PostRepository $postRepository,
+        SerializerInterface $serializer,
+        TagManager $tagManager
+    )
     {
+        $post = $postRepository->findPostWithTags($post);
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $postRepository->add($form->getData(), true);
+            $post->setIsPublished($form->get('is_published')->getData());
+
+            $requestPostTagIds = explode(',', $request->request->get('postTags', ''));
+            $submittedTagIds = array_map(function ($tagIdString) { return (int) $tagIdString; }, $requestPostTagIds);
+            $submittedTagIds = array_filter($submittedTagIds);
+
+            if (count($submittedTagIds)) {
+                $tagManager->updatePostTags($post, $submittedTagIds, $this->getUser());
+            }
+            $entityManager->persist($post);
+            $entityManager->flush();
+
             $this->addFlash('success', 'Post has been updated.');
             return $this->redirectToRoute('admin_post_index');
         }
 
+        $postTagsJson = $serializer->serialize($post->getPostTags(), 'json', [
+            'circular_reference_handler' => function ($object) {
+                return $object->getId();
+            }
+        ]);
+
         return $this->renderForm(
             'admin/posts/edit.html.twig',
-            ['form' => $form, 'post' => $post]
+            [
+                'form' => $form,
+                'post' => $post,
+                'postTagsJson' => $postTagsJson,
+            ]
         );
     }
 

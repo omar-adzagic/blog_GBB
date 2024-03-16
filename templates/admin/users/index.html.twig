@@ -7,6 +7,55 @@
 {% endblock %}
 
 {% block body %}
-    <!-- Add table or list of posts here -->
-    <!-- Add link to create new post -->
+    <div class="mt-3 p-4 border-dashed rounded" style="border: 1px dashed #89c2d9">
+        <div class="d-flex justify-content-end">
+            <a href="{{ path('admin_user_create') }}">
+                <button class="btn btn-primary">Create User</button>
+            </a>
+        </div>
+
+        {% if users|length > 0 %}
+            <table id="usersTable" class="mt-3 table table-striped" style="width:100%">
+                <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Roles</th>
+                    <th>Join Date</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    <tr style="cursor: pointer;" onclick="window.location.href='{{ path('admin_user_show', {'user': user.id}) }}'; event.stopPropagation();">
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td class="small">{{ user.roles|join(', ') }}</td>
+                        <td>{{ user.createdAt|date('d/m/Y H:i') }}</td>
+                        <td>
+                            <div style="cursor: pointer;">
+                                <a href="{{ path('admin_user_edit', {user: user.id}) }}">
+                                    <span class="text-primary">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </span>
+                                </a>
+                            </div>
+                            <div style="cursor: pointer;">
+                                <a href="{{ path('admin_user_delete', {user: user.id}) }}">
+                                    <span class="text-danger" >
+                                        <i class="bi bi-archive delete-comment"></i> Delete
+                                    </span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="d-flex justify-content-center lead">
+                There are no users.
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

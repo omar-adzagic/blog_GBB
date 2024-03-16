@@ -4,7 +4,7 @@ namespace App\DataFixtures;
 
 use App\Entity\Post;
 use App\Entity\User;
-use App\Services\PostService;
+use App\Services\PostManager;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -15,11 +15,11 @@ class AppFixtures extends Fixture
      * @var UserPasswordHasherInterface
      */
     private $userPasswordHasher;
-    private $postService;
+    private $postManager;
 
-    public function __construct(UserPasswordHasherInterface $userPasswordHasher, PostService $postService) {
+    public function __construct(UserPasswordHasherInterface $userPasswordHasher, PostManager $postManager) {
         $this->userPasswordHasher = $userPasswordHasher;
-        $this->postService = $postService;
+        $this->postManager = $postManager;
     }
 
     private function createUser(
@@ -59,7 +59,7 @@ class AppFixtures extends Fixture
         $post = new Post();
         $post->setTitle($title);
         $post->setContent($content);
-        $slug = $this->postService->generateSlug($post->getTitle());
+        $slug = $this->postManager->generateSlug($post->getTitle());
         $post->setSlug($slug);
         $post->setUser($user);
         $manager->persist($post);

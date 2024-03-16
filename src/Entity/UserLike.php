@@ -10,7 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="user_likes")
  * @ORM\HasLifecycleCallbacks()
  */
 class UserLike

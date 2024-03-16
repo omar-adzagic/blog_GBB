@@ -1,0 +1,36 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+<div>{{ form_errors(form) }}</div>
+
+<div class="mb-3">
+    {{ form_label(form.username, 'Please enter the username', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.username, {'attr': {'class': 'form-control shadow-sm'}}) }}
+    {{ form_errors(form.username) }}
+</div>
+
+<div class="mb-3">
+    {{ form_label(form.email, 'Please enter the email', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.email, {'attr': {'class': 'form-control shadow-sm'}}) }}
+    {{ form_errors(form.email) }}
+</div>
+
+<div class="text-secondary my-4 pb-2 border-bottom">
+    Populate fields to change the password
+</div>
+
+<div class="row g-3 d-flex flex-column">
+    <div class="col-md-6">
+        {{ form_label(form.plainPassword.first, 'New Password', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.plainPassword.first, {'attr': {'class': 'form-control mb-2'}})}}
+        {{ form_errors(form.plainPassword.first) }}
+    </div>
+    <div class="col-md-6">
+        {{ form_label(form.plainPassword.second, 'Repeated New Password', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.plainPassword.second, {'attr': {'class': 'form-control mb-2'}})}}
+        {{ form_errors(form.plainPassword.second) }}
+    </div>
+</div>
+
+<div>
+    <button type="submit" class="btn btn-primary w-100 mt-4 mb-2">Save!</button>
+</div>
+{{ form_end(form) }}

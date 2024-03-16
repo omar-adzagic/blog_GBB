@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="posts")
+ * @ORM\Table(indexes={@ORM\Index(name="title_index", columns={"title"})})
  * @ORM\HasLifecycleCallbacks()
  */
 class Post
@@ -263,9 +263,9 @@ class Post
         return $this->is_published;
     }
 
-    public function setIsPublished(bool $is_published): self
+    public function setIsPublished(bool $isPublished): self
     {
-        $this->is_published = $is_published;
+        $this->is_published = $isPublished;
 
         return $this;
     }

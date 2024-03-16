@@ -29,27 +29,35 @@
     <div class="text-right">
         <div class="text-secondary d-flex">
             {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                <div>
-                    <a href="{{ path('app_post_add') }}" class="text-decoration-none">Add New</a>
+                <div class="mx-2">
+                    <a href="{{ path('app_post_create') }}" class="text-decoration-none">Add New</a>
                 </div>
-                <div class="ml-2">
+                <div class="mx-2">
                     <a href="{{ path('app_profile') }}" class="text-decoration-none">Profile</a>
                 </div>
                 {% if is_granted('ROLE_ADMIN') %}
-                    <div class="ml-2">
+                    <div class="mx-2">
                         <a href="{{ path('admin_panel_index') }}" class="text-decoration-none">Admin Panel</a>
                     </div>
                 {% endif %}
-                <div class="ml-2">
-                    <a href="{{ path('app_logout') }}" class="text-decoration-none">Logout</a>
+                <div class="mx-2 text-primary">
+                    <a href="{{ path('app_logout') }}" class="text-decoration-none">
+                        Logout
+                        <i class="bi bi-box-arrow-right"></i>
+                    </a>
                 </div>
             {% else %}
-                <div>
-                    <a href="{{ path('app_login') }}" class="text-decoration-none">Login</a>
-                </div>
-                <div class="ml-2">
-                    <a href="{{ path('app_register') }}" class="text-decoration-none">Register</a>
-                </div>
+                {% if app.request.attributes.get('_route') not in ['app_login', 'app_register'] %}
+                    <div class="mx-2 text-primary">
+                        <a href="{{ path('app_login') }}" class="text-decoration-none">
+                            Login
+                            <i class="bi bi-box-arrow-in-right"></i>
+                        </a>
+                    </div>
+                    <div class="mx-2">
+                        <a href="{{ path('app_register') }}" class="text-decoration-none">Register</a>
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
     </div>

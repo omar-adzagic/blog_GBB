@@ -6,10 +6,10 @@ use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="tags")
  * @ORM\HasLifecycleCallbacks()
  */
 class Tag
@@ -18,16 +18,18 @@ class Tag
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("tag_search")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
+     * @Groups("tag_search")
      */
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity=PostTag::class, mappedBy="tag")
+     * @ORM\OneToMany(targetEntity=PostTag::class, mappedBy="tag", cascade={"remove"})
      */
     private $postTags;
 

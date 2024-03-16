@@ -1,0 +1,11 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block title %}Editing a user{% endblock %}
+
+{% block bread %}
+    → <a href="{{ path('admin_tag_index') }}">Admin Users</a> → Edit
+{% endblock %}
+
+{% block body %}
+    {{ include ('admin/users/_form.html.twig') }}
+{% endblock %}

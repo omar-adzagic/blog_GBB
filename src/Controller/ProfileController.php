@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class ProfileController extends AbstractController
 {
@@ -30,6 +31,7 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/profile/edit/{id}", name="app_profile_edit")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function edit(
         User $user,

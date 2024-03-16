@@ -7,6 +7,8 @@ use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -48,7 +50,7 @@ class PostRepository extends ServiceEntityRepository
         }
     }
 
-    public function findAllWithComments(): array
+    public function findAllWithCommentsQB(): QueryBuilder
     {
         return $this->createQueryBuilder('p')
             ->leftJoin('p.comments', 'c')
@@ -57,7 +59,20 @@ class PostRepository extends ServiceEntityRepository
             ->addSelect('u')
             ->leftJoin('p.likedByUsers', 'l')
             ->addSelect('l')
-            ->orderBy('p.created_at', 'DESC')
+            ->orderBy('p.created_at', 'DESC');
+    }
+
+    public function findAllWithComments(): array
+    {
+        return $this->findAllWithCommentsQB()
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findPublishedWithComments(): array
+    {
+        return $this->findAllWithCommentsQB()
+            ->where('p.is_published = 1')
             ->getQuery()
             ->getResult();
     }
@@ -109,6 +124,24 @@ class PostRepository extends ServiceEntityRepository
         $qb->orderBy('p.created_at', 'DESC');
 
         return $qb;
+    }
+
+    public function findPublishedWithCommentCountQueryBuilder(int $userId)
+    {
+        return $this->findAllWithCommentCountQueryBuilder($userId)
+            ->where('p.is_published = 1');
+    }
+
+    public function findPostWithTags(int $postId)
+    {
+        return $this->createQueryBuilder('p')
+            ->leftJoin('p.postTags', 'pt')
+            ->leftJoin('pt.tag', 't')
+            ->addSelect('pt', 't')
+            ->where('p.id = :postId')
+            ->setParameter('postId', $postId)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     // /**
