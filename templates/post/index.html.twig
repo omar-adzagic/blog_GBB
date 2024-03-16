@@ -3,10 +3,17 @@
 {% block title %}All Posts{% endblock %}
 
 {% block body %}
-    <div class="filter-container my-3">
+    <div class="filter-container my-3 d-flex justify-content-between">
         <div class="form-group col-6 px-0">
             <input type="text" id="titleFilter" class="form-control" placeholder="Filter by title..." />
         </div>
+        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            <div class="mx-2">
+                <a href="{{ path('app_post_create') }}" class="text-decoration-none">
+                    <button class="btn btn-light text-primary border">Add New</button>
+                </a>
+            </div>
+        {% endif %}
     </div>
 
     <div id="postsContainer" class="row"></div>
@@ -105,6 +112,20 @@
                         titleLink.textContent = post.title;
                         titleDiv.appendChild(titleLink);
 
+                        if (post.image) {
+                            const imgDiv = document.createElement('div');
+                            imgDiv.classList.add('post-image-container', 'my-2');
+
+                            const img = document.createElement('img');
+                            img.setAttribute('src', `{{ images_public_path }}post_images/${post.image}`);
+                            img.setAttribute('style', 'max-width: 256px; max-height: 384px');
+                            img.classList.add('d-inline-block', 'rounded-circle', 'border', 'border-2', 'border-white');
+                            img.setAttribute('alt', 'Post image');
+
+                            imgDiv.appendChild(img);
+                            postDiv.appendChild(imgDiv);
+                        }
+
                         // Create the content div
                         const contentDiv = document.createElement('div');
                         contentDiv.classList.add('lead', 'text-justify', 'my-2');
@@ -196,7 +217,6 @@
                             const actionDiv = document.createElement('div');
                             actionDiv.classList.add('my-2', 'd-flex');
 
-                            console.log('post', post)
                             // Edit section
                             if (post.user_id === auth_id) {
                                 const editDiv = document.createElement('div');
@@ -219,17 +239,15 @@
 
                             // Comment section
                             const commentDiv = document.createElement('div');
-
                             const commentLink = document.createElement('a');
-                            commentLink.setAttribute('href', `/post/${post.id}/comment`);
-                            commentLink.classList.add('text-decoration-none');
-                            commentLink.innerHTML = `Comment <span class="px-1 rounded bg-light">${post.totalComments}</span>`;
+                            commentDiv.innerHTML = `Comments: <span class="px-1 rounded bg-light">${post.totalComments}</span>`;
 
                             commentDiv.appendChild(commentLink);
-                            actionDiv.appendChild(commentDiv);
+                            // actionDiv.appendChild(commentDiv);
 
                             // Append the actionDiv to the postDiv
                             infoDiv.appendChild(actionDiv);
+                            infoDiv.appendChild(commentDiv);
                         }
 
                         // Append the constructed post div to the posts container

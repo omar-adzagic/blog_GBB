@@ -6,36 +6,43 @@ namespace App\Controller\Admin;
 use App\Entity\Tag;
 use App\Form\TagType;
 use App\Repository\TagRepository;
+use App\Service\PaginationService;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
  * @Route("/admin")
+ * @IsGranted("ROLE_ADMIN")
  */
 class AdminTagController extends AbstractController
 {
     /**
      * @Route("/tags", name="admin_tag_index")
+     * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function index(TagRepository $tagRepository)
+    public function index(TagRepository $tagRepository, PaginationService $paginationService): Response
     {
-        $tags = $tagRepository->findAllLatest();
-        // Fetch tags from the database
-        // Render the template with tags data
+        $queryBuilder = $tagRepository->findAllLatestQB();
+        $pagination = $paginationService->paginate($queryBuilder);
+
         return $this->render('admin/tags/index.html.twig', [
-            'tags' => $tags
+            'pagination' => $pagination
         ]);
     }
 
     /**
      * @Route("/tags/search", name="admin_tag_search", methods={"GET"})
+     * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function search(Request $request, TagRepository $tagRepository, SerializerInterface $serializer): JsonResponse
+    public function search(Request $request, TagRepository $tagRepository): JsonResponse
     {
         $searchTerm = $request->query->get('q', '');
 
@@ -55,6 +62,7 @@ class AdminTagController extends AbstractController
 
     /**
      * @Route("/tags/create", name="admin_tag_create")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function create(Request $request, TagRepository $tagRepository)
     {
@@ -75,11 +83,9 @@ class AdminTagController extends AbstractController
 
     /**
      * @Route("/tags/{tag}", name="admin_tag_show")
+     * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function show(
-        Tag $tag,
-        TagRepository $tagRepository
-    )
+    public function show(Tag $tag): Response
     {
         return $this->render('admin/tags/show.html.twig', [
             'tag' => $tag
@@ -88,6 +94,7 @@ class AdminTagController extends AbstractController
 
     /**
      * @Route("/tags/{tag}/edit", name="admin_tag_edit")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function edit(Tag $tag, Request $request, TagRepository $tagRepository)
     {
@@ -108,8 +115,9 @@ class AdminTagController extends AbstractController
 
     /**
      * @Route("/tags/{tag}/delete", name="admin_tag_delete")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function delete(Tag $tag, EntityManagerInterface $entityManager)
+    public function delete(Tag $tag, EntityManagerInterface $entityManager): RedirectResponse
     {
         $entityManager->remove($tag);
         $entityManager->flush();

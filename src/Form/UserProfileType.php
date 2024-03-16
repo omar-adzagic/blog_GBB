@@ -4,9 +4,11 @@ namespace App\Form;
 
 use App\Entity\UserProfile;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Validator\Constraints\File;
 
 class UserProfileType extends AbstractType
 {
@@ -25,7 +27,22 @@ class UserProfileType extends AbstractType
                     'widget' => 'single_text',
                     'required' => false
                 ]
-            );
+            )
+            ->add('image', FileType::class, [
+                'label' => 'Profile image (JPG or PNG file)',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1024k',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/png'
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid PNG/JPEG image'
+                    ])
+                ]
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

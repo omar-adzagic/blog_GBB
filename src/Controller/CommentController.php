@@ -9,25 +9,40 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class CommentController extends AbstractController
 {
     /**
-     * @Route("/comments/{id}", name="delete_comment", methods={"DELETE"})
+     * @Route("/comments/{id}/delete", name="delete_comment")
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function deleteComment($id, Request $request, CommentRepository $commentRepository, EntityManagerInterface $entityManager): Response
+    public function deleteComment(Request $request, $id, CommentRepository $commentRepository, EntityManagerInterface $entityManager): Response
     {
-        // Perform your delete operation here. For example:
-         $comment = $commentRepository->find($id);
-         if ($comment) {
-             $entityManager->remove($comment);
-             $entityManager->flush();
+        $comment = $commentRepository->find($id);
+        if (!$comment) {
+            $this->addFlash('error', 'Comment not found.');
+            return $this->redirect($request->headers->get('referer'));
+        }
 
-             return $this->json(['message' => 'Comment deleted successfully.']);
-         }
+        // Check if the logged-in user is the author of the comment or has admin rights
+        // Adapt this check to your application's security logic
+        if ($comment->getAuthor()->getId() !== $this->getUser()->getId() && !$this->isGranted('ROLE_ADMIN')) {
+            throw new AccessDeniedException('You do not have permission to delete this comment.');
+        }
 
-        // Return an error response if the comment wasn't found or if the deletion failed
-        return $this->json(['error' => 'Comment not found'], Response::HTTP_NOT_FOUND);
+        // CSRF token validation for added security
+        $submittedToken = $request->request->get('_token');
+        if ($this->isCsrfTokenValid('delete'.$comment->getId(), $submittedToken)) {
+            $entityManager->remove($comment);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Comment deleted successfully.');
+        } else {
+            $this->addFlash('error', 'Invalid CSRF token.');
+        }
+
+        // Redirect back to the page where the delete operation was initiated
+        return $this->redirect($request->headers->get('referer'));
     }
 }

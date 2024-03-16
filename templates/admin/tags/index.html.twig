@@ -14,7 +14,7 @@
             </a>
         </div>
 
-        {% if tags|length > 0 %}
+        {% if pagination.items|length > 0 %}
             <table id="tagsTable" class="mt-3 table table-striped" style="width:100%">
                 <thead>
                 <tr>
@@ -24,7 +24,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for tag in tags %}
+                {% for tag in pagination.items %}
                     <tr style="cursor: pointer;" onclick="window.location.href='{{ path('admin_tag_show', {'tag': tag.id}) }}'; event.stopPropagation();">
                         <td>{{ tag.name }}</td>
                         <td>{{ tag.createdAt|date('d/m/Y H:i') }}</td>
@@ -48,6 +48,11 @@
                 {% endfor %}
                 </tbody>
             </table>
+
+            {% include 'admin/shared/_pagination.html.twig' with {
+                'pagination': pagination,
+                'indexRoute': 'admin_tag_index',
+            } %}
         {% else %}
             <div class="d-flex justify-content-center lead">
                 There are no tags.

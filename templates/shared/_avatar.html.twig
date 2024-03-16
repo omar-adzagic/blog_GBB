@@ -1,8 +1,15 @@
-{% if profile and profile.image %}
-    <img src="{{ profiles ~ profile.image }}"
-         style="height: {{size}}px; width: {{size}}px;"
-         class="d-inline-block rounded-circle border border-2 border-white" />
-{% else %}
-    <div style="height: {{size}}px; width: {{size}}px; font-size: 1.25rem;"
-         class="d-inline-block bg-secondary rounded-circle border border-2 border-white"></div>
-{% endif %}
+<div class="mr-2">
+    {% if profile and profile.image %}
+        <img src="{{ asset(images_public_path ~ 'profile_images/' ~ profile.image) }}"
+             style="width: {{size}}px;"
+             class="d-inline-block rounded-circle border border-2 border-white"
+             alt="Profile image"
+        />
+    {% else %}
+        <img src="{{ asset(images_public_path ~ 'profile_images/default_user.jpg') }}"
+             style="width: {{size}}px;"
+             class="d-inline-block rounded-circle border border-2 border-white"
+             alt="Default image"
+        />
+    {% endif %}
+</div>

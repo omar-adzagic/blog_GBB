@@ -19,13 +19,26 @@
     {{ form_errors(form.is_published) }}
 </div>
 
-{#<div class="form-check d-flex align-items-center mt-4 mb-4">#}
-{#    {{ form_widget(form.extraPrivacy, {'attr': {'class': 'form-check-input me-2'}}) }}#}
-{#    {{ form_label(form.extraPrivacy, 'I want extra privacy', {'label_attr': {'class': 'form-check-label'}}) }}#}
-{#</div>#}
-{#<div class="text-muted mb-4">#}
-{#    This post can only be seen by the people that you follow.#}
-{#</div>#}
+<div class="row mb-2 d-flex flex-column">
+    <div class="mb-2">Post Image</div>
+    <div class="mr-2">
+        {% if post.image %}
+            <img src="{{ asset(images_public_path ~ 'post_images/' ~ post.image) }}"
+                 style="width: 128px;"
+                 class="d-inline-block rounded-circle border border-2 border-white"
+                 alt="Post image"
+            />
+        {% endif %}
+    </div>
+
+    <div class="col-md-6 mt-3 d-flex flex-column">
+        <label for="{{ form.image.vars.id }}" class="btn btn-secondary">
+            Change
+            {{ form_widget(form.image, {'attr': {'class': 'visually-hidden'}}) }}
+        </label>
+        {{ form_errors(form.image) }}
+    </div>
+</div>
 
 <div>
     <button type="submit" class="btn btn-primary w-100 mt-4 mb-2">Save!</button>

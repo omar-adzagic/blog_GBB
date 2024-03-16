@@ -4,7 +4,7 @@ namespace App\DataFixtures;
 
 use App\Entity\Post;
 use App\Entity\User;
-use App\Services\PostManager;
+use App\Service\PostManager;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;

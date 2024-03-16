@@ -6,6 +6,7 @@ use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -64,14 +65,44 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->flush();
     }
 
-    public function findAllWithoutUserLatest(int $userId): array
+    public function findAllWithoutUserLatestQB(int $userId): QueryBuilder
     {
         return $this->createQueryBuilder('u')
             ->orderBy('u.created_at', 'DESC')
             ->where('u.id != :userId')
-            ->setParameter('userId', $userId)
+            ->setParameter('userId', $userId);
+    }
+
+    public function findAllWithoutUserLatest(int $userId): array
+    {
+        return $this->findAllWithoutUserLatestQB($userId)
             ->getQuery()
             ->getResult();
+    }
+
+    public function findFirstAdmin()
+    {
+        $entityManager = $this->getEntityManager();
+        $connection = $entityManager->getConnection();
+
+        $sql = '
+            SELECT id FROM user
+            WHERE JSON_CONTAINS(roles, :role) = 1
+            LIMIT 1
+        ';
+
+        // Execute the query to find the ID of the first admin user
+        $stmt = $connection->executeQuery($sql, ['role' => '"ROLE_ADMIN"']);
+        $result = $stmt->fetchAssociative();
+
+        if (!$result) {
+            return null; // No admin user found
+        }
+
+        $userId = $result['id'];
+
+        // Use the found user ID to retrieve and return the User entity
+        return $entityManager->getRepository(User::class)->find($userId);
     }
 
     public function findUserWithFavoredPosts(int $userId): ?User

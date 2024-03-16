@@ -9,10 +9,12 @@ use Doctrine\DBAL\Types\BooleanType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Validator\Constraints\File;
 
 class PostType extends AbstractType
 {
@@ -23,6 +25,21 @@ class PostType extends AbstractType
             ->add('content', TextareaType::class)
             ->add('is_published', CheckboxType::class, [
                 'label' => 'Published?'
+            ])
+            ->add('image', FileType::class, [
+                'label' => 'Profile image (JPG or PNG file)',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1024k',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/png'
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid PNG/JPEG image'
+                    ])
+                ]
             ])
             ->add('postTags', HiddenType::class, [
                 'mapped' => false,

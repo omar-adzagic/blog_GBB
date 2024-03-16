@@ -4,18 +4,17 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\UserProfile;
-use App\Form\UserProfileType;
 use App\Form\ProfileImageType;
-use App\Repository\PostRepository;
+use App\Form\UserProfileType;
 use App\Repository\UserFavoriteRepository;
 use App\Repository\UserRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class SettingsProfileController extends AbstractController
 {
@@ -68,7 +67,7 @@ class SettingsProfileController extends AbstractController
                 $newFileName = $safeFilename.'-'.uniqid().'.'.$profileImageFile->guessExtension();
 
                 try {
-                    $profileImageFile->move($this->getParameter('profiles_directory'), $newFileName);
+                    $profileImageFile->move($this->getParameter('images_directory'), $newFileName);
                 } catch (FileException $e) {
                     // Handle exception if something happens during file upload
                 }
@@ -90,12 +89,9 @@ class SettingsProfileController extends AbstractController
 
     /**
      * @Route("/favorite-posts", name="app_favorite_posts")
-     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function favoritePosts(
-        Request $request,
-        UserFavoriteRepository $userFavoriteRepository
-    ): Response
+    public function favoritePosts(UserFavoriteRepository $userFavoriteRepository): Response
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -112,13 +108,9 @@ class SettingsProfileController extends AbstractController
 
     /**
      * @Route("/user-activities", name="app_user_activities")
-     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function userActivities(
-        Request $request,
-        UserRepository $userRepository,
-        PostRepository $postRepository
-    ): Response
+    public function userActivities(UserRepository $userRepository): Response
     {
         /** @var User $user */
         $user = $this->getUser();

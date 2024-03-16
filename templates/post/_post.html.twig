@@ -4,6 +4,15 @@
             {{ post.title }}
         </a>
     </div>
+    <div class="my-2">
+        {% if post.image %}
+            <img src="{{ asset(images_public_path ~ 'post_images/' ~ post.image) }}"
+                 style="max-width: 256px; max-height: 384px"
+                 class="d-inline-block rounded-circle border border-2 border-white"
+                 alt="Post image"
+            />
+        {% endif %}
+    </div>
     <div class="lead text-justify my-2">
         {{ post.content }}
     </div>
@@ -18,7 +27,8 @@
         </div>
         {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
             {# The user is authenticated #}
-            <div class="mt-2 mb-1 d-flex">
+            <div class="my-2 d-flex">
+{#                TODO: Refactor this#}
                 {% set isLikedByCurrentUser = false %}
                 {% for userLike in post.likedByUsers %}
                     {% if userLike.user == app.user %}
@@ -31,7 +41,7 @@
 {#                        <a href="{{ path('app_unlike', { id: post.id }) }}" class="text-decoration-none d-flex align-items-center">#}
 {#                            Unlike <span class="px-2 rounded bg-light">{{ post.likedByUsers.count }}</span>#}
 {#                        </a>#}
-                        <button type="submit" class="btn btn-link text-decoration-none px-0">
+                        <button type="submit" class="btn btn-link text-decoration-none p-0">
                             Unlike <span class="px-2 rounded bg-light">{{ post.likedByUsers.count }}</span>
                             <i class="bi bi-heart-fill text-danger"></i>
                         </button>
@@ -41,14 +51,14 @@
 {#                        <a href="{{ path('app_like', { id: post.id }) }}" class="text-decoration-none d-flex align-items-center">#}
 {#                            Like <span class="px-2 rounded bg-light">{{ post.likedByUsers.count }}</span>#}
 {#                        </a>#}
-                        <button type="submit" class="btn btn-link text-decoration-none px-0">
+                        <button type="submit" class="btn btn-link text-decoration-none p-0">
                             Like <span class="px-2 rounded bg-light">{{ post.likedByUsers.count }}</span>
                             <i class="bi bi-heart text-danger"></i>
                         </button>
                     </form>
                 {% endif %}
             </div>
-            <div class="mt-1 mb-2 d-flex">
+            <div class="my-2 d-flex">
                 {% set isFavoredByCurrentUser = false %}
                 {% for userFavorite in post.favoredByUsers %}
                     {% if userFavorite.user == app.user %}
@@ -81,11 +91,9 @@
                         </a>
                     </div>
                 {% endif %}
-                <div>
-                    <a href="{{ path('app_post_comment', { post: post.id }) }}" class="text-decoration-none">
-                        Comment <span class="px-1 rounded bg-light">{{ post.comments.count }}</span>
-                    </a>
-                </div>
+            </div>
+            <div class="my-2">
+                Comments: <span class="px-1 rounded bg-light">{{ post.comments.count }}</span>
             </div>
         {% endif %}
     </div>

@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Tag;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -49,10 +50,15 @@ class TagRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findAllLatest(): array
+    public function findAllLatestQB(): QueryBuilder
     {
         return $this->createQueryBuilder('t')
-            ->orderBy('t.created_at', 'DESC')
+            ->orderBy('t.created_at', 'DESC');
+    }
+
+    public function findAllLatest(): array
+    {
+        return $this->findAllLatestQB()
             ->getQuery()
             ->getResult();
     }

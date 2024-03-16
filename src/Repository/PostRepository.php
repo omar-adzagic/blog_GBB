@@ -107,18 +107,17 @@ class PostRepository extends ServiceEntityRepository
                 '(SELECT COUNT(l2) FROM App\Entity\UserLike l2 WHERE l2.post = p.id) AS totalLikes',
                 '(SELECT COUNT(c2) FROM App\Entity\Comment c2 WHERE c2.post = p.id) AS totalComments'
             )
-            ->innerJoin('p.user', 'u')
-            ->leftJoin('p.comments', 'c');
+            ->innerJoin('p.user', 'u');
 
         if ($currentUserId) {
             // Add conditional likes information to the query
             $qb->addSelect(
                 "(SELECT COUNT(l) FROM App\Entity\UserLike l WHERE l.post = p AND l.user = :currentUserId) AS isLikedByCurrentUser"
             )
-            ->addSelect(
-                "(SELECT COUNT(f) FROM App\Entity\UserFavorite f WHERE f.post = p AND f.user = :currentUserId) AS isFavoredByCurrentUser"
-            )
-            ->setParameter('currentUserId', $currentUserId);
+                ->addSelect(
+                    "(SELECT COUNT(f) FROM App\Entity\UserFavorite f WHERE f.post = p AND f.user = :currentUserId) AS isFavoredByCurrentUser"
+                )
+                ->setParameter('currentUserId', $currentUserId);
         }
 
         $qb->orderBy('p.created_at', 'DESC');

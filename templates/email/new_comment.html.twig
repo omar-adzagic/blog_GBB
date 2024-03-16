@@ -1,0 +1,19 @@
+{# templates/email/new_comment.html.twig #}
+
+<h1>Hi {{ admin.username }}!</h1>
+
+<p>
+    A new comment was made by {{ comment.author.username }} on the post titled "{{ post.title }}":
+</p>
+
+<p>
+    "{{ comment.content }}"
+</p>
+
+<p>
+    You can view the post and the comment <a href="{{ url('app_post_show', {'slug': post.slug}) }}">here</a>.
+</p>
+
+<p>
+    Cheers!
+</p>

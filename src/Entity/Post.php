@@ -43,16 +43,17 @@ class Post
 
     /**
      * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="post", orphanRemoval=true)
+     * @ORM\OrderBy({"created_at" = "DESC"})
      */
     private $comments;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\UserLike", mappedBy="post")
+     * @ORM\OneToMany(targetEntity="App\Entity\UserLike", mappedBy="post", cascade={"remove"})
      */
     private $likedByUsers;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\UserFavorite", mappedBy="post")
+     * @ORM\OneToMany(targetEntity="App\Entity\UserFavorite", mappedBy="post", cascade={"remove"})
      */
     private $favoredByUsers;
 

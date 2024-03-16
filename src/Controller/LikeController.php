@@ -17,7 +17,7 @@ class LikeController extends AbstractController
 {
     /**
      * @Route("/like/{id}", name="app_like", methods={"POST"})
-     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
     public function like(
         Post $post,
@@ -43,7 +43,7 @@ class LikeController extends AbstractController
 
     /**
      * @Route("/unlike/{id}", name="app_unlike")
-     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
     public function unlike(
         Post $post,

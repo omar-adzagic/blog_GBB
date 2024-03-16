@@ -7,17 +7,25 @@ use App\Entity\Comment;
 use App\Entity\Post;
 use App\Form\CommentType;
 use App\Form\PostType;
+use App\Message\SendEmailMessage;
 use App\Repository\CommentRepository;
 use App\Repository\PostRepository;
-use App\Services\PostManager;
+use App\Repository\UserRepository;
+use App\Service\FileUploader;
+use App\Service\PostManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use App\Security\EmailVerifier;
 
 class PostController extends AbstractController
 {
@@ -31,7 +39,7 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/posts", name="delete_comment", methods={"GET"})
+     * @Route("/posts", name="delete_post_comment", methods={"GET"})
      */
     public function getPosts(
         Request $request,
@@ -86,30 +94,16 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/post/top-liked", name="app_post_topliked")
-     */
-    public function topLiked(PostRepository $posts): Response
-    {
-        return $this->render('post/top_liked.html.twig', ['posts' => $posts]); // $posts->findAllWithMinLikes(2)
-    }
-
-    /**
-     * @Route("/post/follows", name="app_post_follows")
-     * @IsGranted("IS_AUTHENTICATED_FULLY")
-     */
-    public function follows(PostRepository $posts): Response
-    {
-        /** @var User $currentUser */
-        $currentUser = $this->getUser();
-        return $this->render('post/follows.html.twig', ['posts' => $posts]); // $posts->findAllByAuthors($currentUser->getFollows())
-    }
-
-    /**
      * @Route("/post/{slug}", name="app_post_show")
      */
     public function showOne(
-        string $slug, Request $request, PostRepository $postRepository, CommentRepository $commentRepository
-    ): Response // * @IsGranted("VIEW", subject="post")
+        string $slug,
+        Request $request,
+        PostRepository $postRepository,
+        CommentRepository $commentRepository,
+        UserRepository $userRepository,
+        MessageBusInterface $messageBus
+    ): Response
     {
         $post = $postRepository->findOneBy(['slug' => $slug]);
 
@@ -118,7 +112,6 @@ class PostController extends AbstractController
         }
 
         $commentForm = $this->createForm(CommentType::class, new Comment());
-
         $commentForm->handleRequest($request);
 
         if ($commentForm->isSubmitted() && $commentForm->isValid()) {
@@ -127,11 +120,28 @@ class PostController extends AbstractController
             $comment->setPost($post);
             $commentRepository->add($comment, true);
             $this->addFlash('success', 'Your comment has been added.');
+
+            $userAdmin = $userRepository->findFirstAdmin();
+            if ($userAdmin) {
+                $email = (new TemplatedEmail())
+                    ->from(new Address('getByBus@test.com', 'Blog GBB'))
+                    ->to($userAdmin->getEmail())
+                    ->subject('New Comment was Made')
+                    ->htmlTemplate('email/new_comment.html.twig')
+                    ->context([
+                        'admin' => $userAdmin,
+                        'comment' => $comment,
+                        'post' => $post,
+                    ]);
+
+//                $mailer->send($email);
+                $messageBus->dispatch(new SendEmailMessage($email));
+            }
         }
 
         return $this->render('post/show.html.twig', [
             'post' => $post,
-            'commentForm' => $commentForm->createView()
+            'commentForm' => $commentForm->createView(),
         ]);
     }
 
@@ -139,22 +149,42 @@ class PostController extends AbstractController
      * @Route("/post/create", name="app_post_create", priority=2)
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function create(Request $request, PostRepository $posts, PostManager $postManager): Response
+    public function create(
+        Request $request,
+        PostRepository $posts,
+        PostManager $postManager,
+        FileUploader $fileUploader
+    ): Response
     {
-        $form = $this->createForm(PostType::class, new Post());
+        $newPost = new Post();
+        $form = $this->createForm(PostType::class, $newPost);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $post = $form->getData();
+
+            $postImageFile = $form->get('image')->getData();
+
+            if ($postImageFile) {
+                $newFileName = $fileUploader->upload($postImageFile, 'post_images/');
+                $post->setImage($newFileName);
+            }
+
             $post->setUser($this->getUser());
             $slug = $postManager->generateSlug($post->getTitle());
             $post->setSlug($slug);
             $posts->add($post, true);
+
             $this->addFlash('success', 'Your post has been added.');
+
             return $this->redirectToRoute('app_post');
         }
 
-        return $this->renderForm('post/create.html.twig', ['form' => $form]);
+        $responseData = [
+            'form' => $form,
+            'post' => $newPost,
+        ];
+        return $this->renderForm('post/create.html.twig', $responseData);
     }
 
     /**
@@ -164,7 +194,8 @@ class PostController extends AbstractController
     public function edit(
         Post $post, Request $request, PostRepository $posts,
         EntityManagerInterface $entityManager,
-        PostManager $postManager
+        PostManager $postManager,
+        FileUploader $fileUploader
     ): Response // * @IsGranted("EDIT", subject="post")
     {
         $authUserId = $this->getUser()->getId();
@@ -178,6 +209,18 @@ class PostController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $postImageFile = $form->get('image')->getData();
+
+            if ($postImageFile) {
+                $oldFilename = $post->getImage();
+                if ($oldFilename) {
+                    $fileUploader->deleteFile($oldFilename, '/post_images');
+                }
+
+                $newFileName = $fileUploader->upload($postImageFile, '/post_images');
+                $post->setImage($newFileName);
+            }
+
             // Set slug before persisting entity changes
             $slug = $postManager->generateSlug($post->getTitle());
             $post->setSlug($slug);

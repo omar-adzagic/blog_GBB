@@ -9,62 +9,80 @@ use App\Form\CommentType;
 use App\Form\PostType;
 use App\Repository\CommentRepository;
 use App\Repository\PostRepository;
-use App\Services\PostManager;
-use App\Services\TagManager;
+use App\Service\PaginationService;
+use App\Service\PostManager;
+use App\Service\TagManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\SerializerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
  * @Route("/admin")
+ * @IsGranted("ROLE_ADMIN")
  */
 class AdminPostController extends AbstractController
 {
     /**
      * @Route("/posts", name="admin_post_index")
+     * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function index(PostRepository $postRepository)
+    public function index(PostRepository $postRepository, PaginationService $paginationService)
     {
-        $posts = $postRepository->findAllWithComments();
-        // Fetch posts from the database
-        // Render the template with posts data
+        $queryBuilder = $postRepository->findAllWithCommentsQB();
+        $pagination = $paginationService->paginate($queryBuilder);
+
         return $this->render('admin/posts/index.html.twig', [
-            'posts' => $posts
+            'pagination' => $pagination
         ]);
     }
 
     /**
      * @Route("/posts/create", name="admin_post_create")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function create(
         Request $request,
         PostRepository $postRepository,
         TagManager $tagManager,
-        PostManager $postManager
+        PostManager $postManager,
+        EntityManagerInterface $entityManager
     ) {
         $form = $this->createForm(PostType::class, new Post());
         $form->handleRequest($request);
         $post = $form->getData();
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Assuming the form modifies the $post object directly
-            $post->setUser($this->getUser());
-            $slug = $postManager->generateSlug($post->getTitle());
-            $post->setSlug($slug);
-            $postRepository->add($post, true); // Assuming there's a save method to persist and flush the Post entity
+            $entityManager->beginTransaction();
+            try {
+                // Assuming the form modifies the $post object directly
+                $post->setUser($this->getUser());
+                $slug = $postManager->generateSlug($post->getTitle());
+                $post->setSlug($slug);
+                $postRepository->add($post, true); // Assuming there's a save method to persist and flush the Post entity
 
-            $requestPostTagIds = explode(',', $request->request->get('postTags', ''));
-            $submittedTagIds = array_map(function ($tagIdString) {return (int) $tagIdString; }, $requestPostTagIds);
-            $submittedTagIds = array_filter($submittedTagIds);
+                $requestPostTagIds = explode(',', $request->request->get('postTags', ''));
+                $submittedTagIds = array_map(function ($tagIdString) {
+                    return (int)$tagIdString;
+                }, $requestPostTagIds);
+                $submittedTagIds = array_filter($submittedTagIds);
 
-            if (count($submittedTagIds)) {
-                $tagManager->addTagsToPost($post, $submittedTagIds, $this->getUser());
+                if (count($submittedTagIds)) {
+                    $tagManager->addTagsToPost($post, $submittedTagIds, $this->getUser());
+                }
+                $entityManager->commit();
+
+                $this->addFlash('success', 'Post has been created.');
+                return $this->redirectToRoute('admin_post_index');
+            } catch (\Exception $e) {
+                $entityManager->rollback();
+                $this->addFlash('error', 'An error occurred. The post could not be created.');
             }
-
-            $this->addFlash('success', 'Post has been created.');
-            return $this->redirectToRoute('admin_post_index');
         }
 
         // Initially, no tags are associated with the new post, so no need to serialize post tags here
@@ -79,16 +97,16 @@ class AdminPostController extends AbstractController
 
     /**
      * @Route("/posts/{post}", name="admin_post_show")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function show(
         Post $post,
         Request $request,
         PostRepository $postRepository,
         CommentRepository $commentRepository
-    )
+    ): Response
     {
         $commentForm = $this->createForm(CommentType::class, new Comment());
-
         $commentForm->handleRequest($request);
 
         if ($commentForm->isSubmitted() && $commentForm->isValid()) {
@@ -107,6 +125,7 @@ class AdminPostController extends AbstractController
 
     /**
      * @Route("/posts/{post}/edit", name="admin_post_edit")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function edit(
         int $post,
@@ -156,8 +175,9 @@ class AdminPostController extends AbstractController
 
     /**
      * @Route("/posts/{post}/delete", name="admin_post_delete")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function delete(Post $post, EntityManagerInterface $entityManager)
+    public function delete(Post $post, EntityManagerInterface $entityManager): RedirectResponse
     {
         $entityManager->remove($post);
         $entityManager->flush();
@@ -166,6 +186,4 @@ class AdminPostController extends AbstractController
 
         return $this->redirectToRoute('admin_post_index');
     }
-
-    // Add methods for creating, editing, and deleting posts
 }

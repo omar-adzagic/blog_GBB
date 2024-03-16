@@ -1,0 +1,35 @@
+{% set paginationData = pagination.getPaginationData %}
+
+{% if paginationData.pageCount > 1 %}
+    <div class="d-flex justify-content-end">
+        <!-- Pagination -->
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                {% set prev = pagination.currentPageNumber - 1 %}
+                {% set next = pagination.currentPageNumber + 1 %}
+
+                {% if prev > 0 %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ path(indexRoute, {'page': prev}) }}">Previous</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                {% endif %}
+
+                {% for i in 1..paginationData.pageCount %}
+                    <li class="page-item {{ i == pagination.currentPageNumber ? 'active' : '' }}">
+                        <a class="page-link" href="{{ path(indexRoute, {'page': i}) }}">{{ i }}</a>
+                    </li>
+                {% endfor %}
+
+                {% if next <= paginationData.pageCount %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ path(indexRoute, {'page': next}) }}">Next</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Next</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+{% endif %}

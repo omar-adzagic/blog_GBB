@@ -18,7 +18,7 @@ class FavoriteController extends AbstractController
 {
     /**
      * @Route("/favorite/{id}", name="app_favorite")
-     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
     public function addToFavorites(
         Post $post,
@@ -45,7 +45,7 @@ class FavoriteController extends AbstractController
 
     /**
      * @Route("/remove-favorite/{id}", name="app_remove_favorite")
-     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
     public function removeFromFavorites(
         Post $post,
