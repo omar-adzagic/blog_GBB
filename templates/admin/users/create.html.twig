@@ -1,9 +1,13 @@
 {% extends 'admin/admin_base.html.twig' %}
 
-{% block title %}Creating a user{% endblock %}
+{% block title %}
+    {{ 'create_user'|trans({}, null, app.session.get('_locale', 'en')) }}
+{% endblock %}
 
 {% block bread %}
-    → <a href="{{ path('admin_tag_index') }}">Admin Users</a> → Create
+    → <a href="{{ path('admin_tag_index') }}">
+    {{ 'users'|trans({}, null, app.session.get('_locale', 'en')) }}
+</a> → {{ 'create'|trans({}, null, app.session.get('_locale', 'en')) }}
 {% endblock %}
 
 {% block body %}

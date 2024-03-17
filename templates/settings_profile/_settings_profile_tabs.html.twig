@@ -2,25 +2,18 @@
     {% block tabs %}
         {% embed 'shared/_tab.html.twig' with { route: 'app_profile', classes: 'nav-item' } %}
             {% block content %}
-                <span class="mx-2">Profile</span>
+                <span class="mx-2">
+                    {{ 'profile'|trans({}, null, app.session.get('_locale', 'en')) }}
+                </span>
             {% endblock %}
             {% block path %}
                 {{ path('app_profile') }}
             {% endblock %}
         {% endembed %}
 
-{#        {% embed 'shared/_tab.html.twig' with { route: 'app_profile_settings', params: {'tab': 'image'}, classes: 'nav-item ms-2' } %}#}
-{#            {% block content %}#}
-{#                Profile Image#}
-{#            {% endblock %}#}
-{#            {% block path %}#}
-{#                {{ path('app_profile_settings', {'tab': 'image'}) }}#}
-{#            {% endblock %}#}
-{#        {% endembed %}#}
-
         {% embed 'shared/_tab.html.twig' with { route: 'app_favorite_posts', classes: 'nav-item ms-2' } %}
             {% block content %}
-                Favorite Posts
+                {{ 'favorite_posts'|trans({}, null, app.session.get('_locale', 'en')) }}
             {% endblock %}
             {% block path %}
                 {{ path('app_favorite_posts') }}
@@ -29,7 +22,7 @@
 
         {% embed 'shared/_tab.html.twig' with { route: 'app_user_activities', classes: 'nav-item ms-2' } %}
             {% block content %}
-                User Activities
+                {{ 'user_activities'|trans({}, null, app.session.get('_locale', 'en')) }}
             {% endblock %}
             {% block path %}
                 {{ path('app_user_activities') }}

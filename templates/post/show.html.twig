@@ -1,9 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Post - {{ post.title }}{% endblock %}
+{% block title %}
+    {{ 'post'|trans({}, null, app.session.get('_locale')) }} - {{ post.title }}
+{% endblock %}
 
 {% block bread %}
-    → Post
+    → {{ 'post'|trans({}, null, app.session.get('_locale')) }}
 {% endblock %}
 
 {% block body %}
@@ -29,15 +31,21 @@
         <div>
             {{ form_start(commentForm) }}
             <div>{{ form_errors(commentForm)}}</div>
-
             <div class="my-3">
-                {{ form_label(commentForm.content, 'Enter the comment', {'label_attr': {'class': 'form-label'}}) }}
+                {% set labelTranslation = 'enter_the_comment'|trans({}, null, app.session.get('_locale', 'en')) %}
+                {{ form_label(
+                    commentForm.content,
+                    labelTranslation,
+                    {'label_attr': {'class': 'form-label'}}
+                ) }}
                 {{ form_widget(commentForm.content, {'attr': {'class': 'form-control shadow-sm'}}) }}
                 {{ form_errors(commentForm.content) }}
             </div>
 
             <div class="my-3">
-                <button type="submit" class="btn btn-primary w-100">Add comment!</button>
+                <button type="submit" class="btn btn-primary w-100">
+                    {{ 'add_comment'|trans({}, null, app.session.get('_locale')) }}
+                </button>
             </div>
             {{ form_end(commentForm) }}
         </div>
@@ -62,15 +70,15 @@
                 <div class="d-flex align-items-center">
                     <div class="border-end me-3 pe-3 {% if not loop.last %}border-2{% endif %}" style="min-height: 3rem;"></div>
                     <div>{{ comment.content }}</div>
-                    {% if comment.author.id == app.user.id or is_granted('ROLE_ADMIN') %}
+                    {% if (is_granted('IS_AUTHENTICATED_FULLY') and comment.author.id == app.user.id) or is_granted('ROLE_ADMIN') %}
                         <div class="ml-2 lead">
                             <form action="{{ path('delete_comment', {'id': comment.id}) }}"
                                   method="post"
                                   onsubmit="return confirm('Are you sure you want to delete this comment?');"
                             >
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.id) }}"/>
-                                <button type="submit" class="btn btn-lg">
-                                    <i class="bi bi-archive text-danger" style="cursor: pointer;"></i>
+                                <button type="submit" class="btn btn-danger px-2 py-1">
+                                    <i class="bi bi-archive text-white" style="cursor: pointer;"></i>
                                 </button>
                             </form>
                         </div>

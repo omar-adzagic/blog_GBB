@@ -1,16 +1,18 @@
 {% extends 'admin/admin_base.html.twig' %}
 
-{% block title %}Admin - Tags{% endblock %}
+{% block title %}
+    {{ 'admin'|trans({}, null, app.session.get('_locale', 'en')) }} - {{ 'tags'|trans({}, null, app.session.get('_locale', 'en')) }}
+{% endblock %}
 
 {% block header_text %}
-    Tags Management
+    {{ 'tags_management'|trans({}, null, app.session.get('_locale', 'en')) }}
 {% endblock %}
 
 {% block body %}
     <div class="mt-3 p-4 rounded" style="border: 1px dashed #89c2d9">
         <div class="d-flex justify-content-end">
             <a href="{{ path('admin_tag_create') }}">
-                <button class="btn btn-primary">Create Tag</button>
+                <button class="btn btn-primary">{{ 'create_tag'|trans({}, null, app.session.get('_locale', 'en')) }}</button>
             </a>
         </div>
 
@@ -18,9 +20,9 @@
             <table id="tagsTable" class="mt-3 table table-striped" style="width:100%">
                 <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Created</th>
-                    <th>Actions</th>
+                    <th>{{ 'name'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
+                    <th>{{ 'created'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
+                    <th>{{ 'actions'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -32,14 +34,14 @@
                             <div style="cursor: pointer;">
                                 <a href="{{ path('admin_tag_edit', {tag: tag.id}) }}">
                                     <span class="text-primary">
-                                        <i class="bi bi-pencil-square"></i> Edit
+                                        <i class="bi bi-pencil-square"></i> {{ 'edit'|trans({}, null, app.session.get('_locale', 'en')) }}
                                     </span>
                                 </a>
                             </div>
                             <div style="cursor: pointer;">
                                 <a href="{{ path('admin_tag_delete', {tag: tag.id}) }}">
                                     <span class="text-danger" >
-                                        <i class="bi bi-archive delete-comment"></i> Delete
+                                        <i class="bi bi-archive delete-comment"></i> {{ 'delete'|trans({}, null, app.session.get('_locale', 'en')) }}
                                     </span>
                                 </a>
                             </div>
@@ -55,7 +57,7 @@
             } %}
         {% else %}
             <div class="d-flex justify-content-center lead">
-                There are no tags.
+                {{ 'no data'|trans({}, null, app.session.get('_locale', 'en')) }}
             </div>
         {% endif %}
     </div>

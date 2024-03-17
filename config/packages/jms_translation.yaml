@@ -1,0 +1,8 @@
+jms_translation:
+  configs:
+    app:
+      dirs: ["%kernel.project_dir%/src", "%kernel.project_dir%/templates"]
+      output_dir: "%kernel.project_dir%/translations"
+      output_format: yaml
+      excluded_names: ["*TestCase.php", "*Test.php"]
+      excluded_dirs: [cache, data, logs]

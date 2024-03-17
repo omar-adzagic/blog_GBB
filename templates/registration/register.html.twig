@@ -1,9 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}
+    {{ 'register'|trans({}, null, app.session.get('_locale')) }}
+{% endblock %}
 
 {% block bread %}
-    → Register
+    → {{ 'register'|trans({}, null, app.session.get('_locale')) }}
 {% endblock %}
 
 {% block body %}
@@ -13,57 +15,82 @@
 
     {{ form_start(registrationForm, {'attre': {'novalidate': 'novalidate'}}) }}
     <div class="h5 mb-3">
-        Basic Information
+        {{ 'basic_info'|trans({}, null, app.session.get('_locale')) }}
     </div>
     <div class="text-secondary mb-4 pb-2 border-bottom">
-        Enter your credentials
+        {{ 'enter_your_credentials'|trans({}, null, app.session.get('_locale')) }}
     </div>
 
     <div>
-        {{ form_label(registrationForm.username, 'Username', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_label(
+            registrationForm.username,
+            'username'|trans({}, null, app.session.get('_locale')),
+            {'label_attr': {'class': 'form-label'}}
+        ) }}
         {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control mb-2'}})}}
         {{ form_errors(registrationForm.username) }}
     </div>
 
     <div>
-        {{ form_label(registrationForm.email, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_label(
+            registrationForm.email,
+            'email'|trans({}, null, app.session.get('_locale')),
+            {'label_attr': {'class': 'form-label'}}
+        ) }}
         {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control mb-2'}})}}
         {{ form_errors(registrationForm.email) }}
     </div>
 
     <div class="row g-3">
         <div class="col-md-6">
-            {{ form_label(registrationForm.plainPassword.first, 'Password', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_label(
+                registrationForm.plainPassword.first,
+                'password'|trans({}, null, app.session.get('_locale')),
+                {'label_attr': {'class': 'form-label'}}
+            ) }}
             {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control mb-2'}})}}
             {{ form_errors(registrationForm.plainPassword.first) }}
         </div>
         <div class="col-md-6">
-            {{ form_label(registrationForm.plainPassword.second, 'Repeated Password', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_label(
+                registrationForm.plainPassword.second,
+                'repeated_password'|trans({}, null, app.session.get('_locale')),
+                {'label_attr': {'class': 'form-label'}}
+            ) }}
             {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control mb-2'}})}}
             {{ form_errors(registrationForm.plainPassword.second) }}
         </div>
     </div>
 
-    <div class="d-flex align-items-center mt-3 mb-3">
-        {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input me-2'}}) }}
-        {{ form_label(registrationForm.agreeTerms, 'Agree to terms', {'label_attr': {'class': 'form-label'}}) }}
+    <div class="d-flex align-items-center my-3">
+        {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input mb-2'}}) }}
+        {{ form_label(
+            registrationForm.agreeTerms,
+            'agree_to_terms'|trans({}, null, app.session.get('_locale')),
+            {'label_attr': {'class': 'form-label'}}
+        ) }}
     </div>
 
     <div class="h5 mt-4 mb-3">
-        Your Profile
+        {{ 'your_profile'|trans({}, null, app.session.get('_locale')) }}
     </div>
     <div class="text-secondary mb-4 pb-2 border-bottom">
-        Enter more (optional) details about yourself. You can do it later.
+        {{ 'more_optional_details'|trans({}, null, app.session.get('_locale')) }}
     </div>
 
     {{ include ('/settings_profile/_profile_form.html.twig', { form: registrationForm.userProfile, readonly: false }) }}
 
     <div>
-        <button type="submit" class="btn btn-primary w-100 mt-3 mb-2">Register</button>
+        <button type="submit" class="btn btn-primary w-100 mt-3 mb-2">
+            {{ 'register_2'|trans({}, null, app.session.get('_locale')) }}
+        </button>
     </div>
     {{ form_end(registrationForm) }}
 
     <div class="mt-2 text-center text-secondary">
-        Already have an account? <a href="{{ path('app_login') }}" class="link-primary">Login here</a>
+        {{ 'already_have_account'|trans({}, null, app.session.get('_locale')) }}
+        <a href="{{ path('app_login') }}" class="link-primary">
+            {{ 'login_here'|trans({}, null, app.session.get('_locale')) }}
+        </a>
     </div>
 {% endblock %}

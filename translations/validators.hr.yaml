@@ -1,0 +1,7 @@
+'Please enter a password': 'Please enter a password'
+'Please enter a username': 'Please enter a username'
+'Please enter an email': 'Please enter an email'
+'Please upload a valid PNG/JPEG image': 'Please upload a valid PNG/JPEG image'
+'The password fields must match.': 'The password fields must match.'
+'You should agree to our terms.': 'You should agree to our terms.'
+'Your password should be at least {{ limit }} characters': 'Your password should be at least {{ limit }} characters'

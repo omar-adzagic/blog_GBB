@@ -1,11 +1,19 @@
 {% extends 'admin/admin_base.html.twig' %}
 
-{% block title %}Admin Panel{% endblock %}
+{% block title %}
+    {{ 'admin_panel'|trans({}, null, app.session.get('_locale', 'en')) }}
+{% endblock %}
 
 {% block body %}
-    <h1>Admin panel</h1>
+    <h1>
+        {{ 'admin_panel'|trans({}, null, app.session.get('_locale', 'en')) }}
+    </h1>
     <div class="mt-4">
-        <p class="lead">This is the admin panel of the website.</p>
-        <p class="lead">Here, admins can change data about posts, tags and users.</p>
+        <p class="lead">
+            {{ 'admin_panel_text_1'|trans({}, null, app.session.get('_locale', 'en')) }}
+        </p>
+        <p class="lead">
+            {{ 'admin_panel_text_2'|trans({}, null, app.session.get('_locale', 'en')) }}
+        </p>
     </div>
 {% endblock %}

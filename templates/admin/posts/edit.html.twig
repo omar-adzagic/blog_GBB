@@ -1,6 +1,6 @@
 {% extends 'admin/admin_base.html.twig' %}
 
-{% block title %}Editing a Post{% endblock %}
+{% block title %}{{ 'edit_post'|trans({}, null, app.session.get('_locale', 'en')) }}{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -12,7 +12,9 @@
 {% endblock %}
 
 {% block bread %}
-    → <a href="{{ path('admin_post_index') }}">Admin Posts</a> → Edit
+    → <a href="{{ path('admin_post_index') }}">
+    {{ 'posts'|trans({}, null, app.session.get('_locale', 'en')) }}
+</a> → {{ 'edit'|trans({}, null, app.session.get('_locale', 'en')) }}
 {% endblock %}
 
 {% block body %}

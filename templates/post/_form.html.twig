@@ -2,25 +2,46 @@
 <div>{{ form_errors(form) }}</div>
 
 <div class="mb-3">
-    {{ form_label(form.title, 'Please enter the title', {'label_attr': {'class': 'form-label'}}) }}
+    {% set labelTranslation = 'enter_the_title'|trans({}, null, app.session.get('_locale', 'en')) %}
+    {{ form_label(
+        form.title,
+        labelTranslation,
+        {'label_attr': {'class': 'form-label'}})
+    }}
     {{ form_widget(form.title, {'attr': {'class': 'form-control shadow-sm'}}) }}
     {{ form_errors(form.title) }}
 </div>
 
 <div class="mb-3">
-    {{ form_label(form.content, 'Please enter the post text', {'label_attr': {'class': 'form-label'}}) }}
+    {% set labelTranslation = 'enter_the_text'|trans({}, null, app.session.get('_locale', 'en')) %}
+    {{ form_label(
+        form.content,
+        labelTranslation,
+        {'label_attr': {'class': 'form-label'}}
+    ) }}
     {{ form_widget(form.content, {'attr': {'class': 'form-control shadow-sm'}}) }}
     {{ form_errors(form.content) }}
 </div>
 
-<div class="mb-3">
-    {{ form_label(form.is_published, 'Publish?', {'label_attr': {'class': 'form-label'}}) }}
-    {{ form_widget(form.is_published) }}
-    {{ form_errors(form.is_published) }}
-</div>
+{% if is_granted('ROLE_ADMIN') %}
+    <div class="mb-3">
+        {% set labelTranslation = 'publish?'|trans({}, null, app.session.get('_locale', 'en')) %}
+        {{ form_label(
+            form.is_published,
+            labelTranslation,
+            {'label_attr': {'class': 'form-label'}}
+        ) }}
+        {{ form_widget(form.is_published) }}
+        {{ form_errors(form.is_published) }}
+    </div>
+{% else %}
+    {{ form_widget(form.is_published, {'attr': {'style': 'display: none;'}}) }}
+{% endif %}
 
 <div class="row mb-2 d-flex flex-column">
-    <div class="mb-2">Post Image</div>
+    <div class="mb-2">
+        {{ 'post_image'|trans({}, null, app.session.get('_locale')) }}
+    </div>
     <div class="mr-2">
         {% if post.image %}
             <img src="{{ asset(images_public_path ~ 'post_images/' ~ post.image) }}"
@@ -33,7 +54,7 @@
 
     <div class="col-md-6 mt-3 d-flex flex-column">
         <label for="{{ form.image.vars.id }}" class="btn btn-secondary">
-            Change
+            {{ 'change'|trans({}, null, app.session.get('_locale')) }}
             {{ form_widget(form.image, {'attr': {'class': 'visually-hidden'}}) }}
         </label>
         {{ form_errors(form.image) }}
@@ -41,6 +62,8 @@
 </div>
 
 <div>
-    <button type="submit" class="btn btn-primary w-100 mt-4 mb-2">Save!</button>
+    <button type="submit" class="btn btn-primary w-100 mt-4 mb-2">
+        {{ 'save'|trans({}, null, app.session.get('_locale')) }}
+    </button>
 </div>
 {{ form_end(form) }}

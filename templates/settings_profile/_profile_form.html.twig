@@ -2,19 +2,21 @@
     {% if readonly %}
         <div class="d-flex justify-content-end col-md-6">
             <a href="{{ path('app_profile_edit', {'id': app.user.id}) }}" class="btn btn-primary">
-                <i class="bi bi-pencil-square"></i> Edit
+                <i class="bi bi-pencil-square"></i> {{ 'edit'|trans({}, null, app.session.get('_locale')) }}
             </a>
         </div>
     {% endif %}
 
     <div class="row mb-2 d-flex flex-column">
-        <div class="mb-2">Profile Image</div>
+        <div class="mb-2">
+            {{ 'profile_image'|trans({}, null, app.session.get('_locale')) }}
+        </div>
         {{ include('shared/_avatar.html.twig', {size: 128, profile: app.user.userProfile}) }}
 
         {% if not readonly %}
             <div class="col-md-6 mt-3 d-flex flex-column">
                 <label for="{{ form.image.vars.id }}" class="btn btn-secondary">
-                    Change
+                    {{ 'change'|trans({}, null, app.session.get('_locale')) }}
                     {{ form_widget(form.image, {'attr': {'class': 'visually-hidden'}}) }}
                 </label>
                 {{ form_errors(form.image) }}
@@ -27,36 +29,44 @@
 
 <div class="row mb-2">
     <div class="col-md-6">
-        {{ form_label(form.name, 'Your Name', {'label_attr': {'class': 'form-label'}}) }}
+        {% set labelTranslation = 'your_name'|trans({}, null, app.session.get('_locale', 'en')) %}
+        {{ form_label(form.name, labelTranslation, {'label_attr': {'class': 'form-label'}}) }}
         {{ form_widget(form.name, {'attr': {'readonly': readonly, 'class': 'form-control'}}) }}
     </div>
 </div>
 
-{#{{ form_label(form.bio, 'Bio', {'label_attr': {'class': 'form-label'}}) }}#}
-{#{{ form_widget(form.bio, {'attr': {'class': 'form-control mb-3'}}) }}#}
+<div class="row mb-2">
+    <div class="col-md-6">
+        {% set labelTranslation = 'date_of_birth'|trans({}, null, app.session.get('_locale', 'en')) %}
+        {{ form_label(
+            form.dateOfBirth,
+            labelTranslation,
+            {'label_attr': {'class': 'form-label'}}
+        ) }}
+        {{ form_widget(form.dateOfBirth, {'attr': {'readonly': readonly, 'class': 'form-control mb-3'}}) }}
+    </div>
+</div>
 
 <div class="row mb-2">
     <div class="col-md-6">
-        {{ form_label(form.websiteUrl, 'Website URL', {'label_attr': {'class': 'form-label'}}) }}
+        {% set labelTranslation = 'website_url'|trans({}, null, app.session.get('_locale', 'en')) %}
+        {{ form_label(
+            form.websiteUrl,
+            labelTranslation,
+            {'label_attr': {'class': 'form-label'}}
+        ) }}
         {{ form_widget(form.websiteUrl, {'attr': {'readonly': readonly, 'class': 'form-control'}}) }}
     </div>
 </div>
 
 <div class="row mb-2">
-{#    <div class="col-md-6">#}
-{#        {{ form_label(form.company, 'Company', {'label_attr': {'class': 'form-label'}}) }}#}
-{#        {{ form_widget(form.company, {'attr': {'class': 'form-control'}}) }}#}
-{#    </div>#}
-
     <div class="col-md-6">
-        {{ form_label(form.location, 'Location', {'label_attr': {'class': 'form-label'}}) }}
+        {% set labelTranslation = 'location'|trans({}, null, app.session.get('_locale', 'en')) %}
+        {{ form_label(
+            form.location,
+            labelTranslation,
+            {'label_attr': {'class': 'form-label'}}
+        ) }}
         {{ form_widget(form.location, {'attr': {'readonly': readonly, 'class': 'form-control'}}) }}
-    </div>
-</div>
-
-<div class="row mb-2">
-    <div class="col-md-6">
-        {{ form_label(form.dateOfBirth, 'Date of birth', {'label_attr': {'class': 'form-label'}}) }}
-        {{ form_widget(form.dateOfBirth, {'attr': {'readonly': readonly, 'class': 'form-control mb-3'}}) }}
     </div>
 </div>

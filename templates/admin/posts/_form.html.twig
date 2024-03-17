@@ -1,36 +1,52 @@
 {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 <div>{{ form_errors(form) }}</div>
-
-<div class="mb-3">
-    {{ form_label(form.title, 'Please enter the title', {'label_attr': {'class': 'form-label'}}) }}
-    {{ form_widget(form.title, {'attr': {'class': 'form-control shadow-sm'}}) }}
-    {{ form_errors(form.title) }}
-</div>
-
-<div class="mb-3">
-    {{ form_label(form.content, 'Please enter the post text', {'label_attr': {'class': 'form-label'}}) }}
-    {{ form_widget(form.content, {'attr': {'class': 'form-control shadow-sm'}}) }}
-    {{ form_errors(form.content) }}
-</div>
-
-<div class="mb-3">
-    {{ form_label(form.is_published, 'Publish?', {'label_attr': {'class': 'form-label'}}) }}
-    {{ form_widget(form.is_published) }}
-    {{ form_errors(form.is_published) }}
-</div>
-
-{{ form_row(form.postTags, {'attr': {'style': 'display: none;'}}) }}
-
-<div class="col-6 px-0">
-    <div id="tags-container" class="mb-3" data-post-tags-json="{{ postTagsJson ?? '[]' }}"></div>
-    <div>
-        <input type="text" id="tag-input" class="form-control" placeholder="Add a tag" />
+<div class="p-4 bg-light rounded" style="border: 1px dashed #89c2d9">
+    <div class="col-5 px-0 mb-3">
+        {% set labelTranslation = 'enter_the_title'|trans({}, null, app.session.get('_locale', 'en')) %}
+        {{ form_label(
+            form.title,
+            labelTranslation,
+            {'label_attr': {'class': 'form-label'}}
+        ) }}
+        {{ form_widget(form.title, {'attr': {'class': 'form-control shadow-sm'}}) }}
+        {{ form_errors(form.title) }}
     </div>
-    <div id="tag-suggestions" class="list-group"></div>
-    <input type="hidden" id="tag-ids" name="postTags" value="">
+
+    <div class="col-12 px-0 mb-3">
+        {% set labelTranslation = 'enter_the_text'|trans({}, null, app.session.get('_locale', 'en')) %}
+        {{ form_label(
+            form.content,
+            labelTranslation,
+            {'label_attr': {'class': 'form-label'}}
+        ) }}
+        {{ form_widget(form.content, {'attr': {'class': 'form-control shadow-sm'}}) }}
+        {{ form_errors(form.content) }}
+    </div>
+
+    <div class="col-6 mb-3">
+        {% set labelTranslation = 'publish?'|trans({}, null, app.session.get('_locale', 'en')) %}
+        {{ form_label(
+            form.is_published,
+            labelTranslation,
+            {'label_attr': {'class': 'form-label'}}
+        ) }}
+        {{ form_widget(form.is_published) }}
+        {{ form_errors(form.is_published) }}
+    </div>
+
+    {{ form_row(form.postTags, {'attr': {'style': 'display: none;'}}) }}
+
+    <div class="col-5 px-0">
+        <div id="tags-container" class="mb-3" data-post-tags-json="{{ postTagsJson ?? '[]' }}"></div>
+        <div>
+            <input type="text" id="tag-input" class="form-control" placeholder="{{ 'add_tag'|trans({}, null, app.session.get('_locale', 'en')) }}" />
+        </div>
+        <div id="tag-suggestions" class="list-group"></div>
+        <input type="hidden" id="tag-ids" name="postTags" value="">
+    </div>
 </div>
 
-<div>
-    <button type="submit" class="btn btn-primary w-100 mt-4 mb-2">Save!</button>
-</div>
+<button type="submit" class="col-6 btn btn-primary w-100 mt-4 mb-2">
+    {{ 'save'|trans({}, null, app.session.get('_locale', 'en')) }}
+</button>
 {{ form_end(form) }}

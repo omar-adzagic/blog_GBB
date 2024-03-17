@@ -7,7 +7,7 @@
         {% endfor %}
     {% else %}
         <div class="col">
-            There's nothing here yet!
+            {{ 'nothing_here'|trans({}, null, app.session.get('_locale', 'en')) }}
         </div>
     {% endif %}
 </div>

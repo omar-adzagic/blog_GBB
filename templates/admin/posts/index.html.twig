@@ -1,16 +1,20 @@
 {% extends 'admin/admin_base.html.twig' %}
 
-{% block title %}Admin - Posts{% endblock %}
+{% block title %}
+    {{ 'admin'|trans({}, null, app.session.get('_locale', 'en')) }} - {{ 'posts'|trans({}, null, app.session.get('_locale', 'en')) }}
+{% endblock %}
 
 {% block header_text %}
-    Posts Management
+    {{ 'posts_management'|trans({}, null, app.session.get('_locale', 'en')) }}
 {% endblock %}
 
 {% block body %}
     <div class="mt-3 p-4 rounded" style="border: 1px dashed #89c2d9">
         <div class="d-flex justify-content-end">
             <a href="{{ path('admin_post_create') }}">
-                <button class="btn btn-primary">Create Post</button>
+                <button class="btn btn-primary">
+                    {{ 'create_post'|trans({}, null, app.session.get('_locale', 'en')) }}
+                </button>
             </a>
         </div>
 
@@ -18,13 +22,13 @@
         <table id="postsTable" class="mt-3 table table-striped" style="width:100%">
             <thead>
             <tr>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Tags</th>
-                <th>Comments</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th>Actions</th>
+                <th>{{ 'title'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
+                <th>{{ 'author'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
+                <th>{{ 'tags'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
+                <th>{{ 'comments'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
+                <th>{{ 'status'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
+                <th>{{ 'created'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
+                <th>{{ 'actions'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
             </tr>
             </thead>
             <tbody>
@@ -39,9 +43,13 @@
                         <td>{{ post.comments.count }}</td>
                         <td>
                             {% if post.isPublished %}
-                                <span class="py-2 px-3 badge bg-success text-white">Published</span>
+                                <span class="py-2 px-3 badge bg-success text-white">
+                                    {{ 'published'|trans({}, null, app.session.get('_locale', 'en')) }}
+                                </span>
                             {% else %}
-                                <span class="py-2 px-3 badge bg-warning text-dark">Unpublished</span>
+                                <span class="py-2 px-3 badge bg-warning text-dark">
+                                    {{ 'unpublished'|trans({}, null, app.session.get('_locale', 'en')) }}
+                                </span>
                             {% endif %}
                         </td>
                         <td>{{ post.createdAt|date('d/m/Y H:i') }}</td>
@@ -49,14 +57,16 @@
                             <div style="cursor: pointer;">
                                 <a href="{{ path('admin_post_edit', {post: post.id}) }}">
                                     <span class="text-primary">
-                                        <i class="bi bi-pencil-square"></i> Edit
+                                        <i class="bi bi-pencil-square"></i>
+                                        {{ 'edit'|trans({}, null, app.session.get('_locale', 'en')) }}
                                     </span>
                                 </a>
                             </div>
                             <div style="cursor: pointer;">
                                 <a href="{{ path('admin_post_delete', {post: post.id}) }}">
                                     <span class="text-danger" >
-                                        <i class="bi bi-archive delete-comment"></i> Delete
+                                        <i class="bi bi-archive delete-comment"></i>
+                                        {{ 'delete'|trans({}, null, app.session.get('_locale', 'en')) }}
                                     </span>
                                 </a>
                             </div>
@@ -73,7 +83,7 @@
 
         {% else %}
             <div class="d-flex justify-content-center lead">
-                There are no posts.
+                {{ 'no_data'|trans({}, null, app.session.get('_locale', 'en')) }}
             </div>
         {% endif %}
     </div>

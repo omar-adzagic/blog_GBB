@@ -1,23 +1,29 @@
 {% extends 'admin/admin_base.html.twig' %}
 
-{% block title %}Editing a Post{% endblock %}
+{% block title %}
+    {{ 'post_details'|trans({}, null, app.session.get('_locale', 'en')) }}
+{% endblock %}
 
 {% block bread %}
-    → <a href="{{ path('admin_tag_index') }}">Admin Tags</a> → Show
+    → <a href="{{ path('admin_tag_index') }}">
+    {{ 'tags'|trans({}, null, app.session.get('_locale', 'en')) }}
+</a> → {{ 'show'|trans({}, null, app.session.get('_locale', 'en')) }}
 {% endblock %}
 
 {% block body %}
     <div class="card" style="width: 33%; margin-left: auto; margin-right: auto; margin-top: 10%">
-        <h4 class="card-title my-3 mx-auto">User Details</h4>
+        <h4 class="card-title my-3 mx-auto">
+            {{ 'user_details'|trans({}, null, app.session.get('_locale', 'en')) }}
+        </h4>
         <div class="card-body rounded bg-light border">
             <p class="card-text">
-                <strong>Username:</strong> {{ user.username }}
+                <strong>{{ 'username'|trans({}, null, app.session.get('_locale', 'en')) }}:</strong> {{ user.username }}
             </p>
             <p class="card-text">
-                <strong>Email:</strong> {{ user.email }}
+                <strong>{{ 'email'|trans({}, null, app.session.get('_locale', 'en')) }}:</strong> {{ user.email }}
             </p>
             <p class="card-text">
-                <strong>Roles:</strong> {{ user.roles|join(', ') }}
+                <strong>{{ 'roles'|trans({}, null, app.session.get('_locale', 'en')) }}:</strong> {{ user.roles|join(', ') }}
             </p>
         </div>
     </div>

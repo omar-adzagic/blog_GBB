@@ -1,13 +1,22 @@
 {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 <div>{{ form_errors(form) }}</div>
 
-<div class="mb-3">
-    {{ form_label(form.name, 'Please enter the name', {'label_attr': {'class': 'form-label'}}) }}
-    {{ form_widget(form.name, {'attr': {'class': 'form-control shadow-sm'}}) }}
-    {{ form_errors(form.name) }}
+<div class="p-4 bg-light rounded" style="border: 1px dashed #89c2d9">
+    <div class="px-0 col-5 mb-3">
+        {% set labelTranslation = 'enter_the_name'|trans({}, null, app.session.get('_locale', 'en')) %}
+        {{ form_label(
+            form.name,
+            labelTranslation,
+            {'label_attr': {'class': 'form-label'}}
+        ) }}
+        {{ form_widget(form.name, {'attr': {'class': 'form-control shadow-sm'}}) }}
+        {{ form_errors(form.name) }}
+    </div>
 </div>
 
-<div>
-    <button type="submit" class="btn btn-primary w-100 mt-4 mb-2">Save!</button>
+<div class="col-6 px-0">
+    <button type="submit" class="btn btn-primary w-100 mt-4 mb-2">
+        {{ 'save'|trans({}, null, app.session.get('_locale', 'en')) }}
+    </button>
 </div>
 {{ form_end(form) }}

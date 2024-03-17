@@ -1,12 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Create New Post{% endblock %}
+{% block title %}
+    {{ 'add_post'|trans({}, null, app.session.get('_locale', 'en')) }}
+{% endblock %}
 
 {% block bread %}
-    → Add Post
+    → {{ 'add_post'|trans({}, null, app.session.get('_locale', 'en')) }}
 {% endblock %}
 
 {% block body %}
-    {# Include the form template, which should now follow Bootstrap conventions #}
     {{ include('post/_form.html.twig') }}
 {% endblock %}

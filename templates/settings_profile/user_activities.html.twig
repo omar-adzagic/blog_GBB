@@ -5,17 +5,23 @@
                 <span class="mr-1">
                     {% if activity.type == 'like' %}
                         <i class="bi bi-heart-fill text-danger mr-1"></i>
-                        <span>You liked</span>
+                        <span>
+                            {{ 'you_liked'|trans({}, null, app.session.get('_locale', 'en')) }}
+                        </span>
                     {% endif %}
                     {% if activity.type == 'favorite' %}
                         <i class="bi bi-star-fill text-warning mr-1"></i>
-                        <span>You favored</span>
+                        <span>
+                            {{ 'you_favored'|trans({}, null, app.session.get('_locale', 'en')) }}
+                        </span>
                     {% endif %}
                 </span>
                 <a href="{{ path('app_post_show', { slug: activity.post_slug }) }}" class="text-decoration-none">
                     {{ activity.post_title }}
                 </a>
-                <span>post at: </span>
+                <span>
+                    {{ 'post_at'|trans({}, null, app.session.get('_locale', 'en')) }}
+                </span>
                 <span>{{ activity.created_at | date('d/m/Y H:i:s') }}</span>
             </div>
         {% endfor %}

@@ -1,6 +1,6 @@
 {% extends 'admin/admin_base.html.twig' %}
 
-{% block title %}Create a Post{% endblock %}
+{% block title %}{{ 'create_post'|trans({}, null, app.session.get('_locale', 'en')) }}{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -12,7 +12,9 @@
 {% endblock %}
 
 {% block bread %}
-    → <a href="{{ path('admin_post_index') }}">Admin Posts</a> → Create
+    → <a href="{{ path('admin_post_index') }}">
+    {{ 'posts'|trans({}, null, app.session.get('_locale', 'en')) }}
+</a> → {{ 'create'|trans({}, null, app.session.get('_locale', 'en')) }}
 {% endblock %}
 
 {% block body %}

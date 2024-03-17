@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}All Posts{% endblock %}
+{% block title %}
+    {{ 'all_posts'|trans({}, null, app.session.get('_locale', 'en')) }}
+{% endblock %}
 
 {% block body %}
     <div class="filter-container my-3 d-flex justify-content-between">
@@ -10,7 +12,9 @@
         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
             <div class="mx-2">
                 <a href="{{ path('app_post_create') }}" class="text-decoration-none">
-                    <button class="btn btn-light text-primary border">Add New</button>
+                    <button class="btn btn-light text-primary border">
+                        {{ 'add_new_post'|trans({}, null, app.session.get('_locale', 'en')) }}
+                    </button>
                 </a>
             </div>
         {% endif %}
@@ -237,18 +241,19 @@
                                 actionDiv.appendChild(editDiv);
                             }
 
-                            // Comment section
-                            const commentDiv = document.createElement('div');
-                            const commentLink = document.createElement('a');
-                            commentDiv.innerHTML = `Comments: <span class="px-1 rounded bg-light">${post.totalComments}</span>`;
-
-                            commentDiv.appendChild(commentLink);
                             // actionDiv.appendChild(commentDiv);
 
                             // Append the actionDiv to the postDiv
                             infoDiv.appendChild(actionDiv);
-                            infoDiv.appendChild(commentDiv);
                         }
+
+                        // Comment section
+                        const commentDiv = document.createElement('div');
+                        const commentLink = document.createElement('a');
+                        commentDiv.innerHTML = `Comments: <span class="px-1 rounded bg-light">${post.totalComments}</span>`;
+
+                        commentDiv.appendChild(commentLink);
+                        infoDiv.appendChild(commentDiv);
 
                         // Append the constructed post div to the posts container
                         postsContainer.appendChild(postDiv);

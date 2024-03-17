@@ -1,16 +1,20 @@
 {% extends 'admin/admin_base.html.twig' %}
 
-{% block title %}Admin - Users{% endblock %}
+{% block title %}
+    {{ 'admin'|trans({}, null, app.session.get('_locale', 'en')) }} - {{ 'users'|trans({}, null, app.session.get('_locale', 'en')) }}
+{% endblock %}
 
 {% block header_text %}
-    Users Management
+    {{ 'users_management'|trans({}, null, app.session.get('_locale', 'en')) }}
 {% endblock %}
 
 {% block body %}
     <div class="mt-3 p-4 border-dashed rounded" style="border: 1px dashed #89c2d9">
         <div class="d-flex justify-content-end">
             <a href="{{ path('admin_user_create') }}">
-                <button class="btn btn-primary">Create User</button>
+                <button class="btn btn-primary">
+                    {{ 'create_user'|trans({}, null, app.session.get('_locale', 'en')) }}
+                </button>
             </a>
         </div>
 
@@ -18,11 +22,11 @@
             <table id="usersTable" class="mt-3 table table-striped" style="width:100%">
                 <thead>
                 <tr>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Roles</th>
-                    <th>Join Date</th>
-                    <th>Actions</th>
+                    <th>{{ 'username'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
+                    <th>{{ 'email'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
+                    <th>{{ 'roles'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
+                    <th>{{ 'join_date'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
+                    <th>{{ 'actions'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -36,14 +40,16 @@
                             <div style="cursor: pointer;">
                                 <a href="{{ path('admin_user_edit', {user: user.id}) }}">
                                     <span class="text-primary">
-                                        <i class="bi bi-pencil-square"></i> Edit
+                                        <i class="bi bi-pencil-square"></i>
+                                        {{ 'edit'|trans({}, null, app.session.get('_locale', 'en')) }}
                                     </span>
                                 </a>
                             </div>
                             <div style="cursor: pointer;">
                                 <a href="{{ path('admin_user_delete', {user: user.id}) }}">
                                     <span class="text-danger" >
-                                        <i class="bi bi-archive delete-comment"></i> Delete
+                                        <i class="bi bi-archive delete-comment"></i>
+                                        {{ 'delete'|trans({}, null, app.session.get('_locale', 'en')) }}
                                     </span>
                                 </a>
                             </div>
@@ -59,7 +65,7 @@
             } %}
         {% else %}
             <div class="d-flex justify-content-center lead">
-                There are no users.
+                {{ 'no_data'|trans({}, null, app.session.get('_locale', 'en')) }}
             </div>
         {% endif %}
     </div>

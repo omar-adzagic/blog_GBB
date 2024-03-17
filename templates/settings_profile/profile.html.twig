@@ -1,9 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Profile{% endblock %}
+{% block title %}
+    {{ 'profile'|trans({}, null, app.session.get('_locale', 'en')) }}
+{% endblock %}
 
 {% block bread %}
-    → Profile
+    → {{ 'profile'|trans({}, null, app.session.get('_locale', 'en')) }}
 {% endblock %}
 
 {% block body %}

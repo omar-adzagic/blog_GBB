@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - {% block title %}{% endblock %}</title>
+    <title>{{ 'admin_panel'|trans({}, null, app.session.get('_locale', 'en')) }} - {% block title %}{% endblock %}</title>
     <!-- Bootstrap CSS or other stylesheets -->
     {% block stylesheets %}
         {#        {{ encore_entry_link_tags('app') }}#}
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.2.0/mdb.min.css" rel="stylesheet" />
     {% endblock %}
 
     {% block javascripts %}
@@ -30,33 +31,47 @@
                 <a class="navbar-brand text-primary" href="{{ path('admin_panel_index') }}">
                     <i class="bi bi-speedometer"></i>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup"
+                        aria-expanded="false" aria-label="Toggle navigation"
+                >
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse d-flex justify-content-between" id="navbarNavAltMarkup">
+                <div class="mr-3 collapse navbar-collapse d-flex justify-content-between" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
                         <a class="nav-link {{ app.request.attributes.get('_route') == 'admin_post_index' ? 'active' : '' }}"
                            aria-current="page"
-                           href="{{ path('admin_post_index') }}">Posts</a>
+                           href="{{ path('admin_post_index') }}"
+                        >
+                            {{ 'posts'|trans({}, null, app.session.get('_locale', 'en')) }}
+                        </a>
                         <a class="nav-link {{ app.request.attributes.get('_route') == 'admin_tag_index' ? 'active' : '' }}"
-                           href="{{ path('admin_tag_index') }}">Tags</a>
+                           href="{{ path('admin_tag_index') }}"
+                        >
+                            {{ 'tags'|trans({}, null, app.session.get('_locale', 'en')) }}
+                        </a>
                         <a class="nav-link {{ app.request.attributes.get('_route') == 'admin_user_index' ? 'active' : '' }}"
-                           href="{{ path('admin_user_index') }}">Users</a>
+                           href="{{ path('admin_user_index') }}"
+                        >
+                            {{ 'users'|trans({}, null, app.session.get('_locale', 'en')) }}
+                        </a>
                     </div>
                     <div class="ml-2 text-primary">
                         <a href="{{ path('app_logout') }}" class="text-decoration-none">
-                            Logout
+                            {{ 'logout'|trans({}, null, app.session.get('_locale', 'en')) }}
                             <i class="bi bi-box-arrow-right"></i>
                         </a>
                     </div>
                 </div>
+                {{ include('translations/_language_picker.html.twig') }}
             </div>
         </nav>
     </header>
 
-    <div>
-        {% block bread %}
-        {% endblock %}
+    <div class="my-4">
+        <h3>
+            {% block bread %}{% endblock %}
+        </h3>
     </div>
 
     <main>

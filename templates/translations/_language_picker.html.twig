@@ -1,0 +1,12 @@
+<div class="d-flex">
+    <a href="{{ path('change_locale', {'_locale': 'en'}) }}">
+        <div class="px-2 border rounded {{ app.session.get('_locale') == 'en' ? 'border-primary' : '' }}">
+            <i class="m-0 flag flag-united-kingdom"></i>
+        </div>
+    </a>
+    <a href="{{ path('change_locale', {'_locale': 'hr'}) }}">
+        <div class="px-2 border rounded {{ app.session.get('_locale') == 'hr' ? 'border-primary' : '' }}">
+            <i class="m-0 flag flag-croatia"></i>
+        </div>
+    </a>
+</div>

@@ -19,10 +19,13 @@
     <div class="px-3 py-2 border rounded">
         <div class="my-2">
             <div class="small text-secondary">
-                Author: <a href="{{ path('app_profile', { id: post.user.id }) }}" class="text-decoration-none">{{ post.user.email }}</a>
+                {{ 'author'|trans({}, null, app.session.get('_locale', 'en')) }}:
+                <a href="{{ path('app_profile', { id: post.user.id }) }}" class="text-decoration-none">
+                    {{ post.user.email }}
+                </a>
             </div>
             <div class="small text-secondary">
-                Written: {{ post.createdAt | date("M j, Y") }}
+                {{ 'written'|trans({}, null, app.session.get('_locale', 'en')) }}: {{ post.createdAt | date("M j, Y") }}
             </div>
         </div>
         {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
@@ -38,21 +41,17 @@
 
                 {% if isLikedByCurrentUser %}
                     <form action="{{ path('app_unlike', { id: post.id }) }}" method="post" class="d-flex align-items-center">
-{#                        <a href="{{ path('app_unlike', { id: post.id }) }}" class="text-decoration-none d-flex align-items-center">#}
-{#                            Unlike <span class="px-2 rounded bg-light">{{ post.likedByUsers.count }}</span>#}
-{#                        </a>#}
-                        <button type="submit" class="btn btn-link text-decoration-none p-0">
-                            Unlike <span class="px-2 rounded bg-light">{{ post.likedByUsers.count }}</span>
+                        <button type="submit" class="btn btn-link text-decoration-none px-2 py-1 border border-secondary">
+                            {{ 'unlike'|trans({}, null, app.session.get('_locale', 'en')) }}
+                            <span class="px-2 rounded bg-light">{{ post.likedByUsers.count }}</span>
                             <i class="bi bi-heart-fill text-danger"></i>
                         </button>
                     </form>
                 {% else %}
                     <form action="{{ path('app_like', { id: post.id }) }}" method="post" class="d-flex align-items-center">
-{#                        <a href="{{ path('app_like', { id: post.id }) }}" class="text-decoration-none d-flex align-items-center">#}
-{#                            Like <span class="px-2 rounded bg-light">{{ post.likedByUsers.count }}</span>#}
-{#                        </a>#}
-                        <button type="submit" class="btn btn-link text-decoration-none p-0">
-                            Like <span class="px-2 rounded bg-light">{{ post.likedByUsers.count }}</span>
+                        <button type="submit" class="btn btn-link text-decoration-none  px-2 py-1 border border-secondary">
+                            {{ 'like'|trans({}, null, app.session.get('_locale', 'en')) }}
+                            <span class="px-2 rounded bg-light">{{ post.likedByUsers.count }}</span>
                             <i class="bi bi-heart text-danger"></i>
                         </button>
                     </form>
@@ -67,33 +66,44 @@
                 {% endfor %}
 
                 {% if isFavoredByCurrentUser %}
-                    <a href="{{ path('app_remove_favorite', { id: post.id }) }}" class="text-decoration-none d-flex align-items-center">
-                        Remove from Favorites
-                    </a>
-                    <span class="ml-2">
-                    <i class="bi bi-star-fill text-warning lead"></i>
-                </span>
+{#                    <a href="{{ path('app_remove_favorite', { id: post.id }) }}" class="text-decoration-none d-flex align-items-center">#}
+
+{#                    </a>#}
+                    <form action="{{ path('app_remove_favorite', { id: post.id }) }}" method="post" class="d-flex align-items-center">
+                        <button type="submit" class="btn btn-link text-decoration-none px-2 py-1 border border-secondary">
+                            {{ 'remove_from_favorites'|trans({}, null, app.session.get('_locale', 'en')) }}
+                            <span class="ml-2">
+                                <i class="bi bi-star-fill text-warning"></i>
+                            </span>
+                        </button>
+                    </form>
                 {% else %}
                     <a href="{{ path('app_favorite', { id: post.id }) }}" class="text-decoration-none d-flex align-items-center">
-                        Add to Favorites
+
                     </a>
-                    <span class="ml-2">
-                    <i class="bi bi-star text-warning lead"></i>
-                </span>
+                    <form action="{{ path('app_favorite', { id: post.id }) }}" method="post" class="d-flex align-items-center">
+                        <button type="submit" class="btn btn-link text-decoration-none px-2 py-1 border border-secondary">
+                            {{ 'add_to_favorites'|trans({}, null, app.session.get('_locale', 'en')) }}
+                            <span class="ml-2">
+                                <i class="bi bi-star text-warning"></i>
+                            </span>
+                        </button>
+                    </form>
                 {% endif %}
             </div>
             <div class="my-2 d-flex">
                 {% if post.user.id == app.user.id %}
                     <div>
                         <a href="{{ path('app_post_edit', { post: post.id }) }}" class="mr-2 text-decoration-none">
-                            Edit
+                            {{ 'edit'|trans({}, null, app.session.get('_locale', 'en')) }}
                             <i class="bi bi-pencil-square text-primary"></i>
                         </a>
                     </div>
                 {% endif %}
             </div>
             <div class="my-2">
-                Comments: <span class="px-1 rounded bg-light">{{ post.comments.count }}</span>
+                {{ 'comments'|trans({}, null, app.session.get('_locale', 'en')) }}:
+                <span class="px-1 rounded bg-light">{{ post.comments.count }}</span>
             </div>
         {% endif %}
     </div>

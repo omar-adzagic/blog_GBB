@@ -1,9 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Profile Image{% endblock %}
+{% block title %}
+    {{ 'profile_image'|trans({}, null, app.session.get('_locale', 'en')) }}
+{% endblock %}
 
 {% block bread %}
-    → Profile Image
+    → {{ 'profile_image'|trans({}, null, app.session.get('_locale', 'en')) }}
 {% endblock %}
 
 {% block body %}
@@ -15,7 +17,7 @@
         <div class="ms-3">
             {{ form_start(form, {'attr': {'novalidate': 'novalidate'} }) }}
             <label for="{{ form.profileImage.vars.id }}" class="btn btn-secondary cursor-pointer">
-                Change
+                {{ 'change'|trans({}, null, app.session.get('_locale', 'en')) }}
                 {{ form_widget(form.profileImage, {'attr': {'class': 'visually-hidden'}}) }}
             </label>
             {{ form_errors(form.profileImage) }}
@@ -23,7 +25,9 @@
     </div>
 
     <div>
-        <button type="submit" class="btn btn-primary w-100 mt-3 mb-2">Save Changes</button>
+        <button type="submit" class="btn btn-primary w-100 mt-3 mb-2">
+            {{ 'save_changes'|trans({}, null, app.session.get('_locale', 'en')) }}
+        </button>
     </div>
 
     {{ form_end(form) }}
