@@ -4,15 +4,14 @@ namespace App\Controller;
 
 use App\Entity\Post;
 use App\Entity\UserFavorite;
-use App\Entity\UserLike;
 use App\Repository\PostRepository;
 use App\Repository\UserFavoriteRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 class FavoriteController extends AbstractController
 {
@@ -56,13 +55,13 @@ class FavoriteController extends AbstractController
     ): Response {
         $currentUser = $this->getUser();
 
-        // Find the specific UserLike instance for the current user and the post
+        // Find the specific UserFavorite instance for the current user and the post
         $userFavorite = $userFavoriteRepository->findOneBy([
             'user' => $currentUser,
             'post' => $post
         ]);
 
-        // If a UserLike instance is found, remove it
+        // If a UserFavorite instance is found, remove it
         if ($userFavorite) {
             $entityManager->remove($userFavorite);
             $entityManager->flush();

@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
 use App\Entity\Comment;
 use App\Entity\Post;
+use App\Entity\User;
 use App\Form\CommentType;
 use App\Form\PostType;
 use App\Message\SendEmailMessage;
@@ -15,17 +15,15 @@ use App\Service\FileUploader;
 use App\Service\PostManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use App\Security\EmailVerifier;
 
 class PostController extends AbstractController
 {
@@ -47,6 +45,7 @@ class PostController extends AbstractController
         PaginatorInterface $paginator
     ): Response
     {
+        /** @var User $user */
         $user = $this->getUser();
         $userId = $user ? $user->getId() : null;
 
