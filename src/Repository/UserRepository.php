@@ -110,7 +110,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $this->createQueryBuilder('u')
             ->leftJoin('u.userFavorites', 'uf')
             ->addSelect('uf')
-            ->leftJoin('uf.post', 'p') // Assuming `post` is the property in UserFavorite that references the Post entity
+            ->leftJoin('uf.post', 'p')
             ->addSelect('p')
             ->where('u.id = :userId')
             ->setParameter('userId', $userId)

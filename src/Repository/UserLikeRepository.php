@@ -18,6 +18,4 @@ class UserLikeRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, UserLike::class);
     }
-
-    // Add custom repository methods here
 }
