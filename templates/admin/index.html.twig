@@ -1,19 +1,19 @@
 {% extends 'admin/admin_base.html.twig' %}
 
 {% block title %}
-    {{ 'admin_panel'|trans({}, null, app.session.get('_locale', 'en')) }}
+    {{ 'admin_panel'|trans_session }}
 {% endblock %}
 
 {% block body %}
     <h1>
-        {{ 'admin_panel'|trans({}, null, app.session.get('_locale', 'en')) }}
+        {{ 'admin_panel'|trans_session }}
     </h1>
     <div class="mt-4">
         <p class="lead">
-            {{ 'admin_panel_text_1'|trans({}, null, app.session.get('_locale', 'en')) }}
+            {{ 'admin_panel_text_1'|trans_session }}
         </p>
         <p class="lead">
-            {{ 'admin_panel_text_2'|trans({}, null, app.session.get('_locale', 'en')) }}
+            {{ 'admin_panel_text_2'|trans_session }}
         </p>
     </div>
 {% endblock %}

@@ -39,5 +39,20 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 20 }
 
+    gedmo.listener.translatable:
+        class: Gedmo\Translatable\TranslatableListener
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+        calls:
+            - [ setDefaultLocale, [ '%locale%' ] ]
+            - [ setTranslationFallback, [ false ] ]
+
+    App\Twig\TranslationExtension:
+        arguments:
+            $translator: '@translator'
+            $session: '@session'
+        tags:
+            - { name: twig.extension }
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

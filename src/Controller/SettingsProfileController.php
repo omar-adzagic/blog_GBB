@@ -6,7 +6,9 @@ use App\Entity\User;
 use App\Entity\UserProfile;
 use App\Form\ProfileImageType;
 use App\Form\UserProfileType;
+use App\Repository\PostRepository;
 use App\Repository\UserFavoriteRepository;
+use App\Repository\UserLikeRepository;
 use App\Repository\UserRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -91,18 +93,34 @@ class SettingsProfileController extends AbstractController
      * @Route("/favorite-posts", name="app_favorite_posts")
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function favoritePosts(UserFavoriteRepository $userFavoriteRepository): Response
+    public function favoritePosts(
+        UserFavoriteRepository $userFavoriteRepository,
+        PostRepository $postRepository,
+        UserLikeRepository $userLikeRepository
+    ): Response
     {
         /** @var User $user */
         $user = $this->getUser();
         $userId = $user->getId();
 
         $userFavorites = $userFavoriteRepository->findFavoritePostsByUserId($userId);
+        $userFavoritePostIds = array_map(function($userFavorite) {
+            return $userFavorite->getPost()->getId();
+        }, $userFavorites);
+
+        $likedAndFavored = $userFavoriteRepository->findLikedAndFavoredPostsByUserId($userId, $userFavoritePostIds);
+        $likedAndFavoredIdsMap = [];
+        foreach ($likedAndFavored as $likeAndFavor) {
+            $likedAndFavoredIdsMap[$likeAndFavor['id']] = true;
+        }
+        $totalLikesMap = $userLikeRepository->countLikesForPostIds($userFavoritePostIds);
 
         return $this->render('settings_profile/profile.html.twig', [
             'tab' => 'favorite-posts',
             'templatePart' => 'post/_favorite_posts.html.twig',
             'userFavorites' => $userFavorites,
+            'likedAndFavoredIdsMap' => $likedAndFavoredIdsMap,
+            'totalLikesMap' => $totalLikesMap
         ]);
     }
 

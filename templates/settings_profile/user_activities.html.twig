@@ -6,13 +6,13 @@
                     {% if activity.type == 'like' %}
                         <i class="bi bi-heart-fill text-danger mr-1"></i>
                         <span>
-                            {{ 'you_liked'|trans({}, null, app.session.get('_locale', 'en')) }}
+                            {{ 'you_liked'|trans_session }}
                         </span>
                     {% endif %}
                     {% if activity.type == 'favorite' %}
                         <i class="bi bi-star-fill text-warning mr-1"></i>
                         <span>
-                            {{ 'you_favored'|trans({}, null, app.session.get('_locale', 'en')) }}
+                            {{ 'you_favored'|trans_session }}
                         </span>
                     {% endif %}
                 </span>
@@ -20,14 +20,14 @@
                     {{ activity.post_title }}
                 </a>
                 <span>
-                    {{ 'post_at'|trans({}, null, app.session.get('_locale', 'en')) }}
+                    {{ 'post_at'|trans_session }}
                 </span>
-                <span>{{ activity.created_at | date('d/m/Y H:i:s') }}</span>
+                <span>{{ activity.created_at | date('d/m/Y H:i') }}</span>
             </div>
         {% endfor %}
     {% else %}
         <div class="col">
-            There's nothing here yet!
+            {{ 'no_data'|trans_session }}
         </div>
     {% endif %}
 </div>

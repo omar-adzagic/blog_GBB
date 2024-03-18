@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ 'all_posts'|trans({}, null, app.session.get('_locale', 'en')) }}
+    {{ 'all_posts'|trans_session }}
 {% endblock %}
 
 {% block body %}
@@ -13,7 +13,7 @@
             <div class="mx-2">
                 <a href="{{ path('app_post_create') }}" class="text-decoration-none">
                     <button class="btn btn-light text-primary border">
-                        {{ 'add_new_post'|trans({}, null, app.session.get('_locale', 'en')) }}
+                        {{ 'add_new_post'|trans_session }}
                     </button>
                 </a>
             </div>
@@ -113,7 +113,7 @@
                         const titleLink = document.createElement('a');
                         titleLink.setAttribute('href', `/post/${post.slug}`);
                         titleLink.classList.add('text-decoration-none');
-                        titleLink.textContent = post.title;
+                        titleLink.textContent = post.title.length > 20 ? post.title.slice(0, 20) + '...' : post.title;
                         titleDiv.appendChild(titleLink);
 
                         if (post.image) {
@@ -133,7 +133,7 @@
                         // Create the content div
                         const contentDiv = document.createElement('div');
                         contentDiv.classList.add('lead', 'text-justify', 'my-2');
-                        contentDiv.textContent = post.content;
+                        contentDiv.textContent = post.content.length > 400 ? post.content.slice(0, 400) + '...' : post.content;
 
                         // Append the title and content to the main post div
                         postDiv.appendChild(titleDiv);
@@ -173,7 +173,7 @@
                             if (post.isLikedByCurrentUser === '1') {
                                 form.setAttribute('action', `/unlike/${post.id}`);
                                 form.innerHTML = `
-                                    <button type="submit" class="btn btn-link text-decoration-none px-0">
+                                    <button type="submit" class="btn btn-link text-decoration-none my-1 px-2 py-1 border border-secondary">
                                         Unlike <span class="px-2 rounded bg-light">${parseInt(post.totalLikes)}</span>
                                         <i class="bi bi-heart-fill text-danger"></i>
                                     </button>
@@ -181,7 +181,7 @@
                             } else {
                                 form.setAttribute('action', `/like/${post.id}`);
                                 form.innerHTML = `
-                                    <button type="submit" class="btn btn-link text-decoration-none px-0">
+                                    <button type="submit" class="btn btn-link text-decoration-none my-1 px-2 py-1 border border-secondary">
                                         Like <span class="px-2 rounded bg-light">${parseInt(post.totalLikes)}</span>
                                         <i class="bi bi-heart text-danger"></i>
                                     </button>
@@ -192,34 +192,33 @@
                             infoDiv.appendChild(form);
 
                             // Dynamically generate Add to Favorites / Remove from Favorites section
-                            const favoriteForm = document.createElement('div');
+                            const favoriteForm = document.createElement('form');
+                            form.setAttribute('method', 'post');
                             favoriteForm.classList.add('d-flex', 'align-items-center');
 
                             if (post.isFavoredByCurrentUser === '1') {
+                                favoriteForm.setAttribute('action', `/remove-favorite/${post.id}`);
                                 favoriteForm.innerHTML = `
-                                <a href="/remove-favorite/${post.id}" class="text-decoration-none d-flex align-items-center">
-                                    Remove from Favorites
-                                </a>
-                                <span class="ml-2">
-                                    <i class="bi bi-star-fill text-warning lead"></i>
-                                </span>
-                            `;
+                                    <button type="submit" class="btn btn-link text-decoration-none my-1 px-2 py-1 border border-secondary">
+                                        Remove from Favorites
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    </button>
+                                `;
                             } else {
+                                favoriteForm.setAttribute('action', `/favorite/${post.id}`);
                                 favoriteForm.innerHTML = `
-                                <a href="/favorite/${post.id}" class="text-decoration-none d-flex align-items-center">
-                                    Add to Favorites
-                                </a>
-                                <span class="ml-2">
-                                    <i class="bi bi-star text-warning lead"></i>
-                                </span>
-                            `;
+                                    <button type="submit" class="btn btn-link text-decoration-none my-1 px-2 py-1 border border-secondary">
+                                        Add to Favorites
+                                        <i class="bi bi-star text-warning"></i>
+                                    </button>
+                                `;
                             }
 
                             // Append the favoriteForm to the postDiv
                             infoDiv.appendChild(favoriteForm);
 
                             const actionDiv = document.createElement('div');
-                            actionDiv.classList.add('my-2', 'd-flex');
+                            actionDiv.classList.add('my-1', 'd-flex');
 
                             // Edit section
                             if (post.user_id === auth_id) {
@@ -249,6 +248,7 @@
 
                         // Comment section
                         const commentDiv = document.createElement('div');
+                        commentDiv.classList.add('my-1')
                         const commentLink = document.createElement('a');
                         commentDiv.innerHTML = `Comments: <span class="px-1 rounded bg-light">${post.totalComments}</span>`;
 

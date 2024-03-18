@@ -2,12 +2,20 @@
     {% if userFavorites|length > 0 %}
         {% for userFavorite in userFavorites %}
             <div class="col-12 col-sm-6 col-xl-4 mb-4">
-                {{ include('post/_post.html.twig', {post: userFavorite.post}) }}
+                {{ include(
+                    'post/_post.html.twig',
+                    {
+                        post: userFavorite.post,
+                        isLikedByCurrentUser: likedAndFavoredIdsMap[userFavorite.post.id] is defined,
+                        totalLikes: totalLikesMap[userFavorite.post.id] is defined ? totalLikesMap[userFavorite.post.id] : 0,
+                        isFavoredByCurrentUser: true
+                    }
+                ) }}
             </div>
         {% endfor %}
     {% else %}
         <div class="col">
-            {{ 'nothing_here'|trans({}, null, app.session.get('_locale')) }}
+            {{ 'nothing_here'|trans_session }}
         </div>
     {% endif %}
 </div>

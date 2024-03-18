@@ -11,13 +11,13 @@
                 {% if prev > 0 %}
                     <li class="page-item">
                         <a class="page-link" href="{{ path(indexRoute, {'page': prev}) }}">
-                            {{ 'previous'|trans({}, null, app.session.get('_locale', 'en')) }}
+                            {{ 'previous'|trans_session }}
                         </a>
                     </li>
                 {% else %}
                     <li class="page-item disabled">
                         <span class="page-link">
-                            {{ 'previous'|trans({}, null, app.session.get('_locale', 'en')) }}
+                            {{ 'previous'|trans_session }}
                         </span>
                     </li>
                 {% endif %}
@@ -31,13 +31,13 @@
                 {% if next <= paginationData.pageCount %}
                     <li class="page-item">
                         <a class="page-link" href="{{ path(indexRoute, {'page': next}) }}">
-                            {{ 'next'|trans({}, null, app.session.get('_locale', 'en')) }}
+                            {{ 'next'|trans_session }}
                         </a>
                     </li>
                 {% else %}
                     <li class="page-item disabled">
                         <span class="page-link">
-                            {{ 'next'|trans({}, null, app.session.get('_locale', 'en')) }}
+                            {{ 'next'|trans_session }}
                         </span>
                     </li>
                 {% endif %}

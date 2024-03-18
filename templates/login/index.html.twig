@@ -1,25 +1,31 @@
 {% extends 'base.html.twig' %}
 
 {% block bread %}
-    → {{ 'login'|trans({}, null, app.session.get('_locale', 'en')) }}
+    → {{ 'login'|trans_session }}
 {% endblock %}
 
 {% block body %}
     <form action="{{ path('app_login') }}" method="POST">
         <div class="mb-3">
             <label for="username" class="form-label">
-                {{ 'email'|trans({}, null, app.session.get('_locale', 'en')) }}
+                {{ 'email'|trans_session }}
             </label>
-            <input type="text"
+            <input type="email"
+                   class="form-control"
                    id="username"
                    name="_username"
-                   value="{{ lastUsername }}"
-                   class="form-control" />
+                   value="{{ lastUsername }}" />
         </div>
+
+        {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
 
         <div class="mb-3">
             <label for="password" class="form-label">
-                {{ 'password'|trans({}, null, app.session.get('_locale', 'en')) }}
+                {{ 'password'|trans_session }}
             </label>
             <input type="password"
                    id="password"
@@ -29,24 +35,26 @@
 
         <div class="mb-3">
             <label for="remember_me">
-                {{ 'remember_me'|trans({}, null, app.session.get('_locale', 'en')) }}
+                {{ 'remember_me'|trans_session }}
             </label>
             <input id="remember_me" type="checkbox" name="_remember_me" checked />
         </div>
 
         <input type="hidden" name="_target_path" value="/" />
 
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
         <div>
             <button type="submit" class="btn btn-primary w-100 mt-2 mb-2">
-                {{ 'login'|trans({}, null, app.session.get('_locale', 'en')) }}
+                {{ 'login'|trans_session }}
             </button>
         </div>
     </form>
 
     <div class="mt-2 text-center">
-        {{ 'dont_have_account'|trans({}, null, app.session.get('_locale', 'en')) }}
+        {{ 'dont_have_account'|trans_session }}
         <a href="{{ path('app_register') }}" class="text-decoration-none">
-            {{ 'register_here'|trans({}, null, app.session.get('_locale', 'en')) }}
+            {{ 'register_here'|trans_session }}
         </a>
     </div>
 {% endblock %}

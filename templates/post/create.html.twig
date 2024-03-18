@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ 'add_post'|trans({}, null, app.session.get('_locale', 'en')) }}
+    {{ 'add_post'|trans_session }}
 {% endblock %}
 
 {% block bread %}
-    → {{ 'add_post'|trans({}, null, app.session.get('_locale', 'en')) }}
+    → {{ 'add_post'|trans_session }}
 {% endblock %}
 
 {% block body %}

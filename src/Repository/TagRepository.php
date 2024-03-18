@@ -53,6 +53,7 @@ class TagRepository extends ServiceEntityRepository
     public function findAllLatestQB(): QueryBuilder
     {
         return $this->createQueryBuilder('t')
+            ->select('t.id', 't.name', 't.created_at')
             ->orderBy('t.created_at', 'DESC');
     }
 

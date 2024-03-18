@@ -7,10 +7,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Gedmo\Mapping\Annotation as Gedmo;
+use App\Entity\TagTranslation;
 
 /**
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
+ * @Gedmo\TranslationEntity(class="App\Entity\TagTranslation")
  */
 class Tag
 {
@@ -25,8 +28,21 @@ class Tag
     /**
      * @ORM\Column(type="string", length=255, unique=true)
      * @Groups("tag_search")
+     * @Gedmo\Translatable
      */
     private $name;
+
+    /**
+     * @Gedmo\Locale
+     * Used locale to override Translation listener`s locale
+     * this is not a mapped field of entity metadata, just a simple property
+     */
+    private $locale;
+
+    /**
+     * @ORM\OneToMany(targetEntity=TagTranslation::class, mappedBy="object", orphanRemoval=true)
+     */
+    private $translations;
 
     /**
      * @ORM\OneToMany(targetEntity=PostTag::class, mappedBy="tag", cascade={"remove"})
@@ -46,6 +62,7 @@ class Tag
     public function __construct()
     {
         $this->postTags = new ArrayCollection();
+        $this->translations = new ArrayCollection();
     }
 
     public function getPostTags(): Collection
@@ -118,9 +135,16 @@ class Tag
     /**
      * @param mixed $name
      */
-    public function setName($name): void
+    public function setName($name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function setTranslatableLocale($locale): void
+    {
+        $this->locale = $locale;
     }
 
     /**
@@ -129,6 +153,28 @@ class Tag
     public function getId()
     {
         return $this->id;
+    }
+
+    public function getTranslations(): Collection {
+        return $this->translations;
+    }
+
+    public function addTranslation(TagTranslation $translation): self {
+        if (!$this->translations->contains($translation)) {
+            $this->translations[] = $translation;
+            $translation->setObject($this); // Assuming the method is named setObject in TagTranslation
+        }
+        return $this;
+    }
+
+    public function removeTranslation(TagTranslation $translation): self {
+        if ($this->translations->removeElement($translation)) {
+            // Set the owning side to null
+            if ($translation->getObject() === $this) {
+                $translation->setObject(null);
+            }
+        }
+        return $this;
     }
 
     /**

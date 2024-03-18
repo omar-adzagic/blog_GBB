@@ -11,10 +11,15 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Entity\UserLike;
 use App\Entity\UserFavorite;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\HasLifecycleCallbacks()
+ * @UniqueEntity(
+ *      fields={"email"},
+ *      message="email.already_used"
+ *  )
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {

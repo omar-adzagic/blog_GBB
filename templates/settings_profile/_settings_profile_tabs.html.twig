@@ -3,7 +3,7 @@
         {% embed 'shared/_tab.html.twig' with { route: 'app_profile', classes: 'nav-item' } %}
             {% block content %}
                 <span class="mx-2">
-                    {{ 'profile'|trans({}, null, app.session.get('_locale', 'en')) }}
+                    {{ 'profile'|trans_session }}
                 </span>
             {% endblock %}
             {% block path %}
@@ -13,7 +13,7 @@
 
         {% embed 'shared/_tab.html.twig' with { route: 'app_favorite_posts', classes: 'nav-item ms-2' } %}
             {% block content %}
-                {{ 'favorite_posts'|trans({}, null, app.session.get('_locale', 'en')) }}
+                {{ 'favorite_posts'|trans_session }}
             {% endblock %}
             {% block path %}
                 {{ path('app_favorite_posts') }}
@@ -22,7 +22,7 @@
 
         {% embed 'shared/_tab.html.twig' with { route: 'app_user_activities', classes: 'nav-item ms-2' } %}
             {% block content %}
-                {{ 'user_activities'|trans({}, null, app.session.get('_locale', 'en')) }}
+                {{ 'user_activities'|trans_session }}
             {% endblock %}
             {% block path %}
                 {{ path('app_user_activities') }}

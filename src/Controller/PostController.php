@@ -37,62 +37,6 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/posts", name="delete_post_comment", methods={"GET"})
-     */
-    public function getPosts(
-        Request $request,
-        PostRepository $postRepository,
-        PaginatorInterface $paginator
-    ): Response
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-        $userId = $user ? $user->getId() : null;
-
-        $title = $request->query->get('title', '');
-
-        // Query to get all posts (or you might modify it to get a QueryBuilder instance)
-        $queryBuilder = $postRepository->findAllWithCommentCountQueryBuilder($userId);
-
-        // Ensure that only published posts are considered.
-        $queryBuilder->where('p.is_published = 1');
-
-        // Add a conditional search by title if it's provided
-        if (!empty($title)) {
-            // Use andWhere to add to the existing where condition
-            $queryBuilder->andWhere('p.title LIKE :title')->setParameter('title', '%' . $title . '%');
-        }
-
-        // Get current page from query parameters, default is 1 if not set
-        $currentPage = $request->query->getInt('page', 1);
-        // Get limit from query parameters, default is 6 if not set
-        $limit = $request->query->getInt('limit', 6);
-
-        // Paginate the results of the query
-        $pagination = $paginator->paginate(
-            $queryBuilder, /* query NOT result */
-            $currentPage, /* page number */
-            $limit /* limit per page */
-        );
-
-        $posts = $pagination->getItems();
-
-        $responseData = [
-            'posts' => $posts,
-            'is_authenticated' => $this->isGranted('IS_AUTHENTICATED_REMEMBERED'),
-            'auth_id' => $userId,
-            'total' => $pagination->getTotalItemCount(),
-            'page' => $currentPage,
-            'limit' => $limit,
-        ];
-
-        return $this->json($responseData, Response::HTTP_OK);
-
-        // Return an error response if the comment wasn't found or if the deletion failed
-//        return $this->json(['error' => 'Comment not found'], Response::HTTP_NOT_FOUND);
-    }
-
-    /**
      * @Route("/post/{slug}", name="app_post_show")
      */
     public function showOne(
@@ -104,7 +48,9 @@ class PostController extends AbstractController
         MessageBusInterface $messageBus
     ): Response
     {
-        $post = $postRepository->findOneBy(['slug' => $slug]);
+        $user = $this->getUser();
+        $userId = $user->getId();
+        $post = $postRepository->findOneBySlugWithRelationships($slug, $userId);
 
         if (!$post) {
             throw $this->createNotFoundException('No post found for slug '.$slug);
@@ -115,7 +61,7 @@ class PostController extends AbstractController
 
         if ($commentForm->isSubmitted() && $commentForm->isValid()) {
             $comment = $commentForm->getData();
-            $comment->setAuthor($this->getUser());
+            $comment->setAuthor($user);
             $comment->setPost($post);
             $commentRepository->add($comment, true);
             $this->addFlash('success', 'Your comment has been added.');
@@ -133,13 +79,20 @@ class PostController extends AbstractController
                         'post' => $post,
                     ]);
 
-//                $mailer->send($email);
                 $messageBus->dispatch(new SendEmailMessage($email));
             }
+            return $this->redirectToRoute('app_post_show', ['slug' => $post->getSlug()]);
         }
+
+        $isLikedByCurrentUser = $post->isLikedByUser($user);
+        $isFavoredByCurrentUser = $post->isFavoredByUser($user);
+        $totalLikes = $postRepository->countLikesForPost($post->getId());
 
         return $this->render('post/show.html.twig', [
             'post' => $post,
+            'isLikedByCurrentUser' => $isLikedByCurrentUser,
+            'isFavoredByCurrentUser' => $isFavoredByCurrentUser,
+            'totalLikes' => $totalLikes,
             'commentForm' => $commentForm->createView(),
         ]);
     }
@@ -155,6 +108,7 @@ class PostController extends AbstractController
         FileUploader $fileUploader
     ): Response
     {
+        $authUser = $this->getUser();
         $newPost = new Post();
         $form = $this->createForm(PostType::class, $newPost);
         $form->handleRequest($request);
@@ -169,7 +123,7 @@ class PostController extends AbstractController
                 $post->setImage($newFileName);
             }
 
-            $post->setUser($this->getUser());
+            $post->setUser($authUser);
             $slug = $postManager->generateSlug($post->getTitle());
             $post->setSlug($slug);
             $posts->add($post, true);

@@ -1,6 +1,5 @@
 <?php
 
-// src/Controller/Admin/AdminPostController.php
 namespace App\Controller\Admin;
 
 use App\Entity\Comment;
@@ -52,6 +51,7 @@ class AdminPostController extends AbstractController
         PostManager $postManager,
         EntityManagerInterface $entityManager
     ) {
+        $user = $this->getUser();
         $form = $this->createForm(PostType::class, new Post());
         $form->handleRequest($request);
         $post = $form->getData();
@@ -60,7 +60,7 @@ class AdminPostController extends AbstractController
             $entityManager->beginTransaction();
             try {
                 // Assuming the form modifies the $post object directly
-                $post->setUser($this->getUser());
+                $post->setUser($user);
                 $slug = $postManager->generateSlug($post->getTitle());
                 $post->setSlug($slug);
                 $postRepository->add($post, true); // Assuming there's a save method to persist and flush the Post entity
@@ -72,7 +72,7 @@ class AdminPostController extends AbstractController
                 $submittedTagIds = array_filter($submittedTagIds);
 
                 if (count($submittedTagIds)) {
-                    $tagManager->addTagsToPost($post, $submittedTagIds, $this->getUser());
+                    $tagManager->addTagsToPost($post, $submittedTagIds, $user);
                 }
                 $entityManager->commit();
 
@@ -105,12 +105,13 @@ class AdminPostController extends AbstractController
         CommentRepository $commentRepository
     ): Response
     {
+        $user = $this->getUser();
         $commentForm = $this->createForm(CommentType::class, new Comment());
         $commentForm->handleRequest($request);
 
         if ($commentForm->isSubmitted() && $commentForm->isValid()) {
             $comment = $commentForm->getData();
-            $comment->setAuthor($this->getUser());
+            $comment->setAuthor($user);
             $comment->setPost($post);
             $commentRepository->add($comment, true);
             $this->addFlash('success', 'Your comment has been added.');
@@ -135,6 +136,7 @@ class AdminPostController extends AbstractController
         TagManager $tagManager
     )
     {
+        $user = $this->getUser();
         $post = $postRepository->findPostWithTags($post);
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
@@ -147,7 +149,7 @@ class AdminPostController extends AbstractController
             $submittedTagIds = array_filter($submittedTagIds);
 
             if (count($submittedTagIds)) {
-                $tagManager->updatePostTags($post, $submittedTagIds, $this->getUser());
+                $tagManager->updatePostTags($post, $submittedTagIds, $user);
             }
             $entityManager->persist($post);
             $entityManager->flush();

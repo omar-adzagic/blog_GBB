@@ -1,7 +1,29 @@
-'Please enter a password': 'Please enter a password'
-'Please enter a username': 'Please enter a username'
-'Please enter an email': 'Please enter an email'
-'Please upload a valid PNG/JPEG image': 'Please upload a valid PNG/JPEG image'
-'The password fields must match.': 'The password fields must match.'
-'You should agree to our terms.': 'You should agree to our terms.'
-'Your password should be at least {{ limit }} characters': 'Your password should be at least {{ limit }} characters'
+agree_terms_fail: 'You should agree to our terms.'
+title_not_empty: 'The title cannot be empty.'
+name_not_empty: 'The name cannot be empty.'
+content_not_empty: 'The content cannot be empty.'
+past_date: 'The date must be in the past.'
+comment:
+  content_max_length: 'Comment content must not exceed 5000 characters.'
+image:
+  valid_format: 'Please upload a valid PNG/JPEG image.'
+  not_empty: 'Please provide an image.'
+email:
+  already_used: 'This email is already in use.'
+  not_empty: 'The email cannot be empty.'
+password:
+  dont_match: 'The password fields must match.'
+  limit: 'Your password should be at least {{ limit }} characters'
+  not_empty: 'The password cannot be empty.'
+post:
+  content_max_length: 'The content must not exceed 10.000 characters.'
+  title_max_length: 'The title must not exceed 255 characters.'
+profile:
+  website_url_max_length: 'Website URL must not exceed 255 characters.'
+  location_max_length: 'Location must not exceed 255 characters.'
+tag:
+  name_max_length: 'Naziv ne smije biti duži od 255 znakova.'
+user:
+  username_not_empty: 'The username cannot be empty.'
+  name_max_length: 'The name must not exceed 255 characters.'
+  bio_max_length: 'The bio must not exceed 1024 characters.'

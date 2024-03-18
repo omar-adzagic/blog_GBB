@@ -1,18 +1,18 @@
 {% extends 'admin/admin_base.html.twig' %}
 
 {% block title %}
-    {{ 'admin'|trans({}, null, app.session.get('_locale', 'en')) }} - {{ 'tags'|trans({}, null, app.session.get('_locale', 'en')) }}
+    {{ 'admin'|trans_session }} - {{ 'tags'|trans_session }}
 {% endblock %}
 
 {% block header_text %}
-    {{ 'tags_management'|trans({}, null, app.session.get('_locale', 'en')) }}
+    {{ 'tags_management'|trans_session }}
 {% endblock %}
 
 {% block body %}
     <div class="mt-3 p-4 rounded" style="border: 1px dashed #89c2d9">
         <div class="d-flex justify-content-end">
             <a href="{{ path('admin_tag_create') }}">
-                <button class="btn btn-primary">{{ 'create_tag'|trans({}, null, app.session.get('_locale', 'en')) }}</button>
+                <button class="btn btn-primary">{{ 'create_tag'|trans_session }}</button>
             </a>
         </div>
 
@@ -20,28 +20,28 @@
             <table id="tagsTable" class="mt-3 table table-striped" style="width:100%">
                 <thead>
                 <tr>
-                    <th>{{ 'name'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
-                    <th>{{ 'created'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
-                    <th>{{ 'actions'|trans({}, null, app.session.get('_locale', 'en')) }}</th>
+                    <th>{{ 'name'|trans_session }}</th>
+                    <th>{{ 'created'|trans_session }}</th>
+                    <th>{{ 'actions'|trans_session }}</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for tag in pagination.items %}
                     <tr style="cursor: pointer;" onclick="window.location.href='{{ path('admin_tag_show', {'tag': tag.id}) }}'; event.stopPropagation();">
-                        <td>{{ tag.name }}</td>
-                        <td>{{ tag.createdAt|date('d/m/Y H:i') }}</td>
+                        <td>{{ tag.name|crop_text(50) }}</td>
+                        <td>{{ tag.created_at|date('d/m/Y H:i') }}</td>
                         <td>
                             <div style="cursor: pointer;">
                                 <a href="{{ path('admin_tag_edit', {tag: tag.id}) }}">
                                     <span class="text-primary">
-                                        <i class="bi bi-pencil-square"></i> {{ 'edit'|trans({}, null, app.session.get('_locale', 'en')) }}
+                                        <i class="bi bi-pencil-square"></i> {{ 'edit'|trans_session }}
                                     </span>
                                 </a>
                             </div>
                             <div style="cursor: pointer;">
                                 <a href="{{ path('admin_tag_delete', {tag: tag.id}) }}">
                                     <span class="text-danger" >
-                                        <i class="bi bi-archive delete-comment"></i> {{ 'delete'|trans({}, null, app.session.get('_locale', 'en')) }}
+                                        <i class="bi bi-archive delete-comment"></i> {{ 'delete'|trans_session }}
                                     </span>
                                 </a>
                             </div>
@@ -57,7 +57,7 @@
             } %}
         {% else %}
             <div class="d-flex justify-content-center lead">
-                {{ 'no data'|trans({}, null, app.session.get('_locale', 'en')) }}
+                {{ 'no_data'|trans_session }}
             </div>
         {% endif %}
     </div>

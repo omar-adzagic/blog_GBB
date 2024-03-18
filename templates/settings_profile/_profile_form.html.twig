@@ -2,34 +2,38 @@
     {% if readonly %}
         <div class="d-flex justify-content-end col-md-6">
             <a href="{{ path('app_profile_edit', {'id': app.user.id}) }}" class="btn btn-primary">
-                <i class="bi bi-pencil-square"></i> {{ 'edit'|trans({}, null, app.session.get('_locale')) }}
+                <i class="bi bi-pencil-square"></i> {{ 'edit'|trans_session }}
             </a>
         </div>
     {% endif %}
-
-    <div class="row mb-2 d-flex flex-column">
-        <div class="mb-2">
-            {{ 'profile_image'|trans({}, null, app.session.get('_locale')) }}
-        </div>
-        {{ include('shared/_avatar.html.twig', {size: 128, profile: app.user.userProfile}) }}
-
-        {% if not readonly %}
-            <div class="col-md-6 mt-3 d-flex flex-column">
-                <label for="{{ form.image.vars.id }}" class="btn btn-secondary">
-                    {{ 'change'|trans({}, null, app.session.get('_locale')) }}
-                    {{ form_widget(form.image, {'attr': {'class': 'visually-hidden'}}) }}
-                </label>
-                {{ form_errors(form.image) }}
-            </div>
-        {% else %}
-            {{ form_widget(form.image, {attr: {style: 'display: none'}}) }}
-        {% endif %}
-    </div>
 {% endif %}
+
+<div class="row mb-2 d-flex flex-column">
+    <div class="mb-2">
+        {{ 'profile_image'|trans_session }}
+    </div>
+    {% if app.user is not null %}
+        {{ include('shared/_avatar.html.twig', {size: 128, profile: app.user.userProfile}) }}
+    {% else %}
+        {{ include('shared/_avatar.html.twig', {size: 128, profile: null}) }}
+    {% endif %}
+
+    {% if not readonly %}
+        <div class="col-md-6 mt-3 d-flex flex-column">
+            <label for="{{ form.image.vars.id }}" class="btn btn-secondary">
+                {{ 'change'|trans_session }}
+                {{ form_widget(form.image, {'attr': {'class': 'visually-hidden'}}) }}
+            </label>
+            {{ form_errors(form.image) }}
+        </div>
+    {% else %}
+        {{ form_widget(form.image, {attr: {style: 'display: none'}}) }}
+    {% endif %}
+</div>
 
 <div class="row mb-2">
     <div class="col-md-6">
-        {% set labelTranslation = 'your_name'|trans({}, null, app.session.get('_locale', 'en')) %}
+        {% set labelTranslation = 'your_name'|trans_session %}
         {{ form_label(form.name, labelTranslation, {'label_attr': {'class': 'form-label'}}) }}
         {{ form_widget(form.name, {'attr': {'readonly': readonly, 'class': 'form-control'}}) }}
     </div>
@@ -37,7 +41,15 @@
 
 <div class="row mb-2">
     <div class="col-md-6">
-        {% set labelTranslation = 'date_of_birth'|trans({}, null, app.session.get('_locale', 'en')) %}
+        {% set labelTranslation = 'bio'|trans_session %}
+        {{ form_label(form.bio, labelTranslation, {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.bio, {'attr': {'readonly': readonly, 'class': 'form-control'}}) }}
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-md-6">
+        {% set labelTranslation = 'date_of_birth'|trans_session %}
         {{ form_label(
             form.dateOfBirth,
             labelTranslation,
@@ -49,7 +61,7 @@
 
 <div class="row mb-2">
     <div class="col-md-6">
-        {% set labelTranslation = 'website_url'|trans({}, null, app.session.get('_locale', 'en')) %}
+        {% set labelTranslation = 'website_url'|trans_session %}
         {{ form_label(
             form.websiteUrl,
             labelTranslation,
@@ -61,7 +73,7 @@
 
 <div class="row mb-2">
     <div class="col-md-6">
-        {% set labelTranslation = 'location'|trans({}, null, app.session.get('_locale', 'en')) %}
+        {% set labelTranslation = 'location'|trans_session %}
         {{ form_label(
             form.location,
             labelTranslation,

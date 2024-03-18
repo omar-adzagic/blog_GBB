@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Tag;
+use App\Entity\TagTranslation;
 use App\Form\TagType;
 use App\Repository\TagRepository;
 use App\Service\PaginationService;
@@ -93,13 +94,32 @@ class AdminTagController extends AbstractController
      * @Route("/tags/{tag}/edit", name="admin_tag_edit")
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function edit(Tag $tag, Request $request, TagRepository $tagRepository)
+    public function edit(
+        Tag $tag,
+        Request $request,
+        TagRepository $tagRepository,
+        EntityManagerInterface $entityManager
+    )
     {
         $form = $this->createForm(TagType::class, $tag);
+        foreach ($tag->getTranslations() as $translation) {
+            $form->get('name_' . $translation->getLocale())->setData($translation->getContent());
+        }
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $tagRepository->add($form->getData(), true);
+            // Assuming your TagType form has localized fields for 'en' and 'hr'
+            $tag->setName($form->get('name_en')->getData());
+            $tag->setTranslatableLocale('en');
+            $entityManager->persist($tag);
+            $entityManager->flush();
+
+            // Handle the 'hr' translation
+            $tag->setName($form->get('name_hr')->getData());
+            $tag->setTranslatableLocale('hr');
+            $entityManager->persist($tag);
+            $entityManager->flush();
+
             $this->addFlash('success', 'Tag has been updated.');
             return $this->redirectToRoute('admin_tag_index');
         }

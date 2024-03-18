@@ -15,6 +15,7 @@
         "doctrine/doctrine-fixtures-bundle": "^3.4",
         "doctrine/doctrine-migrations-bundle": "^3.1",
         "doctrine/orm": "^2.10",
+        "gedmo/doctrine-extensions": "^3.15",
         "jms/translation-bundle": "^1.7",
         "knplabs/knp-paginator-bundle": "^5.8",
         "sensio/framework-extra-bundle": "^6.2",

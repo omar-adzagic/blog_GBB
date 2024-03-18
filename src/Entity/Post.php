@@ -83,7 +83,7 @@ class Post
     private $content;
 
     /**
-     * @ORM\OneToMany(targetEntity=PostTag::class, mappedBy="post")
+     * @ORM\OneToMany(targetEntity=PostTag::class, mappedBy="post", cascade={"remove"})
      */
     private $postTags;
 
@@ -245,6 +245,26 @@ class Post
         }
 
         return $this;
+    }
+
+    public function isLikedByUser(User $user): bool
+    {
+        foreach ($this->likedByUsers as $like) {
+            if ($like->getUser() === $user) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function isFavoredByUser(User $user): bool
+    {
+        foreach ($this->favoredByUsers as $favorite) {
+            if ($favorite->getUser() === $user) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function getSlug(): ?string

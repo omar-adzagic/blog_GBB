@@ -18,4 +18,23 @@ class UserLikeRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, UserLike::class);
     }
+
+    public function countLikesForPostIds(array $postIds)
+    {
+        $qb = $this->createQueryBuilder('l')
+            ->select('IDENTITY(l.post) AS postId, COUNT(l.id) AS likeCount')
+            ->where('l.post IN (:postIds)')
+            ->setParameter('postIds', $postIds)
+            ->groupBy('l.post')
+            ->getQuery();
+
+        $results = $qb->getResult();
+
+        $likesCountByPostId = [];
+        foreach ($results as $result) {
+            $likesCountByPostId[$result['postId']] = (int) $result['likeCount'];
+        }
+
+        return $likesCountByPostId;
+    }
 }

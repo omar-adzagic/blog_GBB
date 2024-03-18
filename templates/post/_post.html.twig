@@ -19,59 +19,41 @@
     <div class="px-3 py-2 border rounded">
         <div class="my-2">
             <div class="small text-secondary">
-                {{ 'author'|trans({}, null, app.session.get('_locale', 'en')) }}:
+                {{ 'author'|trans_session }}:
                 <a href="{{ path('app_profile', { id: post.user.id }) }}" class="text-decoration-none">
                     {{ post.user.email }}
                 </a>
             </div>
             <div class="small text-secondary">
-                {{ 'written'|trans({}, null, app.session.get('_locale', 'en')) }}: {{ post.createdAt | date("M j, Y") }}
+                {{ 'written'|trans_session }}: {{ post.createdAt | date("M j, Y") }}
             </div>
         </div>
         {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
             {# The user is authenticated #}
             <div class="my-2 d-flex">
-{#                TODO: Refactor this#}
-                {% set isLikedByCurrentUser = false %}
-                {% for userLike in post.likedByUsers %}
-                    {% if userLike.user == app.user %}
-                        {% set isLikedByCurrentUser = true %}
-                    {% endif %}
-                {% endfor %}
-
                 {% if isLikedByCurrentUser %}
                     <form action="{{ path('app_unlike', { id: post.id }) }}" method="post" class="d-flex align-items-center">
                         <button type="submit" class="btn btn-link text-decoration-none px-2 py-1 border border-secondary">
-                            {{ 'unlike'|trans({}, null, app.session.get('_locale', 'en')) }}
-                            <span class="px-2 rounded bg-light">{{ post.likedByUsers.count }}</span>
+                            {{ 'unlike'|trans_session }}
+                            <span class="px-2 rounded bg-light">{{ totalLikes }}</span>
                             <i class="bi bi-heart-fill text-danger"></i>
                         </button>
                     </form>
                 {% else %}
                     <form action="{{ path('app_like', { id: post.id }) }}" method="post" class="d-flex align-items-center">
                         <button type="submit" class="btn btn-link text-decoration-none  px-2 py-1 border border-secondary">
-                            {{ 'like'|trans({}, null, app.session.get('_locale', 'en')) }}
-                            <span class="px-2 rounded bg-light">{{ post.likedByUsers.count }}</span>
+                            {{ 'like'|trans_session }}
+                            <span class="px-2 rounded bg-light">{{ totalLikes }}</span>
                             <i class="bi bi-heart text-danger"></i>
                         </button>
                     </form>
                 {% endif %}
             </div>
             <div class="my-2 d-flex">
-                {% set isFavoredByCurrentUser = false %}
-                {% for userFavorite in post.favoredByUsers %}
-                    {% if userFavorite.user == app.user %}
-                        {% set isFavoredByCurrentUser = true %}
-                    {% endif %}
-                {% endfor %}
-
                 {% if isFavoredByCurrentUser %}
-{#                    <a href="{{ path('app_remove_favorite', { id: post.id }) }}" class="text-decoration-none d-flex align-items-center">#}
-
-{#                    </a>#}
                     <form action="{{ path('app_remove_favorite', { id: post.id }) }}" method="post" class="d-flex align-items-center">
                         <button type="submit" class="btn btn-link text-decoration-none px-2 py-1 border border-secondary">
-                            {{ 'remove_from_favorites'|trans({}, null, app.session.get('_locale', 'en')) }}
+                            {{ 'remove_from_favorites'|trans_session }}
                             <span class="ml-2">
                                 <i class="bi bi-star-fill text-warning"></i>
                             </span>
@@ -83,7 +65,7 @@
                     </a>
                     <form action="{{ path('app_favorite', { id: post.id }) }}" method="post" class="d-flex align-items-center">
                         <button type="submit" class="btn btn-link text-decoration-none px-2 py-1 border border-secondary">
-                            {{ 'add_to_favorites'|trans({}, null, app.session.get('_locale', 'en')) }}
+                            {{ 'add_to_favorites'|trans_session }}
                             <span class="ml-2">
                                 <i class="bi bi-star text-warning"></i>
                             </span>
@@ -95,14 +77,14 @@
                 {% if post.user.id == app.user.id %}
                     <div>
                         <a href="{{ path('app_post_edit', { post: post.id }) }}" class="mr-2 text-decoration-none">
-                            {{ 'edit'|trans({}, null, app.session.get('_locale', 'en')) }}
+                            {{ 'edit'|trans_session }}
                             <i class="bi bi-pencil-square text-primary"></i>
                         </a>
                     </div>
                 {% endif %}
             </div>
             <div class="my-2">
-                {{ 'comments'|trans({}, null, app.session.get('_locale', 'en')) }}:
+                {{ 'comments'|trans_session }}:
                 <span class="px-1 rounded bg-light">{{ post.comments.count }}</span>
             </div>
         {% endif %}

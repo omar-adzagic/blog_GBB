@@ -68,8 +68,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function findAllWithoutUserLatestQB(int $userId): QueryBuilder
     {
         return $this->createQueryBuilder('u')
+            ->innerJoin('u.userProfile', 'up')
             ->orderBy('u.created_at', 'DESC')
             ->where('u.id != :userId')
+            ->select('u', 'up')
             ->setParameter('userId', $userId);
     }
 
@@ -103,6 +105,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         // Use the found user ID to retrieve and return the User entity
         return $entityManager->getRepository(User::class)->find($userId);
+    }
+
+    public function findUserWithProfile(int $userId)
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.userProfile', 'up')
+            ->addSelect('u', 'up')
+            ->where('u.id = :userId')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     public function findUserWithFavoredPosts(int $userId): ?User

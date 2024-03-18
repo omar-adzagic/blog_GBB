@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ 'edit_profile'|trans({}, null, app.session.get('_locale', 'en')) }}
+    {{ 'edit_profile'|trans_session }}
 {% endblock %}
 
 {% block bread %}
     → <a href="{{ path('app_profile') }}" class="text-decoration-none">
-    {{ 'profile'|trans({}, null, app.session.get('_locale', 'en')) }}
-</a> → {{ 'edit'|trans({}, null, app.session.get('_locale', 'en')) }}
+    {{ 'profile'|trans_session }}
+</a> → {{ 'edit'|trans_session }}
 {% endblock %}
 
 {% block body %}
@@ -17,7 +17,7 @@
 <div class="row">
     <div class="col-12 col-md-6 mt-2">
         <button type="submit" class="btn btn-primary btn-block shadow-sm">
-            {{ 'save'|trans({}, null, app.session.get('_locale', 'en')) }}
+            {{ 'save'|trans_session }}
         </button>
     </div>
 </div>

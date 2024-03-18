@@ -3,7 +3,7 @@
 
 <div class="p-4 bg-light rounded" style="border: 1px dashed #89c2d9">
     <div class="px-0 col-6 mb-3">
-        {% set labelTranslation = 'enter_the_username'|trans({}, null, app.session.get('_locale', 'en')) %}
+        {% set labelTranslation = 'enter_the_username'|trans_session %}
         {{ form_label(
             form.username,
             labelTranslation,
@@ -14,7 +14,7 @@
     </div>
 
     <div class="px-0 col-6 mb-3">
-        {% set labelTranslation = 'enter_the_email'|trans({}, null, app.session.get('_locale', 'en')) %}
+        {% set labelTranslation = 'enter_the_email'|trans_session %}
         {{ form_label(
             form.email,
             labelTranslation,
@@ -25,12 +25,12 @@
     </div>
 
     <div class="text-secondary my-4 pb-2 border-bottom">
-        {{ 'change_password_text'|trans({}, null, app.session.get('_locale', 'en')) }}
+        {{ 'change_password_text'|trans_session }}
     </div>
 
     <div class="row g-3 d-flex flex-column">
         <div class="col-md-6">
-            {% set labelTranslation = 'new_password'|trans({}, null, app.session.get('_locale', 'en')) %}
+            {% set labelTranslation = 'new_password'|trans_session %}
             {{ form_label(
                 form.plainPassword.first,
                 labelTranslation,
@@ -40,7 +40,7 @@
             {{ form_errors(form.plainPassword.first) }}
         </div>
         <div class="col-md-6">
-            {% set labelTranslation = 'repeat_new_password'|trans({}, null, app.session.get('_locale', 'en')) %}
+            {% set labelTranslation = 'repeat_new_password'|trans_session %}
             {{ form_label(
                 form.plainPassword.second,
                 labelTranslation,
@@ -54,7 +54,7 @@
 
 <div class="col-6 px-0">
     <button type="submit" class="btn btn-primary w-100 mt-4 mb-2">
-        {{ 'save'|trans({}, null, app.session.get('_locale', 'en')) }}
+        {{ 'save'|trans_session }}
     </button>
 </div>
 {{ form_end(form) }}

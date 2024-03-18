@@ -7,7 +7,7 @@
         {% endfor %}
     {% else %}
         <div class="col">
-            {{ 'nothing_here'|trans({}, null, app.session.get('_locale', 'en')) }}
+            {{ 'nothing_here'|trans_session }}
         </div>
     {% endif %}
 </div>

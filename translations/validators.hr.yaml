@@ -1,7 +1,29 @@
-'Please enter a password': 'Please enter a password'
-'Please enter a username': 'Please enter a username'
-'Please enter an email': 'Please enter an email'
-'Please upload a valid PNG/JPEG image': 'Please upload a valid PNG/JPEG image'
-'The password fields must match.': 'The password fields must match.'
-'You should agree to our terms.': 'You should agree to our terms.'
-'Your password should be at least {{ limit }} characters': 'Your password should be at least {{ limit }} characters'
+agree_terms_fail: 'Trebali biste se složiti s našim uvjetima.'
+title_not_empty: 'Naslov ne može biti prazan.'
+name_not_empty: 'Ime ne može biti prazno.'
+content_not_empty: 'Sadržaj ne može biti prazan.'
+past_date: 'Datum mora biti u prošlosti.'
+comment:
+  content_max_length: 'Sadržaj komentara ne smije premašiti 5000 znakova.'
+image:
+  valid_format: 'Učitajte valjanu PNG/JPEG sliku.'
+  not_empty: 'Molimo dostavite sliku.'
+email:
+  already_used: 'Ovaj email je zauzet.'
+  not_empty: 'E-mail ne može biti prazan.'
+password:
+  dont_match: 'Polja za lozinke se moraju podudarati.'
+  limit: 'Your password should be at least {{ limit }} characters'
+  not_empty: 'Potrebno je unijeti lozinku.'
+post:
+  content_max_length: 'Sadržaj ne smije biti dulji od 10.000 znakova.'
+  title_max_length: 'Naslov ne smije biti dulji od 255 znakova.'
+profile:
+  website_url_max_length: 'URL web stranice ne smije premašiti 255 znakova.'
+  location_max_length: 'Lokacija ne smije premašiti 255 znakova.'
+tag:
+  name_max_length: 'Naziv ne smije biti dulje od 255 znakova.'
+user:
+  username_not_empty: 'Korisničko ime ne može biti prazno.'
+  name_max_length: 'Ime korisnika ne smije biti dulje od 255 znakova.'
+  bio_max_length: 'Biografija ne smije premašiti 1024 karaktera.'

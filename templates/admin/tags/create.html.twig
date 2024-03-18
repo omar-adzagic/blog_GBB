@@ -1,13 +1,13 @@
 {% extends 'admin/admin_base.html.twig' %}
 
 {% block title %}
-    {{ 'add_tag'|trans({}, null, app.session.get('_locale', 'en')) }}
+    {{ 'add_tag'|trans_session }}
 {% endblock %}
 
 {% block bread %}
     → <a href="{{ path('admin_tag_index') }}">
-    {{ 'tags'|trans({}, null, app.session.get('_locale', 'en')) }}
-</a> → {{ 'add'|trans({}, null, app.session.get('_locale', 'en')) }}
+    {{ 'tags'|trans_session }}
+</a> → {{ 'add'|trans_session }}
 {% endblock %}
 
 {% block body %}

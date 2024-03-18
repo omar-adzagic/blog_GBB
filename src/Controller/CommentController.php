@@ -17,8 +17,13 @@ class CommentController extends AbstractController
      * @Route("/comments/{id}/delete", name="delete_comment")
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function deleteComment(Request $request, $id, CommentRepository $commentRepository, EntityManagerInterface $entityManager): Response
+    public function deleteComment(
+        Request $request, $id,
+        CommentRepository $commentRepository,
+        EntityManagerInterface $entityManager
+    ): Response
     {
+        $userId = $this->getUser()->getId();
         $comment = $commentRepository->find($id);
         if (!$comment) {
             $this->addFlash('error', 'Comment not found.');
@@ -27,7 +32,7 @@ class CommentController extends AbstractController
 
         // Check if the logged-in user is the author of the comment or has admin rights
         // Adapt this check to your application's security logic
-        if ($comment->getAuthor()->getId() !== $this->getUser()->getId() && !$this->isGranted('ROLE_ADMIN')) {
+        if ($comment->getAuthor()->getId() !== $userId && !$this->isGranted('ROLE_ADMIN')) {
             throw new AccessDeniedException('You do not have permission to delete this comment.');
         }
 

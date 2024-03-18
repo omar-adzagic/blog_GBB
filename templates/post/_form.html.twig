@@ -2,7 +2,7 @@
 <div>{{ form_errors(form) }}</div>
 
 <div class="mb-3">
-    {% set labelTranslation = 'enter_the_title'|trans({}, null, app.session.get('_locale', 'en')) %}
+    {% set labelTranslation = 'enter_the_title'|trans_session %}
     {{ form_label(
         form.title,
         labelTranslation,
@@ -13,7 +13,7 @@
 </div>
 
 <div class="mb-3">
-    {% set labelTranslation = 'enter_the_text'|trans({}, null, app.session.get('_locale', 'en')) %}
+    {% set labelTranslation = 'enter_the_text'|trans_session %}
     {{ form_label(
         form.content,
         labelTranslation,
@@ -25,7 +25,7 @@
 
 {% if is_granted('ROLE_ADMIN') %}
     <div class="mb-3">
-        {% set labelTranslation = 'publish?'|trans({}, null, app.session.get('_locale', 'en')) %}
+        {% set labelTranslation = 'publish?'|trans_session %}
         {{ form_label(
             form.is_published,
             labelTranslation,
@@ -40,7 +40,7 @@
 
 <div class="row mb-2 d-flex flex-column">
     <div class="mb-2">
-        {{ 'post_image'|trans({}, null, app.session.get('_locale')) }}
+        {{ 'post_image'|trans_session }}
     </div>
     <div class="mr-2">
         {% if post.image %}
@@ -54,7 +54,7 @@
 
     <div class="col-md-6 mt-3 d-flex flex-column">
         <label for="{{ form.image.vars.id }}" class="btn btn-secondary">
-            {{ 'change'|trans({}, null, app.session.get('_locale')) }}
+            {{ 'change'|trans_session }}
             {{ form_widget(form.image, {'attr': {'class': 'visually-hidden'}}) }}
         </label>
         {{ form_errors(form.image) }}
@@ -63,7 +63,7 @@
 
 <div>
     <button type="submit" class="btn btn-primary w-100 mt-4 mb-2">
-        {{ 'save'|trans({}, null, app.session.get('_locale')) }}
+        {{ 'save'|trans_session }}
     </button>
 </div>
 {{ form_end(form) }}

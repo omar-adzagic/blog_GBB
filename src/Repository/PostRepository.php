@@ -54,11 +54,11 @@ class PostRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('p')
             ->leftJoin('p.comments', 'c')
-            ->addSelect('c')
             ->leftJoin('p.user', 'u')
-            ->addSelect('u')
             ->leftJoin('p.likedByUsers', 'l')
-            ->addSelect('l')
+            ->leftJoin('p.postTags', 'pt')
+            ->leftJoin('pt.tag', 't')
+            ->addSelect('c', 'u', 'l', 'pt', 't')
             ->orderBy('p.created_at', 'DESC');
     }
 
@@ -141,5 +141,31 @@ class PostRepository extends ServiceEntityRepository
             ->setParameter('postId', $postId)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    public function findOneBySlugWithRelationships($slug, $userId)
+    {
+        return $this->createQueryBuilder('p')
+            ->leftJoin('p.comments', 'c')
+            ->leftJoin('p.likedByUsers', 'l', 'WITH', 'l.user = :userId')
+            ->leftJoin('p.favoredByUsers', 'f', 'WITH', 'f.user = :userId')
+            ->leftJoin('p.user', 'u')
+            ->addSelect('p', 'c', 'l', 'f', 'u')
+            ->where('p.slug = :slug')
+            ->setParameter('slug', $slug)
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function countLikesForPost($postId)
+    {
+        return $this->getEntityManager()->createQuery(
+            'SELECT COUNT(l.id)
+            FROM App\Entity\UserLike l
+            WHERE l.post = :postId'
+        )
+            ->setParameter('postId', $postId)
+            ->getSingleScalarResult();
     }
 }

@@ -33,6 +33,7 @@ security:
       form_login:
         login_path: app_login
         check_path: app_login
+#        username_parameter: email
 
       logout:
         path: app_logout

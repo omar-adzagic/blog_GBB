@@ -7,28 +7,40 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserType extends AbstractType
 {
+    private $translator;
+    private $locale;
+
+    public function __construct(TranslatorInterface $translator, RequestStack $requestStack)
+    {
+        $this->translator = $translator;
+        $session = $requestStack->getSession();
+        $this->locale = $session->get('_locale', 'en');
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('username', null, [
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter a username',
+                        'message' => $this->translator->trans('user.username_not_empty', [], 'validators', $this->locale),
                     ]),
                 ],
             ])
             ->add('email', null, [
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter an email',
+                        'message' => $this->translator->trans('email.not_empty', [], 'validators', $this->locale),
                     ]),
                 ],
             ])
@@ -50,7 +62,7 @@ class UserType extends AbstractType
                 'constraints' => [
                     new Length([
                         'min' => 6,
-                        'minMessage' => 'Your password should be at least {{ limit }} characters',
+                        'minMessage' => $this->translator->trans('password.limit', ['{{ limit }}' => 6], 'validators', $this->locale),
                         'max' => 4096, // max length allowed by Symfony for security reasons
                     ]),
                 ],
@@ -66,7 +78,7 @@ class UserType extends AbstractType
                 $form->get('plainPassword')->add('first', PasswordType::class, [
                     'constraints' => [
                         new NotBlank([
-                            'message' => 'Please enter a password',
+                            'message' => $this->translator->trans('password.not_empty', [], 'validators', $this->locale),
                         ]),
                     ],
                 ]);

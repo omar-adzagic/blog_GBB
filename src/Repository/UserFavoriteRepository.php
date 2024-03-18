@@ -29,11 +29,29 @@ class UserFavoriteRepository extends ServiceEntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('uf')
             ->innerJoin('uf.post', 'p')
+            ->leftJoin('p.comments', 'c')
+            ->leftJoin('p.user', 'u')
+            ->addSelect('p', 'c', 'u')
             ->where('uf.user = :userId')
             ->setParameter('userId', $userId)
-            ->select('uf', 'p')
             ->getQuery();
 
         return $queryBuilder->getResult();
+    }
+
+    public function findLikedAndFavoredPostsByUserId(int $userId, array $postIds)
+    {
+        $qb = $this->createQueryBuilder('uf');
+
+        $qb->select('p.id')
+            ->innerJoin('uf.post', 'p')
+            ->leftJoin('p.likedByUsers', 'l', 'WITH', 'l.user = :userId')
+            ->where('uf.user = :userId')
+            ->andWhere($qb->expr()->in('p.id', $postIds))
+            ->setParameter('userId', $userId)
+            ->groupBy('p.id')
+            ->having('COUNT(l.id) > 0');
+
+        return $qb->getQuery()->getResult();
     }
 }

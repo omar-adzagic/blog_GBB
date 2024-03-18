@@ -1,30 +1,26 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ 'register'|trans({}, null, app.session.get('_locale')) }}
+    {{ 'register'|trans_session }}
 {% endblock %}
 
 {% block bread %}
-    → {{ 'register'|trans({}, null, app.session.get('_locale')) }}
+    → {{ 'register'|trans_session }}
 {% endblock %}
 
 {% block body %}
-    {% for flash_error in app.flashes('verify_email_error') %}
-        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-    {% endfor %}
-
-    {{ form_start(registrationForm, {'attre': {'novalidate': 'novalidate'}}) }}
+    {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
     <div class="h5 mb-3">
-        {{ 'basic_info'|trans({}, null, app.session.get('_locale')) }}
+        {{ 'basic_info'|trans_session }}
     </div>
     <div class="text-secondary mb-4 pb-2 border-bottom">
-        {{ 'enter_your_credentials'|trans({}, null, app.session.get('_locale')) }}
+        {{ 'enter_your_credentials'|trans_session }}
     </div>
 
     <div>
         {{ form_label(
             registrationForm.username,
-            'username'|trans({}, null, app.session.get('_locale')),
+            'username'|trans_session,
             {'label_attr': {'class': 'form-label'}}
         ) }}
         {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control mb-2'}})}}
@@ -34,7 +30,7 @@
     <div>
         {{ form_label(
             registrationForm.email,
-            'email'|trans({}, null, app.session.get('_locale')),
+            'email'|trans_session,
             {'label_attr': {'class': 'form-label'}}
         ) }}
         {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control mb-2'}})}}
@@ -45,7 +41,7 @@
         <div class="col-md-6">
             {{ form_label(
                 registrationForm.plainPassword.first,
-                'password'|trans({}, null, app.session.get('_locale')),
+                'password'|trans_session,
                 {'label_attr': {'class': 'form-label'}}
             ) }}
             {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control mb-2'}})}}
@@ -54,7 +50,7 @@
         <div class="col-md-6">
             {{ form_label(
                 registrationForm.plainPassword.second,
-                'repeated_password'|trans({}, null, app.session.get('_locale')),
+                'repeated_password'|trans_session,
                 {'label_attr': {'class': 'form-label'}}
             ) }}
             {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control mb-2'}})}}
@@ -66,31 +62,32 @@
         {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input mb-2'}}) }}
         {{ form_label(
             registrationForm.agreeTerms,
-            'agree_to_terms'|trans({}, null, app.session.get('_locale')),
+            'agree_to_terms'|trans_session,
             {'label_attr': {'class': 'form-label'}}
         ) }}
+        {{ form_errors(registrationForm.agreeTerms) }}
     </div>
 
     <div class="h5 mt-4 mb-3">
-        {{ 'your_profile'|trans({}, null, app.session.get('_locale')) }}
+        {{ 'your_profile'|trans_session }}
     </div>
     <div class="text-secondary mb-4 pb-2 border-bottom">
-        {{ 'more_optional_details'|trans({}, null, app.session.get('_locale')) }}
+        {{ 'more_optional_details'|trans_session }}
     </div>
 
     {{ include ('/settings_profile/_profile_form.html.twig', { form: registrationForm.userProfile, readonly: false }) }}
 
     <div>
         <button type="submit" class="btn btn-primary w-100 mt-3 mb-2">
-            {{ 'register_2'|trans({}, null, app.session.get('_locale')) }}
+            {{ 'register_2'|trans_session }}
         </button>
     </div>
     {{ form_end(registrationForm) }}
 
     <div class="mt-2 text-center text-secondary">
-        {{ 'already_have_account'|trans({}, null, app.session.get('_locale')) }}
+        {{ 'already_have_account'|trans_session }}
         <a href="{{ path('app_login') }}" class="link-primary">
-            {{ 'login_here'|trans({}, null, app.session.get('_locale')) }}
+            {{ 'login_here'|trans_session }}
         </a>
     </div>
 {% endblock %}

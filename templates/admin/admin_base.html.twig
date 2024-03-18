@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ 'admin_panel'|trans({}, null, app.session.get('_locale', 'en')) }} - {% block title %}{% endblock %}</title>
+    <title>{{ 'admin_panel'|trans_session }} - {% block title %}{% endblock %}</title>
     <!-- Bootstrap CSS or other stylesheets -->
     {% block stylesheets %}
         {#        {{ encore_entry_link_tags('app') }}#}
@@ -43,22 +43,22 @@
                            aria-current="page"
                            href="{{ path('admin_post_index') }}"
                         >
-                            {{ 'posts'|trans({}, null, app.session.get('_locale', 'en')) }}
+                            {{ 'posts'|trans_session }}
                         </a>
                         <a class="nav-link {{ app.request.attributes.get('_route') == 'admin_tag_index' ? 'active' : '' }}"
                            href="{{ path('admin_tag_index') }}"
                         >
-                            {{ 'tags'|trans({}, null, app.session.get('_locale', 'en')) }}
+                            {{ 'tags'|trans_session }}
                         </a>
                         <a class="nav-link {{ app.request.attributes.get('_route') == 'admin_user_index' ? 'active' : '' }}"
                            href="{{ path('admin_user_index') }}"
                         >
-                            {{ 'users'|trans({}, null, app.session.get('_locale', 'en')) }}
+                            {{ 'users'|trans_session }}
                         </a>
                     </div>
                     <div class="ml-2 text-primary">
                         <a href="{{ path('app_logout') }}" class="text-decoration-none">
-                            {{ 'logout'|trans({}, null, app.session.get('_locale', 'en')) }}
+                            {{ 'logout'|trans_session }}
                             <i class="bi bi-box-arrow-right"></i>
                         </a>
                     </div>
