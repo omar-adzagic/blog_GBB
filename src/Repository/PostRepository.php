@@ -65,21 +65,6 @@ class PostRepository extends ServiceEntityRepository
             ->orderBy('p.created_at', 'DESC');
     }
 
-    public function findAllWithComments(): array
-    {
-        return $this->findAllWithCommentsQB()
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function findPublishedWithComments(): array
-    {
-        return $this->findAllWithCommentsQB()
-            ->where('p.is_published = 1')
-            ->getQuery()
-            ->getResult();
-    }
-
     public function findAllByUser($user): array
     {
         return $this->createQueryBuilder('p')
@@ -110,7 +95,7 @@ class PostRepository extends ServiceEntityRepository
 //                ->setParameter('currentUserId', $currentUserId);
 //        }
 
-    public function findAllWithCommentCountQB(): QueryBuilder
+    private function findAllWithCommentCountQB(): QueryBuilder
     {
         return $this->createQueryBuilder('p')
             ->leftJoin('p.translations', 'pt')

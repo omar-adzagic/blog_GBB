@@ -26,7 +26,6 @@ class PostTagRepository extends ServiceEntityRepository
     public function findPostTagByIdsWithRelations(array $postTagIds): array
     {
         return $this->createQueryBuilder('pt')
-//            ->join('pt.post', 'p')
             ->join('pt.tag', 't')
             ->leftJoin('t.translations', 'tt')
             ->select('pt', 't', 'tt')

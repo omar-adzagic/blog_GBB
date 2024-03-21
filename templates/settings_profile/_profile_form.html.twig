@@ -12,10 +12,10 @@
     <div class="mb-2">
         {{ 'profile.image'|trans_session }}
     </div>
-    {% if app.user is not null %}
+    {% if app.user.userProfile.image is defined %}
         {{ include('shared/_avatar.html.twig', {size: 128, profile: app.user.userProfile}) }}
     {% else %}
-        {{ include('shared/_avatar.html.twig', {size: 128, profile: null}) }}
+        {{ include('shared/_avatar.html.twig', {size: 128, profile: {image: null}}) }}
     {% endif %}
 
     {% if not readonly %}

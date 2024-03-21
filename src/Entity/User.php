@@ -90,6 +90,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\OneToOne(targetEntity="UserProfile", mappedBy="user", cascade={"persist", "remove"})
      */
     private $userProfile;
+    private $likedPosts;
 
     public function __construct()
     {

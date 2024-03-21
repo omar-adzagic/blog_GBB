@@ -46,6 +46,10 @@ class UserFavoriteRepository extends ServiceEntityRepository
 
     public function findFavoritePostsByPostIdsAndUserId(array $postIds, int $userId): array
     {
+        if (empty($postIds)) {
+            return [];
+        }
+
         $qb = $this->createQueryBuilder('uf');
         $qb->innerJoin('uf.post', 'p')
             ->innerJoin('uf.user', 'u')

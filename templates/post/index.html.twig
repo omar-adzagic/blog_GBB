@@ -20,6 +20,11 @@
         {% endif %}
     </div>
 
+    <div class="justify-content-center" id="spinner-container">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
     <div id="postsContainer" class="row"></div>
     <div id="paginationContainer" class="d-flex justify-content-end"></div>
 {% endblock %}
@@ -72,7 +77,27 @@
             paginationContainer.appendChild(nav);
         }
 
+        function showSpinner () {
+            console.log('show spinner')
+            const spinnerDiv = document.getElementById('spinner-container');
+            if (spinnerDiv) {
+                spinnerDiv.classList.add('d-flex');
+            }
+        }
+
+        function hideSpinner () {
+            console.log('hide spinner')
+            const spinnerDiv = document.getElementById('spinner-container');
+            console.log('spinnerDiv', spinnerDiv)
+            if (spinnerDiv) {
+                spinnerDiv.classList.remove('d-flex');
+                spinnerDiv.classList.add('d-none');
+                console.log('spinnerDiv', spinnerDiv)
+            }
+        }
+
         function fetchPosts(url, page=1, title='') {
+            showSpinner();
             // Perform the AJAX request
             url += `?page=${page}`
 
@@ -260,7 +285,10 @@
 
                     // console.log('postsContainer', postsContainer)
                 })
-                .catch(error => console.error('Error fetching data:', error));
+                .catch(error => console.error('Error fetching data:', error))
+                .finally(() => {
+                    hideSpinner();
+                });
         }
 
         document.addEventListener('DOMContentLoaded', function() {

@@ -40,29 +40,12 @@ class TagRepository extends ServiceEntityRepository
         }
     }
 
-
-    public function findByNameLike(string $searchTerm)
-    {
-        return $this->createQueryBuilder('t')
-            ->where('t.name LIKE :searchTerm')
-            ->setParameter('searchTerm', '%'.$searchTerm.'%')
-            ->getQuery()
-            ->getResult();
-    }
-
     public function findAllLatestQB(): QueryBuilder
     {
         return $this->createQueryBuilder('t')
             ->leftJoin('t.translations', 'tt')
             ->select('t', 'tt')
             ->orderBy('t.created_at', 'DESC');
-    }
-
-    public function findAllLatest(): array
-    {
-        return $this->findAllLatestQB()
-            ->getQuery()
-            ->getResult();
     }
 
     /**

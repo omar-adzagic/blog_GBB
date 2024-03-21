@@ -75,13 +75,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->setParameter('userId', $userId);
     }
 
-    public function findAllWithoutUserLatest(int $userId): array
-    {
-        return $this->findAllWithoutUserLatestQB($userId)
-            ->getQuery()
-            ->getResult();
-    }
-
     public function findFirstAdmin()
     {
         $entityManager = $this->getEntityManager();
@@ -105,30 +98,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         // Use the found user ID to retrieve and return the User entity
         return $entityManager->getRepository(User::class)->find($userId);
-    }
-
-    public function findUserWithProfile(int $userId)
-    {
-        return $this->createQueryBuilder('u')
-            ->leftJoin('u.userProfile', 'up')
-            ->addSelect('u', 'up')
-            ->where('u.id = :userId')
-            ->setParameter('userId', $userId)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
-
-    public function findUserWithFavoredPosts(int $userId): ?User
-    {
-        return $this->createQueryBuilder('u')
-            ->leftJoin('u.userFavorites', 'uf')
-            ->addSelect('uf')
-            ->leftJoin('uf.post', 'p')
-            ->addSelect('p')
-            ->where('u.id = :userId')
-            ->setParameter('userId', $userId)
-            ->getQuery()
-            ->getOneOrNullResult();
     }
 
     public function findUserActivities(int $userId, string $locale)
