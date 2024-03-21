@@ -2,12 +2,19 @@
 
 namespace App\Controller\Admin;
 
+use App\DTO\PostDTO;
+use App\DTO\TagDTO;
 use App\Entity\Comment;
 use App\Entity\Post;
+use App\Entity\PostTranslation;
+use App\Entity\User;
 use App\Form\CommentType;
 use App\Form\PostType;
-use App\Repository\CommentRepository;
 use App\Repository\PostRepository;
+use App\Repository\PostTagRepository;
+use App\Service\CommentManager;
+use App\Service\ContentTranslationService;
+use App\Service\HelperService;
 use App\Service\PaginationService;
 use App\Service\PostManager;
 use App\Service\TagManager;
@@ -30,14 +37,20 @@ class AdminPostController extends AbstractController
      * @Route("/posts", name="admin_post_index")
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function index(PostRepository $postRepository, PaginationService $paginationService)
+    public function index(
+        PostRepository $postRepository,
+        PaginationService $paginationService,
+        ContentTranslationService $contentTranslationService
+    ): Response
     {
         $queryBuilder = $postRepository->findAllWithCommentsQB();
         $pagination = $paginationService->paginate($queryBuilder);
 
-        return $this->render('admin/posts/index.html.twig', [
-            'pagination' => $pagination
-        ]);
+        $items = $pagination->getItems();
+        $postsDTO = PostDTO::createFromEntities($items, $contentTranslationService);
+        $pagination->setItems($postsDTO);
+
+        return $this->render('admin/posts/index.html.twig', ['pagination' => $pagination]);
     }
 
     /**
@@ -46,34 +59,34 @@ class AdminPostController extends AbstractController
      */
     public function create(
         Request $request,
-        PostRepository $postRepository,
         TagManager $tagManager,
         PostManager $postManager,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        ContentTranslationService $contentTranslationService
     ) {
         $user = $this->getUser();
         $form = $this->createForm(PostType::class, new Post());
+        $contentTranslationService->setLocaleCreateFormFields($form, ['title', 'content']);
         $form->handleRequest($request);
         $post = $form->getData();
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->beginTransaction();
             try {
-                // Assuming the form modifies the $post object directly
-                $post->setUser($user);
-                $slug = $postManager->generateSlug($post->getTitle());
-                $post->setSlug($slug);
-                $postRepository->add($post, true); // Assuming there's a save method to persist and flush the Post entity
+                $postManager->saveCreatePost($post, $form);
 
-                $requestPostTagIds = explode(',', $request->request->get('postTags', ''));
-                $submittedTagIds = array_map(function ($tagIdString) {
-                    return (int)$tagIdString;
-                }, $requestPostTagIds);
-                $submittedTagIds = array_filter($submittedTagIds);
+                $contentTranslationService->setCreateTranslatableFormFields(
+                    $form, $post, ['title', 'content'], PostTranslation::class
+                );
+
+                $requestTagIdsString = $request->request->get('postTags', '');
+                $submittedTagIds = $postManager->extractTagIdsFromRequestData($requestTagIdsString);
 
                 if (count($submittedTagIds)) {
-                    $tagManager->addTagsToPost($post, $submittedTagIds, $user);
+                    $tagManager->addTagsToPost($post, $submittedTagIds);
                 }
+
+                $entityManager->flush();
                 $entityManager->commit();
 
                 $this->addFlash('success', 'Post has been created.');
@@ -84,14 +97,12 @@ class AdminPostController extends AbstractController
             }
         }
 
-        // Initially, no tags are associated with the new post, so no need to serialize post tags here
-        return $this->renderForm(
-            'admin/posts/create.html.twig',
-            [
-                'form' => $form,
-                'post' => $post
-            ]
-        );
+        $responseData = [
+            'form' => $form,
+            'post' => $post,
+            'locales' => $contentTranslationService->getSupportedLocales()
+        ];
+        return $this->renderForm('admin/posts/create.html.twig', $responseData);
     }
 
     /**
@@ -102,24 +113,34 @@ class AdminPostController extends AbstractController
         Post $post,
         Request $request,
         PostRepository $postRepository,
-        CommentRepository $commentRepository
+        CommentManager $commentManager,
+        ContentTranslationService $contentTranslationService
     ): Response
     {
+        /** @var User $user */
         $user = $this->getUser();
+
+        $post = $postRepository->findUserPostWithRelations($post->getId(), $user->getId());
+
         $commentForm = $this->createForm(CommentType::class, new Comment());
         $commentForm->handleRequest($request);
 
         if ($commentForm->isSubmitted() && $commentForm->isValid()) {
             $comment = $commentForm->getData();
-            $comment->setAuthor($user);
-            $comment->setPost($post);
-            $commentRepository->add($comment, true);
+            $commentManager->saveComment($post, $comment);
             $this->addFlash('success', 'Your comment has been added.');
+
+            return $this->redirectToRoute('admin_post_show', ['post' => $post->getId()]);
         }
 
+        $postDTO = PostDTO::createFromEntity($post, $contentTranslationService);
+        $postDTO->setIsLiked($post->isLikedByUser($user));
+        $postDTO->setIsFavorite($post->isFavoredByUser($user));
+        $postDTO->setLikesCount($postRepository->countLikesForPost($post->getId()));
+
         return $this->render('post/show.html.twig', [
-            'post' => $post,
-            'commentForm' => $commentForm->createView()
+            'post' => $postDTO,
+            'commentForm' => $commentForm->createView(),
         ]);
     }
 
@@ -130,60 +151,79 @@ class AdminPostController extends AbstractController
     public function edit(
         int $post,
         Request $request,
-        EntityManagerInterface $entityManager,
         PostRepository $postRepository,
+        PostTagRepository $postTagRepository,
         SerializerInterface $serializer,
-        TagManager $tagManager
+        TagManager $tagManager,
+        PostManager $postManager,
+        ContentTranslationService $contentTranslationService,
+        EntityManagerInterface $entityManager
     )
     {
         $user = $this->getUser();
-        $post = $postRepository->findPostWithTags($post);
+        $post = $postRepository->findUserPostWithRelations($post, $user->getId());
+
         $form = $this->createForm(PostType::class, $post);
+        $contentTranslationService->setLocaleEditFormFields($form, $post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $post->setIsPublished($form->get('is_published')->getData());
+            $entityManager->beginTransaction();
+            try {
+                $postManager->saveCreatePost($post, $form);
+                $contentTranslationService->setEditTranslatableFields($form, $post);
 
-            $requestPostTagIds = explode(',', $request->request->get('postTags', ''));
-            $submittedTagIds = array_map(function ($tagIdString) { return (int) $tagIdString; }, $requestPostTagIds);
-            $submittedTagIds = array_filter($submittedTagIds);
+                $requestTagIdsString = $request->request->get('postTags', '');
+                $submittedTagIds = $postManager->extractTagIdsFromRequestData($requestTagIdsString);
+                if (count($submittedTagIds)) {
+                    $tagManager->updatePostTags($post, $submittedTagIds);
+                }
 
-            if (count($submittedTagIds)) {
-                $tagManager->updatePostTags($post, $submittedTagIds, $user);
+                $entityManager->flush();
+                $entityManager->commit();
+
+                $this->addFlash('success', 'Post has been updated.');
+                return $this->redirectToRoute('admin_post_index');
+            } catch (\Exception $e) {
+                $entityManager->rollback();
+                $this->addFlash('error', 'An error occurred. The post could not be created.');
             }
-            $entityManager->persist($post);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Post has been updated.');
-            return $this->redirectToRoute('admin_post_index');
         }
 
-        $postTagsJson = $serializer->serialize($post->getPostTags(), 'json', [
-            'circular_reference_handler' => function ($object) {
-                return $object->getId();
-            }
-        ]);
+        $postTagIds = HelperService::getIdsFromDoctrine($post->getPostTags()->toArray());
+        $postTags = $postTagRepository->findPostTagByIdsWithRelations($postTagIds);
+        $tagDTOs = TagDTO::createFromPostTags($postTags, $contentTranslationService);
+        $postTagsJson = $serializer->serialize($tagDTOs, 'json');
 
-        return $this->renderForm(
-            'admin/posts/edit.html.twig',
-            [
-                'form' => $form,
-                'post' => $post,
-                'postTagsJson' => $postTagsJson,
-            ]
-        );
+        $responseData = [
+            'form' => $form,
+            'post' => $post,
+            'postTagsJson' => $postTagsJson,
+            'locales' => $contentTranslationService->getSupportedLocales()
+        ];
+        return $this->renderForm('admin/posts/edit.html.twig', $responseData);
     }
 
     /**
      * @Route("/posts/{post}/delete", name="admin_post_delete")
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function delete(Post $post, EntityManagerInterface $entityManager): RedirectResponse
+    public function delete(Post $post, PostManager $postManager, EntityManagerInterface $entityManager): RedirectResponse
     {
-        $entityManager->remove($post);
-        $entityManager->flush();
+        $entityManager->beginTransaction();
+        try {
+            $postManager->deleteOldImage($post);
 
-        $this->addFlash('success', 'Post has been deleted.');
+            $entityManager->remove($post);
+            $entityManager->flush();
+
+            $entityManager->commit();
+
+            $this->addFlash('success', 'Post has been deleted.');
+        } catch (\Exception $e) {
+            $entityManager->rollback();
+            $this->addFlash('error', 'An error occurred while deleting the post.');
+        }
 
         return $this->redirectToRoute('admin_post_index');
     }

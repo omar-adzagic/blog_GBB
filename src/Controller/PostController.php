@@ -2,26 +2,23 @@
 
 namespace App\Controller;
 
+use App\DTO\PostDTO;
 use App\Entity\Comment;
 use App\Entity\Post;
+use App\Entity\PostTranslation;
 use App\Entity\User;
 use App\Form\CommentType;
 use App\Form\PostType;
-use App\Message\SendEmailMessage;
-use App\Repository\CommentRepository;
 use App\Repository\PostRepository;
-use App\Repository\UserRepository;
-use App\Service\FileUploader;
+use App\Service\CommentManager;
+use App\Service\ContentTranslationService;
+use App\Service\EmailService;
 use App\Service\PostManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -30,10 +27,9 @@ class PostController extends AbstractController
     /**
      * @Route("/", name="app_post")
      */
-    public function index(PostRepository $postRepository): Response
+    public function index(): Response
     {
-        $posts = $postRepository->findPublishedWithComments();
-        return $this->render('post/index.html.twig', ['posts' => $posts]);
+        return $this->render('post/index.html.twig');
     }
 
     /**
@@ -43,17 +39,18 @@ class PostController extends AbstractController
         string $slug,
         Request $request,
         PostRepository $postRepository,
-        CommentRepository $commentRepository,
-        UserRepository $userRepository,
-        MessageBusInterface $messageBus
+        CommentManager $commentManager,
+        EmailService $emailService,
+        ContentTranslationService $contentTranslationService
     ): Response
     {
+        /** @var User $user */
         $user = $this->getUser();
-        $userId = $user->getId();
+        $userId = $user ? $user->getId() : null;
         $post = $postRepository->findOneBySlugWithRelationships($slug, $userId);
 
         if (!$post) {
-            throw $this->createNotFoundException('No post found for slug '.$slug);
+            throw $this->createNotFoundException('No post found for slug ' . $slug);
         }
 
         $commentForm = $this->createForm(CommentType::class, new Comment());
@@ -61,40 +58,26 @@ class PostController extends AbstractController
 
         if ($commentForm->isSubmitted() && $commentForm->isValid()) {
             $comment = $commentForm->getData();
-            $comment->setAuthor($user);
-            $comment->setPost($post);
-            $commentRepository->add($comment, true);
+            $commentManager->saveComment($post, $comment);
+
+            $emailService->sendAdminNewCommentNotification($post, $comment);
+
             $this->addFlash('success', 'Your comment has been added.');
-
-            $userAdmin = $userRepository->findFirstAdmin();
-            if ($userAdmin) {
-                $email = (new TemplatedEmail())
-                    ->from(new Address('getByBus@test.com', 'Blog GBB'))
-                    ->to($userAdmin->getEmail())
-                    ->subject('New Comment was Made')
-                    ->htmlTemplate('email/new_comment.html.twig')
-                    ->context([
-                        'admin' => $userAdmin,
-                        'comment' => $comment,
-                        'post' => $post,
-                    ]);
-
-                $messageBus->dispatch(new SendEmailMessage($email));
-            }
             return $this->redirectToRoute('app_post_show', ['slug' => $post->getSlug()]);
         }
 
-        $isLikedByCurrentUser = $post->isLikedByUser($user);
-        $isFavoredByCurrentUser = $post->isFavoredByUser($user);
-        $totalLikes = $postRepository->countLikesForPost($post->getId());
+        $postDTO = PostDTO::createFromEntity($post, $contentTranslationService);
+        if ($user) {
+            $postDTO->setIsLiked($post->isLikedByUser($user));
+            $postDTO->setIsFavorite($post->isFavoredByUser($user));
+        }
+        $postDTO->setLikesCount($postRepository->countLikesForPost($post->getId()));
 
-        return $this->render('post/show.html.twig', [
-            'post' => $post,
-            'isLikedByCurrentUser' => $isLikedByCurrentUser,
-            'isFavoredByCurrentUser' => $isFavoredByCurrentUser,
-            'totalLikes' => $totalLikes,
+        $responseData = [
+            'post' => $postDTO,
             'commentForm' => $commentForm->createView(),
-        ]);
+        ];
+        return $this->render('post/show.html.twig', $responseData);
     }
 
     /**
@@ -103,39 +86,43 @@ class PostController extends AbstractController
      */
     public function create(
         Request $request,
-        PostRepository $posts,
         PostManager $postManager,
-        FileUploader $fileUploader
+        ContentTranslationService $contentTranslationService,
+        EntityManagerInterface $entityManager
     ): Response
     {
-        $authUser = $this->getUser();
         $newPost = new Post();
+
         $form = $this->createForm(PostType::class, $newPost);
+        $contentTranslationService->setLocaleCreateFormFields($form, ['title', 'content']);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $post = $form->getData();
+            $entityManager->beginTransaction();
+            try {
+                $post = $form->getData();
+                $postManager->saveCreatePost($post, $form);
+                $postManager->savePostImage($post, $form);
+                $contentTranslationService->setCreateTranslatableFormFields(
+                    $form, $post, ['title', 'content'], PostTranslation::class
+                );
 
-            $postImageFile = $form->get('image')->getData();
+                $entityManager->flush();
+                $entityManager->commit();
 
-            if ($postImageFile) {
-                $newFileName = $fileUploader->upload($postImageFile, 'post_images/');
-                $post->setImage($newFileName);
+                $this->addFlash('success', 'Your post has been added.');
+
+                return $this->redirectToRoute('app_post');
+            } catch (\Exception $e) {
+                $entityManager->rollback();
+                $this->addFlash('error', 'An error occurred. The post could not be created.');
             }
-
-            $post->setUser($authUser);
-            $slug = $postManager->generateSlug($post->getTitle());
-            $post->setSlug($slug);
-            $posts->add($post, true);
-
-            $this->addFlash('success', 'Your post has been added.');
-
-            return $this->redirectToRoute('app_post');
         }
 
         $responseData = [
             'form' => $form,
             'post' => $newPost,
+            'locales' => $contentTranslationService->getSupportedLocales()
         ];
         return $this->renderForm('post/create.html.twig', $responseData);
     }
@@ -145,11 +132,10 @@ class PostController extends AbstractController
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function edit(
-        Post $post, Request $request, PostRepository $posts,
-        EntityManagerInterface $entityManager,
+        Post $post, Request $request,
         PostManager $postManager,
-        FileUploader $fileUploader
-    ): Response // * @IsGranted("EDIT", subject="post")
+        ContentTranslationService $contentTranslationService
+    ): Response
     {
         $authUserId = $this->getUser()->getId();
 
@@ -159,55 +145,23 @@ class PostController extends AbstractController
         }
 
         $form = $this->createForm(PostType::class, $post);
+        $contentTranslationService->setLocaleEditFormFields($form, $post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $postImageFile = $form->get('image')->getData();
-
-            if ($postImageFile) {
-                $oldFilename = $post->getImage();
-                if ($oldFilename) {
-                    $fileUploader->deleteFile($oldFilename, '/post_images');
-                }
-
-                $newFileName = $fileUploader->upload($postImageFile, '/post_images');
-                $post->setImage($newFileName);
-            }
-
-            // Set slug before persisting entity changes
-            $slug = $postManager->generateSlug($post->getTitle());
-            $post->setSlug($slug);
-
-            // If $posts->add() method already handles persisting and flushing,
-            // there's no need to call $entityManager->persist() and flush() again.
-            $posts->add($post, true);
+            $postManager->saveEditPost($post, $form);
+            $postManager->updatePostImage($post, $form);
+            $contentTranslationService->setEditTranslatableFields($form, $post);
 
             $this->addFlash('success', 'Your post has been updated.');
             return $this->redirectToRoute('app_post');
         }
 
-        return $this->renderForm('post/edit.html.twig', ['form' => $form, 'post' => $post]);
-    }
-
-    /**
-     * @Route("/post/{post}/comment", name="app_post_comment")
-     * @IsGranted("IS_AUTHENTICATED_FULLY")
-     */
-    public function addComment(Post $post, Request $request, CommentRepository $comments): Response // * @IsGranted("ROLE_COMMENTER")
-    {
-        $form = $this->createForm(CommentType::class, new Comment());
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $comment = $form->getData();
-            $comment->setPost($post);
-            $comment->setAuthor($this->getUser());
-            $comments->add($comment, true);
-            $this->addFlash('success', 'Your comment has been posted.');
-
-            return $this->redirectToRoute('app_post_show', ['slug' => $post->getSlug()]);
-        }
-
-        return $this->renderForm('post/comment.html.twig', ['form' => $form, 'post' => $post]);
+        $responseData = [
+            'form' => $form,
+            'post' => $post,
+            'locales' => $contentTranslationService->getSupportedLocales()
+        ];
+        return $this->renderForm('post/edit.html.twig', $responseData);
     }
 }

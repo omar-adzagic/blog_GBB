@@ -20,7 +20,7 @@
     <div>
         {{ form_label(
             registrationForm.username,
-            'username'|trans_session,
+            'user.username'|trans_session,
             {'label_attr': {'class': 'form-label'}}
         ) }}
         {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control mb-2'}})}}
@@ -30,7 +30,7 @@
     <div>
         {{ form_label(
             registrationForm.email,
-            'email'|trans_session,
+            'user.email'|trans_session,
             {'label_attr': {'class': 'form-label'}}
         ) }}
         {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control mb-2'}})}}
@@ -41,7 +41,7 @@
         <div class="col-md-6">
             {{ form_label(
                 registrationForm.plainPassword.first,
-                'password'|trans_session,
+                'user.password'|trans_session,
                 {'label_attr': {'class': 'form-label'}}
             ) }}
             {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control mb-2'}})}}

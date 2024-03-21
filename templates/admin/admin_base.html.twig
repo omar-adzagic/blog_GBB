@@ -20,10 +20,10 @@
     {% endblock %}
 </head>
 <body>
-<div class="" style="margin: auto; width: 80%">
+<div style="margin: auto; width: 80%">
     <header>
         <!-- Admin navigation bar or header content -->
-        <nav class="navbar navbar-expand-lg mt-2 navbar-light bg-light rounded" style="border: 1px solid #89c2d9">
+        <nav class="navbar navbar-expand-lg mt-3 px-3 navbar-light bg-light rounded" style="border: 1px solid #89c2d9">
             <div class="container-fluid">
                 <a class="navbar-brand text-primary" href="{{ path('app_post') }}">
                     <i class="bi bi-house"></i>
@@ -43,17 +43,17 @@
                            aria-current="page"
                            href="{{ path('admin_post_index') }}"
                         >
-                            {{ 'posts'|trans_session }}
+                            {{ 'the_posts'|trans_session }}
                         </a>
                         <a class="nav-link {{ app.request.attributes.get('_route') == 'admin_tag_index' ? 'active' : '' }}"
                            href="{{ path('admin_tag_index') }}"
                         >
-                            {{ 'tags'|trans_session }}
+                            {{ 'the_tags'|trans_session }}
                         </a>
                         <a class="nav-link {{ app.request.attributes.get('_route') == 'admin_user_index' ? 'active' : '' }}"
                            href="{{ path('admin_user_index') }}"
                         >
-                            {{ 'users'|trans_session }}
+                            {{ 'the_users'|trans_session }}
                         </a>
                     </div>
                     <div class="ml-2 text-primary">

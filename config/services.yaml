@@ -54,5 +54,18 @@ services:
         tags:
             - { name: twig.extension }
 
+    App\Twig\ContentTranslationExtension:
+        tags:
+            - { name: twig.extension }
+
+    App\Service\ContentTranslationService:
+        arguments:
+            $parameterBag: '@parameter_bag'
+
+    App\Service\PostManager:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+            $authorizationChecker: '@security.authorization_checker'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

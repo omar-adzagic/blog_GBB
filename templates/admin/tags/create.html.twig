@@ -1,13 +1,13 @@
 {% extends 'admin/admin_base.html.twig' %}
 
 {% block title %}
-    {{ 'add_tag'|trans_session }}
+    {{ 'tag.add'|trans_session }}
 {% endblock %}
 
 {% block bread %}
     → <a href="{{ path('admin_tag_index') }}">
-    {{ 'tags'|trans_session }}
-</a> → {{ 'add'|trans_session }}
+    {{ 'the_tags'|trans_session }}
+</a> → {{ 'actions.add'|trans_session }}
 {% endblock %}
 
 {% block body %}

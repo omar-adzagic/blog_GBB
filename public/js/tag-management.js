@@ -1,16 +1,15 @@
 let availableTags = []; // Store the tags fetched from the API
 let selectedTagIds = []; // This will store the tag IDs
 
-function addTag(tag) {
+function addTag(postTag) {
     // Check if the tagName exists in availableTags
-    const tagExists = availableTags.some(currentTag => currentTag.name === tag.name);
-    console.log('availableTags', availableTags, 'tagName', tag.name, 'tagExists', tagExists)
+    const tagExists = availableTags.some(currentTag => currentTag.name === postTag.name);
     if (tagExists) {
-        selectedTagIds.push(tag.id);
+        selectedTagIds.push(postTag.id);
         const newTag = document.createElement('span');
         newTag.className = 'badge bg-primary p-2 mr-2 text-white';
-        newTag.innerHTML = `${tag.name} <i class="bi bi-x-lg ml-1 text-danger" onclick="removeTag(this)"></i>`;
-        newTag.setAttribute('data-tag-id', tag.id);
+        newTag.innerHTML = `${postTag.name} <i class="bi bi-x-lg ml-1 text-danger" onclick="removeTag(this)"></i>`;
+        newTag.setAttribute('data-tag-id', postTag.id);
         const tagsContainer = document.getElementById('tags-container');
         tagsContainer.appendChild(newTag);
         updateHiddenInputWithTags();
@@ -20,7 +19,6 @@ function addTag(tag) {
 }
 
 function removeTag(element) {
-    console.log('element', element.parentNode)
     const removedTagId = parseInt(element.parentNode.dataset.tagId);
     selectedTagIds = selectedTagIds.filter(tagId => tagId !== removedTagId);
     element.parentNode.remove(); // Remove the tag badge
@@ -37,9 +35,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const postTags = JSON.parse(tagsContainer.dataset.postTagsJson);
 
     postTags.forEach(postTag => {
-        const tag = postTag.tag;
-        availableTags.push(tag);
-        addTag(tag);
+        availableTags.push(postTag);
+        addTag(postTag);
     });
 
     const input = document.getElementById('tag-input');
@@ -47,9 +44,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('add-tag-btn').addEventListener('click', function(e) {
         e.preventDefault();
-        const tagName = input.value;
-        const tag = availableTags.find(tag => tag.name === tagName);
-        addTag(tag);
+        const name = input.value;
+        const postTag = availableTags.find(postTag => postTag.name === name);
+        addTag(postTag);
         input.value = '';
     });
 });
@@ -59,12 +56,13 @@ function fetchTagSuggestions() {
     const searchTerm = input.value.trim();
 
     if (searchTerm) {
-        const url = `/admin/tags/search?q=${encodeURIComponent(searchTerm)}`;
+        const url = `/api/tags/search?q=${encodeURIComponent(searchTerm)}`;
         fetch(url)
             .then(response => response.json())
             .then(data => {
                 console.log('data.tags', data.tags)
                 availableTags = [...availableTags, ...data.tags];
+                console.log('availableTags', availableTags)
                 displayTagSuggestions(data.tags);
             });
     } else {

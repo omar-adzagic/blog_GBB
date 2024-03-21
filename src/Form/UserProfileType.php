@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\UserProfile;
+use App\Service\TranslationService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -18,14 +19,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserProfileType extends AbstractType
 {
-    private $translator;
-    private $locale;
-
-    public function __construct(TranslatorInterface $translator, RequestStack $requestStack)
+    private $translationService;
+    public function __construct(TranslationService $translationService)
     {
-        $this->translator = $translator;
-        $session = $requestStack->getSession();
-        $this->locale = $session->get('_locale', 'en');
+        $this->translationService = $translationService;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -35,15 +32,16 @@ class UserProfileType extends AbstractType
                 'constraints' => [
                     new Length([
                         'max' => 255,
-                        'maxMessage' => $this->translator->trans('user.name_max_length', [], 'validators', $this->locale),
+                        'maxMessage' => $this->translationService->sessionTranslate('user.name_max_length','validators'),
                     ]),
                 ],
             ])
             ->add('bio', TextareaType::class, [
+                'required' => false,
                 'constraints' => [
                     new Length([
                         'max' => 1024,
-                        'maxMessage' => $this->translator->trans('user.bio_max_length', [], 'validators', $this->locale),
+                        'maxMessage' => $this->translationService->sessionTranslate('user.bio_max_length','validators'),
                     ]),
                 ],
             ])
@@ -51,7 +49,7 @@ class UserProfileType extends AbstractType
                 'constraints' => [
                     new Length([
                         'max' => 255,
-                        'maxMessage' => $this->translator->trans('profile.website_url_max_length', [], 'validators', $this->locale),
+                        'maxMessage' => $this->translationService->sessionTranslate('profile.website_url_max_length','validators'),
                     ]),
                 ],
             ])
@@ -59,7 +57,7 @@ class UserProfileType extends AbstractType
                 'constraints' => [
                     new Length([
                         'max' => 255,
-                        'maxMessage' => $this->translator->trans('profile.location_max_length', [], 'validators', $this->locale),
+                        'maxMessage' => $this->translationService->sessionTranslate('profile.location_max_length','validators'),
                     ]),
                 ],
             ])
@@ -72,7 +70,7 @@ class UserProfileType extends AbstractType
                     'constraints' => [
                         new LessThan([
                             'value' => 'today',
-                            'message' => $this->translator->trans('past_date', [], 'validators', $this->locale),
+                            'message' => $this->translationService->sessionTranslate('past_date','validators'),
                         ]),
                     ],
                 ]
@@ -88,7 +86,7 @@ class UserProfileType extends AbstractType
                             'image/jpeg',
                             'image/png',
                         ],
-                        'mimeTypesMessage' => $this->translator->trans('image.valid_format', [], 'validators', $this->locale),
+                        'mimeTypesMessage' => $this->translationService->sessionTranslate('image.valid_format','validators'),
                     ]),
                 ]
             ]);

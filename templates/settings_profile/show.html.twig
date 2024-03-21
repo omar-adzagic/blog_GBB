@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'profile.show'|trans_session }}{% endblock %}
+
+{% block bread %}
+ → {{ 'profile.show'|trans_session }}
+{% endblock %}
+
+{% block body %}
+    <div class="card" style="width: 33%; margin-left: auto; margin-right: auto; margin-top: 10%">
+        <h4 class="card-title my-3 mx-auto">{{ 'profile.details'|trans_session }}</h4>
+        <div class="card-body rounded bg-light border">
+            <div class="d-flex mb-3 justify-content-center pb-3 border-bottom">
+                {{ include('shared/_avatar.html.twig', { profile: profile, size: 128 }) }}
+            </div>
+            {% if profile.name %}
+                <div class="card-text my-2">
+                    <strong>{{ 'profile.name'|trans_session }}:</strong>
+                    <span>{{ profile.name }}</span>
+                </div>
+            {% endif %}
+            {% if profile.bio %}
+                <div class="card-text my-2">
+                    <strong>{{ 'profile.bio'|trans_session }}:</strong> {{ profile.bio }}
+                </div>
+            {% endif %}
+            {% if profile.websiteUrl %}
+                <div class="card-text my-2">
+                    <strong>{{ 'profile.website_url'|trans_session }}:</strong> {{ profile.websiteUrl }}
+                </div>
+            {% endif %}
+            {% if profile.location %}
+                <div class="card-text my-2">
+                    <strong>{{ 'profile.location'|trans_session }}:</strong> {{ profile.location }}
+                </div>
+            {% endif %}
+            {% if profile.dateOfBirth %}
+                <div class="card-text my-2">
+                    <strong>{{ 'profile.date_of_birth'|trans_session }}:</strong> {{ profile.dateOfBirth }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

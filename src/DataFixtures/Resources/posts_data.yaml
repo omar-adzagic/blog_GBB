@@ -1,0 +1,21 @@
+- image: 'letter-tiles.jpg'
+  en:
+    title: 'Lorem ipsum dolor sit amet'
+    content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum! Provident similique accusantium nemo autem.'
+  hr:
+    title: 'Važno je znati samu bol'
+    content: 'Najviše od svega, nefleksibilnost, neugodnosti koje čak i prednosti odbijanja proizlaze iz zadovoljstava rada, nikada ne dopustite da bilo tko od njegovog laskanja, ali mrzite pobjeći pukim bijegom sadašnje opcije, i te stvari! Oni predviđaju takve tužitelje, ali nitko.'
+- image: 'person-writing.jpg'
+  en:
+    title: 'Veritatis obcaecati tenetur'
+    content: 'Veritatis obcaecati tenetur iure eius earum ut molestias architecto voluptate aliquam nihil, eveniet aliquid culpa officia aut! Impedit sit sunt quaerat, odit, tenetur error, harum nesciunt ipsum debitis quas aliquid.'
+  hr:
+    title: 'On je dužan biti zaslijepljen istinom'
+    content: 'On je dužan biti zaslijepljen istinom, on je dužan biti zaslijepljen istinom svog prava da gnjavi arhitekta s nekim zadovoljstvom, nešto će se dogoditi ili krivnja odgovornosti! On je spriječen u traženju, mrzi, drži se u zabludi, oni ne poznaju same dugove koje nešto.'
+- image: 'workspace.jpg'
+  en:
+    title: 'Reprehenderit, quia'
+    content: 'Reprehenderit, quia. Quo neque error repudiandae fuga? Ipsa laudantium molestias eos sapiente officiis modi at sunt excepturi expedita sint? Sed quibusdam recusandae alias error harum maxime adipisci amet laborum. Perspiciatis minima nesciunt dolorem! Officiis iure rerum voluptates a cumque velit quibusdam sed amet tempora.'
+  hr:
+    title: 'Kritizirat će jer'
+    content: 'Kritizirat će jer. Gdje je greška odbijanja leta? Ali jesu li korisni da prime nevolje onih koji ih hvale na mudar način? Ali neki ljudi odbijaju izvući maksimum iz ovih drugih pogrešaka. Vidite, mali ne poznaju bol! Zadovoljstva zakona stvari, od koga hoće neka, ali vremena će biti velika.'

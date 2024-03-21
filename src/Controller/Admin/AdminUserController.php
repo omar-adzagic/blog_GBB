@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\DTO\UserDTO;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
@@ -28,12 +29,14 @@ class AdminUserController extends AbstractController
     public function index(
         UserRepository $userRepository,
         PaginationService $paginationService
-    )
+    ): Response
     {
         $userId = $this->getUser()->getId();
         $queryBuilder = $userRepository->findAllWithoutUserLatestQB($userId);
 
         $pagination = $paginationService->paginate($queryBuilder);
+        $userDTOs = UserDTO::createFromEntities($pagination->getItems());
+        $pagination->setItems($userDTOs);
 
         return $this->render('admin/users/index.html.twig', [
             'pagination' => $pagination
@@ -54,10 +57,9 @@ class AdminUserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $plainPassword = $form->get('plainPassword')->getData(); // Access specific field data
+            $plainPassword = $form->get('plainPassword')->getData();
 
             $user = $form->getData();
-            // Assuming you have $userPasswordHasher injected or available in your method
             if ($plainPassword !== null) {
                 $user->setPassword(
                     $userPasswordHasher->hashPassword($user, $plainPassword)
@@ -91,10 +93,9 @@ class AdminUserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $plainPassword = $form->get('plainPassword')->getData(); // Access specific field data
+            $plainPassword = $form->get('plainPassword')->getData();
 
             $user = $form->getData();
-            // Assuming you have $userPasswordHasher injected or available in your method
             if ($plainPassword !== null) {
                 $user->setPassword(
                     $userPasswordHasher->hashPassword($user, $plainPassword)

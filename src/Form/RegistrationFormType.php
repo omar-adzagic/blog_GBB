@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\User;
 use App\Form\UserProfileType;
+use App\Service\TranslationService;
 use Doctrine\DBAL\Types\TextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -19,14 +20,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RegistrationFormType extends AbstractType
 {
-    private $translator;
-    private $locale;
-
-    public function __construct(TranslatorInterface $translator, RequestStack $requestStack)
+    private $translationService;
+    public function __construct(TranslationService $translationService)
     {
-        $this->translator = $translator;
-        $session = $requestStack->getSession();
-        $this->locale = $session->get('_locale', 'en');
+        $this->translationService = $translationService;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -35,14 +32,14 @@ class RegistrationFormType extends AbstractType
             ->add('username', null, [
                 'constraints' => [
                     new NotBlank([
-                        'message' => $this->translator->trans('user.username_not_empty', [], 'validators', $this->locale),
+                        'message' => $this->translationService->sessionTranslate('user.username_not_empty','validators'),
                     ]),
                 ]
             ])
             ->add('email', null, [
                 'constraints' => [
                     new NotBlank([
-                        'message' => $this->translator->trans('email.not_empty', [], 'validators', $this->locale),
+                        'message' => $this->translationService->sessionTranslate('email.not_empty','validators'),
                     ]),
                 ]
             ])
@@ -50,7 +47,7 @@ class RegistrationFormType extends AbstractType
                 'mapped' => false,
                 'constraints' => [
                     new IsTrue([
-                        'message' => $this->translator->trans('agree_terms_fail', [], 'validators', $this->locale),
+                        'message' => $this->translationService->sessionTranslate('agree_terms_fail','validators'),
                     ]),
                 ],
             ])
@@ -59,7 +56,7 @@ class RegistrationFormType extends AbstractType
                 // this is read and encoded in the controller
                 'type' => PasswordType::class,
                 'mapped' => false,
-                'invalid_message' => $this->translator->trans('password.dont_match', [], 'validators', $this->locale),
+                'invalid_message' => $this->translationService->sessionTranslate('password.dont_match','validators'),
                 'attr' => ['autocomplete' => 'new-password'],
                 'first_options' => [
                     'label' => 'Password',
@@ -71,11 +68,11 @@ class RegistrationFormType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank([
-                        'message' => $this->translator->trans('password.not_empty', [], 'validators', $this->locale),
+                        'message' => $this->translationService->sessionTranslate('password.not_empty','validators'),
                     ]),
                     new Length([
                         'min' => 6,
-                        'minMessage' => $this->translator->trans('password.limit', ['{{ limit }}' => 6], 'validators', $this->locale),
+                        'minMessage' => $this->translationService->sessionTranslate('password.limit', 'validators', ['{{ limit }}' => 6]),
                         // max length allowed by Symfony for security reasons
                         'max' => 4096,
                     ]),

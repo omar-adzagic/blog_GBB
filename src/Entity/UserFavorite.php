@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use DateTime;
 use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -73,5 +74,18 @@ class UserFavorite
     public function setUser($user): void
     {
         $this->user = $user;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getCreatedAt(): DateTimeInterface
+    {
+        return $this->createdAt;
     }
 }

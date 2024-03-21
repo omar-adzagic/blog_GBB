@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ 'profile_image'|trans_session }}
+    {{ 'profile.image'|trans_session }}
 {% endblock %}
 
 {% block bread %}
-    → {{ 'profile_image'|trans_session }}
+    → {{ 'profile.image'|trans_session }}
 {% endblock %}
 
 {% block body %}
@@ -17,7 +17,7 @@
         <div class="ms-3">
             {{ form_start(form, {'attr': {'novalidate': 'novalidate'} }) }}
             <label for="{{ form.profileImage.vars.id }}" class="btn btn-secondary cursor-pointer">
-                {{ 'change'|trans_session }}
+                {{ 'actions.change'|trans_session }}
                 {{ form_widget(form.profileImage, {'attr': {'class': 'visually-hidden'}}) }}
             </label>
             {{ form_errors(form.profileImage) }}

@@ -1,7 +1,7 @@
 <div class="row d-flex flex-column container">
     {% if activities|length > 0 %}
         {% for activity in activities %}
-            <div class="col-12 col-sm-8 my-2 w-100 py-3 px-4 border border-info rounded">
+            <div class="col-12 col-sm-8 my-2 w-100 py-3 px-4 border border-info rounded" style="background-color: #edf6f9">
                 <span class="mr-1">
                     {% if activity.type == 'like' %}
                         <i class="bi bi-heart-fill text-danger mr-1"></i>
@@ -27,7 +27,7 @@
         {% endfor %}
     {% else %}
         <div class="col">
-            {{ 'no_data'|trans_session }}
+            {{ 'nothing_here'|trans_session }}
         </div>
     {% endif %}
 </div>

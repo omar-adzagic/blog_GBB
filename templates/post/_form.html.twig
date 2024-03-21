@@ -2,25 +2,27 @@
 <div>{{ form_errors(form) }}</div>
 
 <div class="mb-3">
-    {% set labelTranslation = 'enter_the_title'|trans_session %}
-    {{ form_label(
-        form.title,
-        labelTranslation,
-        {'label_attr': {'class': 'form-label'}})
-    }}
-    {{ form_widget(form.title, {'attr': {'class': 'form-control shadow-sm'}}) }}
-    {{ form_errors(form.title) }}
+    {% for locale in locales %}
+        <div class="d-flex my-2">
+            <div class="w-100">
+                {{ form_label(form['title_' ~ locale]) }}
+                {{ form_widget(form['title_' ~ locale], {attr: {'class': 'form-control'}}) }}
+                {{ form_errors(form['title_' ~ locale]) }}
+            </div>
+        </div>
+    {% endfor %}
 </div>
 
 <div class="mb-3">
-    {% set labelTranslation = 'enter_the_text'|trans_session %}
-    {{ form_label(
-        form.content,
-        labelTranslation,
-        {'label_attr': {'class': 'form-label'}}
-    ) }}
-    {{ form_widget(form.content, {'attr': {'class': 'form-control shadow-sm'}}) }}
-    {{ form_errors(form.content) }}
+    {% for locale in locales %}
+        <div class="d-flex my-2">
+            <div class="w-100">
+                {{ form_label(form['content_' ~ locale]) }}
+                {{ form_widget(form['content_' ~ locale], {attr: {'class': 'form-control'}}) }}
+                {{ form_errors(form['content_' ~ locale]) }}
+            </div>
+        </div>
+    {% endfor %}
 </div>
 
 {% if is_granted('ROLE_ADMIN') %}
@@ -40,28 +42,28 @@
 
 <div class="row mb-2 d-flex flex-column">
     <div class="mb-2">
-        {{ 'post_image'|trans_session }}
+        {{ 'post.image'|trans_session }}
     </div>
     <div class="mr-2">
         {% if post.image %}
             <img src="{{ asset(images_public_path ~ 'post_images/' ~ post.image) }}"
-                 style="width: 128px;"
-                 class="d-inline-block rounded-circle border border-2 border-white"
+                 style="width: 256px;"
+                 class="d-inline-block rounded border border-2 border-white"
                  alt="Post image"
             />
         {% endif %}
     </div>
 
-    <div class="col-md-6 mt-3 d-flex flex-column">
+    <div class="col-4 mt-3 d-flex flex-column">
         <label for="{{ form.image.vars.id }}" class="btn btn-secondary">
-            {{ 'change'|trans_session }}
+            {{ 'actions.change'|trans_session }}
             {{ form_widget(form.image, {'attr': {'class': 'visually-hidden'}}) }}
         </label>
         {{ form_errors(form.image) }}
     </div>
 </div>
 
-<div>
+<div class="col-6 px-0">
     <button type="submit" class="btn btn-primary w-100 mt-4 mb-2">
         {{ 'save'|trans_session }}
     </button>

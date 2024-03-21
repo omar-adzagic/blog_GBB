@@ -1,11 +1,11 @@
 {% extends 'admin/admin_base.html.twig' %}
 
 {% block title %}
-    {{ 'admin'|trans_session }} - {{ 'posts'|trans_session }}
+    {{ 'admin'|trans_session }} - {{ 'the_posts'|trans_session }}
 {% endblock %}
 
 {% block header_text %}
-    {{ 'posts_management'|trans_session }}
+    {{ 'posts.management'|trans_session }}
 {% endblock %}
 
 {% block body %}
@@ -13,7 +13,7 @@
         <div class="d-flex justify-content-end">
             <a href="{{ path('admin_post_create') }}">
                 <button class="btn btn-primary">
-                    {{ 'create_post'|trans_session }}
+                    {{ 'post.create'|trans_session }}
                 </button>
             </a>
         </div>
@@ -24,11 +24,11 @@
             <tr>
                 <th>{{ 'title'|trans_session }}</th>
                 <th>{{ 'author'|trans_session }}</th>
-                <th>{{ 'tags'|trans_session }}</th>
-                <th>{{ 'comments'|trans_session }}</th>
+                <th>{{ 'the_tags'|trans_session }}</th>
+                <th>{{ 'the_comments'|trans_session }}</th>
                 <th>{{ 'status'|trans_session }}</th>
                 <th>{{ 'created'|trans_session }}</th>
-                <th>{{ 'actions'|trans_session }}</th>
+                <th>{{ 'the_actions'|trans_session }}</th>
             </tr>
             </thead>
             <tbody>
@@ -37,10 +37,14 @@
                     <tr style="cursor: pointer;" onclick="window.location.href='{{ path('admin_post_show', {'post': post.id}) }}'; event.stopPropagation();">
                         <td>{{ post.title|crop_text(40) }}</td>
                         <td>{{ post.user.email|crop_text(25) }}</td>
-                        <td class="small">
-                            {{ post.postTags|map(postTag => postTag.tag.name)|join(', ') }}
+                        <td>
+                            {% for tag in post.postTags %}
+                            <span class="small badge bg-primary py-1 px-2">
+                                {{ tag.name }}
+                            </span>
+                            {% endfor %}
                         </td>
-                        <td>{{ post.comments.count }}</td>
+                        <td>{{ post.comments|length }}</td>
                         <td>
                             {% if post.isPublished %}
                                 <span class="py-2 px-3 badge bg-success text-white">
@@ -52,13 +56,13 @@
                                 </span>
                             {% endif %}
                         </td>
-                        <td>{{ post.createdAt|date('d/m/Y H:i') }}</td>
+                        <td>{{ post.createdAt }}</td>
                         <td>
                             <div style="cursor: pointer;">
                                 <a href="{{ path('admin_post_edit', {post: post.id}) }}">
                                     <span class="text-primary">
                                         <i class="bi bi-pencil-square"></i>
-                                        {{ 'edit'|trans_session }}
+                                        {{ 'actions.edit'|trans_session }}
                                     </span>
                                 </a>
                             </div>
@@ -66,7 +70,7 @@
                                 <a href="{{ path('admin_post_delete', {post: post.id}) }}">
                                     <span class="text-danger" >
                                         <i class="bi bi-archive delete-comment"></i>
-                                        {{ 'delete'|trans_session }}
+                                        {{ 'actions.delete'|trans_session }}
                                     </span>
                                 </a>
                             </div>

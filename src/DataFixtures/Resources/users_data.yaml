@@ -1,0 +1,24 @@
+- username: 'test'
+  email: 'test@test.com'
+  password: '12341234'
+  roles: []
+  name: 'Test Test'
+  image: 'italo-melo.jpg'
+- username: 'john'
+  email: 'john@test.com'
+  password: '12341234'
+  roles: []
+  name: 'John Doe'
+  image: 'stefan-stefancik.jpg'
+- username: 'jane'
+  email: 'jane@test.com'
+  password: '12341234'
+  roles: []
+  name: 'Jane Doe'
+  image: 'asian-woman.jpg'
+- username: 'admin'
+  email: 'admin@test.com'
+  password: '12341234'
+  roles: ['ROLE_ADMIN']
+  name: 'Admin Admin'
+  image: 'asian-woman.jpg'

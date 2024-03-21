@@ -1,29 +1,31 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ 'post'|trans_session }} - {{ post.title|crop_text(40) }}
+    {{ 'the_post'|trans_session }} - {{ post.title|crop_text(40) }}
 {% endblock %}
 
 {% block bread %}
-    → {{ 'post'|trans_session }}
+    → {{ 'the_post'|trans_session }}
 {% endblock %}
 
 {% block body %}
-    <div class="d-flex align-items-center mb-4">
-        <div>
-            {{ include('shared/_avatar.html.twig', { profile: post.user.userProfile, size: 64 }) }}
-        </div>
-        <div class="ms-4 d-flex align-items-center">
-            <div class="fs-5 mx-2">
-                {{ post.user.userProfile.name ?? post.user.email }}
+    {% if post.user.userProfile is defined %}
+        <div class="d-flex align-items-center mb-4">
+            <div>
+                {{ include('shared/_avatar.html.twig', { profile: post.user.userProfile, size: 64 }) }}
             </div>
-            <div class="text-muted mx-2">
-                <a href="{{ path('app_profile', { id: post.user.id }) }}" class="text-decoration-none">
-                    {{ post.user.email }}
-                </a>
+            <div class="ms-4 d-flex align-items-center">
+                <div class="fs-5 mx-2">
+                    {{ post.user.userProfile.name ?? post.user.email }}
+                </div>
+                <div class="text-muted mx-2">
+                    <a href="{{ path('app_profile_show', { id: post.user.id }) }}" class="text-decoration-none">
+                        {{ post.user.email }}
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
+    {% endif %}
 
     {{ include('post/_post.html.twig', {post: post}) }}
 
@@ -32,7 +34,7 @@
             {{ form_start(commentForm) }}
             <div>{{ form_errors(commentForm)}}</div>
             <div class="my-3">
-                {% set labelTranslation = 'enter_the_comment'|trans_session %}
+                {% set labelTranslation = 'comment.enter'|trans_session %}
                 {{ form_label(
                     commentForm.content,
                     labelTranslation,
@@ -42,9 +44,9 @@
                 {{ form_errors(commentForm.content) }}
             </div>
 
-            <div class="my-3">
+            <div class="col-6 px-0 my-3">
                 <button type="submit" class="btn btn-primary w-100">
-                    {{ 'add_comment'|trans_session }}
+                    {{ 'comment.add'|trans_session }}
                 </button>
             </div>
             {{ form_end(commentForm) }}
@@ -60,17 +62,17 @@
                     </div>
                     <div>
                         <div class="fw-bold">
-                            <a href="{{ path('app_profile', { id: comment.author.id }) }}" class="text-decoration-none">
+                            <a href="{{ path('app_profile_show', { id: comment.author.id }) }}" class="text-decoration-none">
                                 {{ comment.author.email }}
                             </a>
                         </div>
-                        <div class="text-muted">{{ comment.createdAt | date("M j, Y") }}</div>
+                        <div class="text-muted">{{ comment.createdAt }}</div>
                     </div>
                 </div>
                 <div class="d-flex align-items-center">
                     <div class="border-end me-3 pe-3 {% if not loop.last %}border-2{% endif %}" style="min-height: 3rem;"></div>
                     <div>{{ comment.content }}</div>
-                    {% if (is_granted('IS_AUTHENTICATED_FULLY') and comment.author.id == app.user.id) or is_granted('ROLE_ADMIN') %}
+                    {% if (is_granted('IS_AUTHENTICATED_FULLY') and (comment.author.id == app.user.id or is_granted('ROLE_ADMIN'))) %}
                         <div class="ml-2 lead">
                             <form action="{{ path('delete_comment', {'id': comment.id}) }}"
                                   method="post"

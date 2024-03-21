@@ -1,26 +1,46 @@
 {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 <div>{{ form_errors(form) }}</div>
 <div class="p-4 bg-light rounded" style="border: 1px dashed #89c2d9">
-    <div class="col-5 px-0 mb-3">
-        {% set labelTranslation = 'enter_the_title'|trans_session %}
-        {{ form_label(
-            form.title,
-            labelTranslation,
-            {'label_attr': {'class': 'form-label'}}
-        ) }}
-        {{ form_widget(form.title, {'attr': {'class': 'form-control shadow-sm'}}) }}
-        {{ form_errors(form.title) }}
+    <div class="col-6 px-0 mb-3">
+{#        {% set labelTranslation = 'enter_the_title'|trans_session %}#}
+{#        {{ form_label(#}
+{#            form.title,#}
+{#            labelTranslation,#}
+{#            {'label_attr': {'class': 'form-label'}}#}
+{#        ) }}#}
+{#        {{ form_widget(form.title, {'attr': {'class': 'form-control shadow-sm'}}) }}#}
+{#        {{ form_errors(form.title) }}#}
+
+        {% for locale in locales %}
+            <div class="d-flex my-2">
+                <div class="w-100">
+                    {{ form_label(form['title_' ~ locale]) }}
+                    {{ form_widget(form['title_' ~ locale], {attr: {'class': 'form-control'}}) }}
+                    {{ form_errors(form['title_' ~ locale]) }}
+                </div>
+            </div>
+        {% endfor %}
     </div>
 
-    <div class="col-12 px-0 mb-3">
-        {% set labelTranslation = 'enter_the_text'|trans_session %}
-        {{ form_label(
-            form.content,
-            labelTranslation,
-            {'label_attr': {'class': 'form-label'}}
-        ) }}
-        {{ form_widget(form.content, {'attr': {'class': 'form-control shadow-sm'}}) }}
-        {{ form_errors(form.content) }}
+    <div class="col-6 px-0 mb-3">
+{#        {% set labelTranslation = 'enter_the_text'|trans_session %}#}
+{#        {{ form_label(#}
+{#            form.content,#}
+{#            labelTranslation,#}
+{#            {'label_attr': {'class': 'form-label'}}#}
+{#        ) }}#}
+{#        {{ form_widget(form.content, {'attr': {'class': 'form-control shadow-sm'}}) }}#}
+{#        {{ form_errors(form.content) }}#}
+
+        {% for locale in locales %}
+            <div class="d-flex my-2">
+                <div class="w-100">
+                    {{ form_label(form['content_' ~ locale]) }}
+                    {{ form_widget(form['content_' ~ locale], {attr: {'class': 'form-control'}}) }}
+                    {{ form_errors(form['content_' ~ locale]) }}
+                </div>
+            </div>
+        {% endfor %}
     </div>
 
     <div class="col-6 mb-3">
@@ -39,7 +59,7 @@
     <div class="col-5 px-0">
         <div id="tags-container" class="mb-3" data-post-tags-json="{{ postTagsJson ?? '[]' }}"></div>
         <div>
-            <input type="text" id="tag-input" class="form-control" placeholder="{{ 'add_tag'|trans_session }}" />
+            <input type="text" id="tag-input" class="form-control" placeholder="{{ 'tag.add'|trans_session }}" />
         </div>
         <div id="tag-suggestions" class="list-group"></div>
         <input type="hidden" id="tag-ids" name="postTags" value="">

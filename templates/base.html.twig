@@ -39,7 +39,7 @@
             {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                 <div class="mx-2">
                     <a href="{{ path('app_profile') }}" class="text-decoration-none">
-                        {{ 'profile'|trans_session }}
+                        {{ 'the_profile'|trans_session }}
                     </a>
                 </div>
                 {% if is_granted('ROLE_ADMIN') %}

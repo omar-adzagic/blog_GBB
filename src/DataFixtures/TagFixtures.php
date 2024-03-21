@@ -2,26 +2,47 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\TagTranslation;
+use App\Service\ContentTranslationService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use App\Entity\Tag;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class TagFixtures extends Fixture
 {
+    private $contentTranslationService;
+        private $env;
+    public function __construct(
+        ContentTranslationService $contentTranslationService,
+        ParameterBagInterface $params
+    )
+    {
+        $this->contentTranslationService = $contentTranslationService;
+        $this->env = $params->get('kernel.environment');
+    }
+
     public function load(ObjectManager $manager)
     {
-        $tags = [
-            'JavaScript', 'HTML5', 'CSS3', 'React', 'Angular', 'Vue.js',
-            'Node.js', 'Django', 'Git', 'Docker', 'Agile Development',
-            'TDD', 'Responsive Design', 'AI'
-        ];
-
-        foreach ($tags as $tagName) {
-            $tag = new Tag();
-            $tag->setName($tagName);
-            $manager->persist($tag);
+        if ($this->env !== 'dev') {
+            return;
         }
+        $tagsData = Yaml::parse(file_get_contents(__DIR__ . '\Resources\tags_data.yaml'));
 
-        $manager->flush();
+        foreach ($tagsData as $tagData) {
+            $tag = new Tag();
+            $tag->setName(null);
+            $manager->persist($tag);
+            $manager->flush();
+            foreach ($this->contentTranslationService->getSupportedLocales() as $locale) {
+                $entityLocaleTranslation = new TagTranslation(
+                    $locale, 'name', $tagData[$locale]['content']
+                );
+                $entityLocaleTranslation->setObject($tag);
+                $manager->persist($entityLocaleTranslation);
+            }
+            $manager->flush();
+        }
     }
 }

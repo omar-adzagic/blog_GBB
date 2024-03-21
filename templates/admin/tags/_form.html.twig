@@ -2,34 +2,20 @@
 <div>{{ form_errors(form) }}</div>
 
 <div class="p-4 bg-light rounded" style="border: 1px dashed #89c2d9">
-    <div class="px-0 col-5 mb-3">
-        {% set labelTranslation = 'enter_the_name'|trans_session %}
-{#        {{ form_label(#}
-{#            form.name,#}
-{#            labelTranslation,#}
-{#            {'label_attr': {'class': 'form-label'}}#}
-{#        ) }}#}
-{#        {{ form_widget(form.name, {'attr': {'class': 'form-control shadow-sm'}}) }}#}
-{#        {{ form_errors(form.name) }}#}
-    </div>
-    <div class="px-0 col-5 mb-3">
-{#        {{ form_label(#}
-{#            form.translations,#}
-{#            'translations',#}
-{#            {'label_attr': {'class': 'form-label'}}#}
-{#        ) }}#}
+    <div class="col-6 px-0 mb-3">
         {{ form_widget(form.translations, {'attr': {'class': 'form-control shadow-sm', 'style': 'display: none'}}) }}
-{#        {{ form_widget(form.name_en, {'attr': {'class': 'form-control shadow-sm', 'style': 'display: none'}}) }}#}
-{#        {{ form_widget(form.name_hr, {'attr': {'class': 'form-control shadow-sm', 'style': 'display: none'}}) }}#}
-{#        {{ form_errors(form.translations) }}#}
 
         <div class="d-flex flex-column">
-            {% for translation in tag.translations %}
-                <div class="d-flex">
-                    <span class="col-1 lead mr-2">{{ translation.locale }}</span>
-                    {{ form_widget(form['name_' ~ translation.locale]) }}
+            {% for locale in locales %}
+                <div class="d-flex my-2">
+                    <div class="w-100">
+                        {{ form_label(form['name_' ~ locale]) }}
+                        {{ form_widget(form['name_' ~ locale], {attr: {'class': 'form-control'}}) }}
+                        {{ form_errors(form['name_' ~ locale]) }}
+                    </div>
                 </div>
             {% endfor %}
+{#            {% endif %}#}
         </div>
     </div>
 </div>

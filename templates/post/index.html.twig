@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ 'all_posts'|trans_session }}
+    {{ 'posts.all'|trans_session }}
 {% endblock %}
 
 {% block body %}
@@ -12,8 +12,8 @@
         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
             <div class="mx-2">
                 <a href="{{ path('app_post_create') }}" class="text-decoration-none">
-                    <button class="btn btn-light text-primary border">
-                        {{ 'add_new_post'|trans_session }}
+                    <button class="btn btn-light text-primary border border-primary">
+                        {{ 'post.add_new'|trans_session }}
                     </button>
                 </a>
             </div>
@@ -58,7 +58,7 @@
                         // Here, call your function to fetch and update the data for the selected page
                         console.log(`Page ${i} clicked`);
                         // For example: fetchData(i); where fetchData is your function to update the content
-                        const url = '/posts'
+                        const url = '/api/posts'
                         fetchPosts(url, i)
                     });
 
@@ -97,7 +97,8 @@
                         auth_id,
                         total,
                         page,
-                        limit
+                        limit,
+                        translations,
                     } = res;
 
                     updatePagination(total, page, limit);
@@ -122,8 +123,8 @@
 
                             const img = document.createElement('img');
                             img.setAttribute('src', `{{ images_public_path }}post_images/${post.image}`);
-                            img.setAttribute('style', 'max-width: 256px; max-height: 384px');
-                            img.classList.add('d-inline-block', 'rounded-circle', 'border', 'border-2', 'border-white');
+                            img.setAttribute('style', 'max-height: 384px');
+                            img.classList.add('d-inline-block', 'rounded', 'border', 'border-2', 'border-white', 'w-100');
                             img.setAttribute('alt', 'Post image');
 
                             imgDiv.appendChild(img);
@@ -148,14 +149,12 @@
                         authorDiv.classList.add('my-2');
                         const authorText = document.createElement('div');
                         authorText.classList.add('small', 'text-secondary');
-                        authorText.innerHTML = `Author: <a href="/profile/${post.user_id}" class="text-decoration-none">${post.user_email}</a>`;
+                        authorText.innerHTML = `${translations.author}: <a href="/profile/${post.user.id}" class="text-decoration-none">${post.user.email}</a>`;
                         authorDiv.appendChild(authorText);
 
                         const dateDiv = document.createElement('div');
                         dateDiv.classList.add('small', 'text-secondary');
-                        const postDate = new Date(post.created_at); // Assuming post.createdAt is in a format that Date() constructor can parse
-                        const formattedDate = postDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); // Format date as "M j, Y"
-                        dateDiv.textContent = `Written: ${formattedDate}`;
+                        dateDiv.textContent = `${translations.written}: ${post.createdAt}`;
 
                         authorDiv.appendChild(dateDiv);
                         infoDiv.appendChild(authorDiv);
@@ -170,11 +169,11 @@
                             form.classList.add('d-flex', 'align-items-center');
 
                             // Decide whether to generate a Like or Unlike form based on whether the user has liked the post
-                            if (post.isLikedByCurrentUser === '1') {
+                            if (post.isLiked) {
                                 form.setAttribute('action', `/unlike/${post.id}`);
                                 form.innerHTML = `
                                     <button type="submit" class="btn btn-link text-decoration-none my-1 px-2 py-1 border border-secondary">
-                                        Unlike <span class="px-2 rounded bg-light">${parseInt(post.totalLikes)}</span>
+                                        ${translations.unlike} <span class="px-2 rounded bg-light">${post.likesCount}</span>
                                         <i class="bi bi-heart-fill text-danger"></i>
                                     </button>
                                 `;
@@ -182,7 +181,7 @@
                                 form.setAttribute('action', `/like/${post.id}`);
                                 form.innerHTML = `
                                     <button type="submit" class="btn btn-link text-decoration-none my-1 px-2 py-1 border border-secondary">
-                                        Like <span class="px-2 rounded bg-light">${parseInt(post.totalLikes)}</span>
+                                        ${translations.like} <span class="px-2 rounded bg-light">${post.likesCount}</span>
                                         <i class="bi bi-heart text-danger"></i>
                                     </button>
                                 `;
@@ -196,11 +195,11 @@
                             form.setAttribute('method', 'post');
                             favoriteForm.classList.add('d-flex', 'align-items-center');
 
-                            if (post.isFavoredByCurrentUser === '1') {
+                            if (post.isFavorite) {
                                 favoriteForm.setAttribute('action', `/remove-favorite/${post.id}`);
                                 favoriteForm.innerHTML = `
                                     <button type="submit" class="btn btn-link text-decoration-none my-1 px-2 py-1 border border-secondary">
-                                        Remove from Favorites
+                                        <span class="mr-1">${translations.remove_from_favorites}</span>
                                         <i class="bi bi-star-fill text-warning"></i>
                                     </button>
                                 `;
@@ -208,7 +207,7 @@
                                 favoriteForm.setAttribute('action', `/favorite/${post.id}`);
                                 favoriteForm.innerHTML = `
                                     <button type="submit" class="btn btn-link text-decoration-none my-1 px-2 py-1 border border-secondary">
-                                        Add to Favorites
+                                        <span class="mr-1">${translations.add_to_favorites}</span>
                                         <i class="bi bi-star text-warning"></i>
                                     </button>
                                 `;
@@ -221,14 +220,14 @@
                             actionDiv.classList.add('my-1', 'd-flex');
 
                             // Edit section
-                            if (post.user_id === auth_id) {
+                            if (post.user.id === auth_id) {
                                 const editDiv = document.createElement('div');
                                 const editLink = document.createElement('a');
                                 editLink.setAttribute('href', `/post/${post.id}/edit`);
                                 editLink.classList.add('mr-2', 'text-decoration-none');
                                 const editLinkSpan = document.createElement('span');
                                 editLinkSpan.classList.add('mr-1');
-                                editLinkSpan.textContent = 'Edit';
+                                editLinkSpan.textContent = translations.edit;
 
                                 const editIcon = document.createElement('i');
                                 editIcon.classList.add('mr-2', 'bi', 'bi-pencil-square', 'text-primary');
@@ -250,7 +249,7 @@
                         const commentDiv = document.createElement('div');
                         commentDiv.classList.add('my-1')
                         const commentLink = document.createElement('a');
-                        commentDiv.innerHTML = `Comments: <span class="px-1 rounded bg-light">${post.totalComments}</span>`;
+                        commentDiv.innerHTML = `${translations.comments}: <span class="px-1 rounded bg-light">${post.commentsCount}</span>`;
 
                         commentDiv.appendChild(commentLink);
                         infoDiv.appendChild(commentDiv);
@@ -266,10 +265,11 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             const titleFilterInput = document.getElementById('titleFilter');
-            fetchPosts('/posts', 1, titleFilterInput.value);
+            const url = '/api/posts';
+            fetchPosts(url, 1, titleFilterInput.value);
 
             titleFilterInput.addEventListener('keyup', function() {
-                fetchPosts('/posts', 1, this.value);
+                fetchPosts(url, 1, this.value);
             });
 
             document.querySelectorAll('.js-pagination-link').forEach(link => {
@@ -277,7 +277,7 @@
                     e.preventDefault(); // Prevent default link action
 
                     let page = this.getAttribute('data-page'); // Get the page number
-                    let url = '/posts'; // Construct the URL
+                    // let url = '/posts'; // Construct the URL
 
                     fetchPosts(url, parseInt(page) + 1)
                 });

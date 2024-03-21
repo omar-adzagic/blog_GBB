@@ -53,13 +53,29 @@ class TagRepository extends ServiceEntityRepository
     public function findAllLatestQB(): QueryBuilder
     {
         return $this->createQueryBuilder('t')
-            ->select('t.id', 't.name', 't.created_at')
+            ->leftJoin('t.translations', 'tt')
+            ->select('t', 'tt')
             ->orderBy('t.created_at', 'DESC');
     }
 
     public function findAllLatest(): array
     {
         return $this->findAllLatestQB()
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Find tags by a list of ids.
+     *
+     * @param array $tagIds Array of Tag IDs
+     * @return Tag[] Returns an array of Tag objects
+     */
+    public function findByIds(array $tagIds): array
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.id IN (:tagIds)')
+            ->setParameter('tagIds', $tagIds)
             ->getQuery()
             ->getResult();
     }

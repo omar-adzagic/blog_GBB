@@ -68,7 +68,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function findAllWithoutUserLatestQB(int $userId): QueryBuilder
     {
         return $this->createQueryBuilder('u')
-            ->innerJoin('u.userProfile', 'up')
+            ->leftJoin('u.userProfile', 'up')
             ->orderBy('u.created_at', 'DESC')
             ->where('u.id != :userId')
             ->select('u', 'up')
@@ -131,7 +131,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getOneOrNullResult();
     }
 
-    public function findUserActivities(int $userId)
+    public function findUserActivities(int $userId, string $locale)
     {
         $em = $this->getEntityManager();
         $conn = $em->getConnection();
@@ -141,8 +141,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
                 activity.type, 
                 activity.user_id, 
                 activity.post_id, 
-                post.title AS post_title,
                 post.slug as post_slug,
+                post_translations.content as post_title,
                 activity.created_at
             FROM
                 (SELECT 'like' AS type, user_id, post_id, created_at 
@@ -151,12 +151,19 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
                  SELECT 'favorite' AS type, user_id, post_id,created_at 
                  FROM user_favorite) AS activity
             JOIN post ON activity.post_id = post.id
+            LEFT JOIN post_translations ON post.id = post_translations.object_id
             WHERE activity.user_id = :userId
+            AND post_translations.locale = :locale
+            AND post_translations.field = 'title'
             ORDER BY activity.created_at DESC
         ";
 
         $stmt = $conn->prepare($sql);
-        $result = $stmt->executeQuery(['userId' => $userId]);
+        $parameters = [
+            'userId' => $userId,
+            'locale' => $locale,
+        ];
+        $result = $stmt->executeQuery($parameters);
 
         return $result->fetchAllAssociative();
     }

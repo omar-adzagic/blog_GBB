@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\UserFavorite;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -23,35 +24,72 @@ class UserFavoriteRepository extends ServiceEntityRepository
      * Find all favorites (and associated posts) for a given user ID, returning specific post fields.
      *
      * @param int $userId The ID of the user.
-     * @return array Returns an array of arrays with specific fields from Post entities and the UserFavorite identifier.
+     * @return QueryBuilder Returns an QueryBuilder with specific fields from Post entities and the UserFavorite identifier.
      */
-    public function findFavoritePostsByUserId(int $userId): array
+    public function findFavoritePostsByUserIdQB(int $userId): QueryBuilder
     {
-        $queryBuilder = $this->createQueryBuilder('uf')
+        return $this->createQueryBuilder('uf')
             ->innerJoin('uf.post', 'p')
             ->leftJoin('p.comments', 'c')
             ->leftJoin('p.user', 'u')
             ->addSelect('p', 'c', 'u')
             ->where('uf.user = :userId')
-            ->setParameter('userId', $userId)
-            ->getQuery();
-
-        return $queryBuilder->getResult();
+            ->setParameter('userId', $userId);
     }
 
-    public function findLikedAndFavoredPostsByUserId(int $userId, array $postIds)
+    public function findFavoritePostsByUserId(int $userId): array
     {
+        return $this->findFavoritePostsByUserIdQB($userId)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findFavoritePostsByPostIdsAndUserId(array $postIds, int $userId): array
+    {
+        $qb = $this->createQueryBuilder('uf');
+        $qb->innerJoin('uf.post', 'p')
+            ->innerJoin('uf.user', 'u')
+            ->select('p.id')
+            ->where($qb->expr()->in('p.id', ':postIds'))
+            ->setParameter('postIds', $postIds)
+            ->andWhere('u.id = :userId')
+            ->setParameter('userId', $userId);
+
+        $qbResult = $qb->getQuery()->getResult();
+
+        $resultMap = [];
+        foreach ($qbResult as $result) {
+            $resultMap[$result['id']] = true;
+        }
+
+        return $resultMap;
+    }
+
+    public function findLikedAndFavoredPostsByUserId(int $userId, array $postIds): array
+    {
+        if (empty($postIds)) {
+            return [];
+        }
+
         $qb = $this->createQueryBuilder('uf');
 
         $qb->select('p.id')
             ->innerJoin('uf.post', 'p')
             ->leftJoin('p.likedByUsers', 'l', 'WITH', 'l.user = :userId')
             ->where('uf.user = :userId')
-            ->andWhere($qb->expr()->in('p.id', $postIds))
             ->setParameter('userId', $userId)
+            ->andWhere($qb->expr()->in('p.id', ':postIds'))
+            ->setParameter('postIds', $postIds)
             ->groupBy('p.id')
             ->having('COUNT(l.id) > 0');
 
-        return $qb->getQuery()->getResult();
+        $queryResult = $qb->getQuery()->getResult();
+
+        $likedAndFavoredIdsMap = array_fill_keys($postIds, false);
+        foreach ($queryResult as $item) {
+            $likedAndFavoredIdsMap[$item['id']] = true;
+        }
+
+        return $likedAndFavoredIdsMap;
     }
 }

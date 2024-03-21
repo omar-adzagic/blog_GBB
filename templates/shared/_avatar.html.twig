@@ -1,5 +1,5 @@
 <div class="mr-2">
-    {% if profile and profile.image %}
+    {% if profile.image %}
         <img src="{{ asset(images_public_path ~ 'profile_images/' ~ profile.image) }}"
              style="width: {{size}}px;"
              class="d-inline-block rounded-circle border border-2 border-white"

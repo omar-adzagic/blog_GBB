@@ -4,16 +4,16 @@
 
 {% block bread %}
     → <a href="{{ path('admin_tag_index') }}">
-    {{ 'tags'|trans_session }}
+    {{ 'the_tags'|trans_session }}
 </a> → {{ 'show'|trans_session }}
 {% endblock %}
 
 {% block body %}
     <div class="card" style="width: 33%; margin-left: auto; margin-right: auto; margin-top: 10%">
-        <h4 class="card-title my-3 mx-auto">{{ 'tag_details'|trans_session }}</h4>
+        <h4 class="card-title my-3 mx-auto">{{ 'tag.details'|trans_session }}</h4>
         <div class="card-body rounded bg-light border">
             <p class="card-text">
-                <strong>{{ 'tag_name'|trans_session }}:</strong> {{ tag.name }}
+                <strong>{{ 'tag.name'|trans_session }}:</strong> {{ tag.name|crop_text(40) }}
             </p>
         </div>
     </div>

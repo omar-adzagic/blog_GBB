@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ 'edit_profile'|trans_session }}
+    {{ 'profile_edit'|trans_session }}
 {% endblock %}
 
 {% block bread %}
     → <a href="{{ path('app_profile') }}" class="text-decoration-none">
-    {{ 'profile'|trans_session }}
-</a> → {{ 'edit'|trans_session }}
+    {{ 'the_profile'|trans_session }}
+</a> → {{ 'actions.edit'|trans_session }}
 {% endblock %}
 
 {% block body %}

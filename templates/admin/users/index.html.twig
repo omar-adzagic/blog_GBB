@@ -1,11 +1,11 @@
 {% extends 'admin/admin_base.html.twig' %}
 
 {% block title %}
-    {{ 'admin'|trans_session }} - {{ 'users'|trans_session }}
+    {{ 'admin'|trans_session }} - {{ 'the_users'|trans_session }}
 {% endblock %}
 
 {% block header_text %}
-    {{ 'users_management'|trans_session }}
+    {{ 'users.management'|trans_session }}
 {% endblock %}
 
 {% block body %}
@@ -13,7 +13,7 @@
         <div class="d-flex justify-content-end">
             <a href="{{ path('admin_user_create') }}">
                 <button class="btn btn-primary">
-                    {{ 'create_user'|trans_session }}
+                    {{ 'user.create'|trans_session }}
                 </button>
             </a>
         </div>
@@ -22,11 +22,11 @@
             <table id="usersTable" class="mt-3 table table-striped" style="width:100%">
                 <thead>
                 <tr>
-                    <th>{{ 'username'|trans_session }}</th>
-                    <th>{{ 'email'|trans_session }}</th>
-                    <th>{{ 'roles'|trans_session }}</th>
+                    <th>{{ 'user.username'|trans_session }}</th>
+                    <th>{{ 'user.email'|trans_session }}</th>
+                    <th>{{ 'user.roles'|trans_session }}</th>
                     <th>{{ 'join_date'|trans_session }}</th>
-                    <th>{{ 'actions'|trans_session }}</th>
+                    <th>{{ 'the_actions'|trans_session }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -34,14 +34,20 @@
                     <tr style="cursor: pointer;" onclick="window.location.href='{{ path('admin_user_show', {'user': user.id}) }}'; event.stopPropagation();">
                         <td>{{ user.username|crop_text(40) }}</td>
                         <td>{{ user.email|crop_text(25) }}</td>
-                        <td class="small">{{ user.roles|join(', ') }}</td>
-                        <td>{{ user.createdAt|date('d/m/Y H:i') }}</td>
+                        <td>
+                            {% for role in user.roles %}
+                                <span class="small badge bg-success px-2 py-1">
+                                    {{ role }}
+                                </span>
+                            {% endfor %}
+                        </td>
+                        <td>{{ user.createdAt }}</td>
                         <td>
                             <div style="cursor: pointer;">
                                 <a href="{{ path('admin_user_edit', {user: user.id}) }}">
                                     <span class="text-primary">
                                         <i class="bi bi-pencil-square"></i>
-                                        {{ 'edit'|trans_session }}
+                                        {{ 'actions.edit'|trans_session }}
                                     </span>
                                 </a>
                             </div>
@@ -49,7 +55,7 @@
                                 <a href="{{ path('admin_user_delete', {user: user.id}) }}">
                                     <span class="text-danger" >
                                         <i class="bi bi-archive delete-comment"></i>
-                                        {{ 'delete'|trans_session }}
+                                        {{ 'actions.delete'|trans_session }}
                                     </span>
                                 </a>
                             </div>

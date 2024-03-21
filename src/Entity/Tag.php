@@ -26,7 +26,7 @@ class Tag
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @ORM\Column(type="string", length=255, unique=true, nullable=true)
      * @Groups("tag_search")
      * @Gedmo\Translatable
      */
@@ -38,6 +38,14 @@ class Tag
      * this is not a mapped field of entity metadata, just a simple property
      */
     private $locale;
+
+    /**
+     * @return mixed
+     */
+    public function getLocale()
+    {
+        return $this->locale;
+    }
 
     /**
      * @ORM\OneToMany(targetEntity=TagTranslation::class, mappedBy="object", orphanRemoval=true)

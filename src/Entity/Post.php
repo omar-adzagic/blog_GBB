@@ -7,11 +7,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity
  * @ORM\Table(indexes={@ORM\Index(name="title_index", columns={"title"})})
  * @ORM\HasLifecycleCallbacks()
+ * @Gedmo\TranslationEntity(class="App\Entity\PostTranslation")
  */
 class Post
 {
@@ -22,11 +25,14 @@ class Post
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("user")
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Gedmo\Translatable
+     * @Groups("user")
      */
     private $title;
 
@@ -36,8 +42,16 @@ class Post
     private $image;
 
     /**
+     * @Gedmo\Locale
+     * Used locale to override Translation listener`s locale
+     * this is not a mapped field of entity metadata, just a simple property
+     */
+    private $locale;
+
+    /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="posts")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"user"})
      */
     private $user;
 
@@ -59,16 +73,18 @@ class Post
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
+     * @Groups("user")
      */
     private $slug;
 
     /**
      * @ORM\Column(type="boolean", options={"default":0})
      */
-    private $is_published = false;
+    private $is_published;
 
     /**
      * @ORM\Column(type="datetime_immutable")
+     * @Groups("user")
      */
     private $created_at;
 
@@ -78,7 +94,8 @@ class Post
     private $updated_at;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
+     * @Gedmo\Translatable
      */
     private $content;
 
@@ -87,12 +104,27 @@ class Post
      */
     private $postTags;
 
+    /**
+     * @ORM\OneToMany(targetEntity=PostTranslation::class, mappedBy="object", orphanRemoval=true, fetch="EAGER")
+     * @Groups("user")
+     */
+    private $translations;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
         $this->likedByUsers = new ArrayCollection();
         $this->favoredByUsers = new ArrayCollection();
         $this->postTags = new ArrayCollection();
+        $this->translations = new ArrayCollection();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLocale()
+    {
+        return $this->locale;
     }
 
     public function getPostTags(): Collection
@@ -132,7 +164,10 @@ class Post
         return $this->title;
     }
 
-    public function setTitle(string $title): self
+    /**
+     * @param mixed $title
+     */
+    public function setTitle($title): self
     {
         $this->title = $title;
 
@@ -301,6 +336,28 @@ class Post
         return $this->updated_at;
     }
 
+    public function getTranslations(): Collection {
+        return $this->translations;
+    }
+
+    public function addTranslation(PostTranslation $translation): self {
+        if (!$this->translations->contains($translation)) {
+            $this->translations[] = $translation;
+            $translation->setObject($this); // Ensure the translation is correctly associated with this Post
+        }
+        return $this;
+    }
+
+    public function removeTranslation(PostTranslation $translation): self {
+        if ($this->translations->removeElement($translation)) {
+            // Set the owning side to null (unless already changed)
+            if ($translation->getObject() === $this) {
+                $translation->setObject(null); // Correctly nullify the association
+            }
+        }
+        return $this;
+    }
+
     /**
      * @ORM\PrePersist
      */
@@ -327,7 +384,11 @@ class Post
         return $this->content;
     }
 
-    public function setContent(string $content): self
+    /**
+     * @param mixed $content
+     * @return $this
+     */
+    public function setContent($content): self
     {
         $this->content = $content;
 

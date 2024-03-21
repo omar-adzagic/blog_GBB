@@ -18,10 +18,14 @@ password:
 post:
   content_max_length: 'Sadržaj ne smije biti dulji od 10.000 znakova.'
   title_max_length: 'Naslov ne smije biti dulji od 255 znakova.'
+  title_en: 'Naslov objave na engleskom'
+  title_hr: 'Naslov objave na hrvatskom'
 profile:
   website_url_max_length: 'URL web stranice ne smije premašiti 255 znakova.'
   location_max_length: 'Lokacija ne smije premašiti 255 znakova.'
 tag:
+  name_en: 'Naziv oznake na engleskom'
+  name_hr: 'Naziv oznake na hrvatskom'
   name_max_length: 'Naziv ne smije biti dulje od 255 znakova.'
 user:
   username_not_empty: 'Korisničko ime ne može biti prazno.'

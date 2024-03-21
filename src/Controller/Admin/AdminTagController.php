@@ -2,15 +2,18 @@
 
 namespace App\Controller\Admin;
 
+use App\DTO\TagDTO;
 use App\Entity\Tag;
 use App\Entity\TagTranslation;
 use App\Form\TagType;
 use App\Repository\TagRepository;
+use App\Service\ContentTranslationService;
 use App\Service\PaginationService;
+use App\Service\TagManager;
+use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,67 +29,64 @@ class AdminTagController extends AbstractController
      * @Route("/tags", name="admin_tag_index")
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function index(TagRepository $tagRepository, PaginationService $paginationService): Response
+    public function index(
+        TagRepository $tagRepository,
+        PaginationService $paginationService,
+        ContentTranslationService $contentTranslationService
+    ): Response
     {
         $queryBuilder = $tagRepository->findAllLatestQB();
         $pagination = $paginationService->paginate($queryBuilder);
+        $tagDTOs = TagDTO::createFromTags($pagination->getItems(), $contentTranslationService);
+        $pagination->setItems($tagDTOs);
 
-        return $this->render('admin/tags/index.html.twig', [
-            'pagination' => $pagination
-        ]);
-    }
-
-    /**
-     * @Route("/tags/search", name="admin_tag_search", methods={"GET"})
-     * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
-     */
-    public function search(Request $request, TagRepository $tagRepository): JsonResponse
-    {
-        $searchTerm = $request->query->get('q', '');
-
-        $tags = $tagRepository->findByNameLike($searchTerm);
-
-        $tagsArray = array_map(function($tag) {
-            return [
-                'id' => $tag->getId(),
-                'name' => $tag->getName(),
-            ];
-        }, $tags);
-
-        return $this->json(['tags' => $tags], Response::HTTP_OK, [], [
-            'groups' => ['tag_search']
-        ]);
+        return $this->render('admin/tags/index.html.twig', ['pagination' => $pagination]);
     }
 
     /**
      * @Route("/tags/create", name="admin_tag_create")
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function create(Request $request, TagRepository $tagRepository)
+    public function create(
+        Request $request,
+        TagManager $tagManager,
+        ContentTranslationService $contentTranslationService
+    )
     {
-        $form = $this->createForm(TagType::class, new Tag());
+        $newTag = new Tag();
+        $form = $this->createForm(TagType::class, $newTag);
+        $contentTranslationService->setLocaleCreateFormFields($form, ['name']);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $tagRepository->add($form->getData(), true);
+            $tag = $form->getData();
+            $tagManager->saveTagCreate($tag);
+
+            $contentTranslationService->setCreateTranslatableFormFields(
+                $form, $tag, ['name'], TagTranslation::class
+            );
+
             $this->addFlash('success', 'Tag has been created.');
             return $this->redirectToRoute('admin_tag_index');
         }
 
-        return $this->renderForm(
-            'admin/tags/create.html.twig',
-            ['form' => $form]
-        );
+        $responseData = [
+            'tag' => $newTag,
+            'form' => $form,
+            'locales' => $contentTranslationService->getSupportedLocales()
+        ];
+        return $this->renderForm('admin/tags/create.html.twig', $responseData);
     }
 
     /**
      * @Route("/tags/{tag}", name="admin_tag_show")
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function show(Tag $tag): Response
+    public function show(Tag $tag, ContentTranslationService $contentTranslationService): Response
     {
+        $tagDTO = TagDTO::createFromTag($tag, $contentTranslationService);
         return $this->render('admin/tags/show.html.twig', [
-            'tag' => $tag
+            'tag' => $tagDTO
         ]);
     }
 
@@ -97,37 +97,26 @@ class AdminTagController extends AbstractController
     public function edit(
         Tag $tag,
         Request $request,
-        TagRepository $tagRepository,
-        EntityManagerInterface $entityManager
+        ContentTranslationService $contentTranslationService
     )
     {
         $form = $this->createForm(TagType::class, $tag);
-        foreach ($tag->getTranslations() as $translation) {
-            $form->get('name_' . $translation->getLocale())->setData($translation->getContent());
-        }
+        $contentTranslationService->setLocaleEditFormFields($form, $tag);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Assuming your TagType form has localized fields for 'en' and 'hr'
-            $tag->setName($form->get('name_en')->getData());
-            $tag->setTranslatableLocale('en');
-            $entityManager->persist($tag);
-            $entityManager->flush();
-
-            // Handle the 'hr' translation
-            $tag->setName($form->get('name_hr')->getData());
-            $tag->setTranslatableLocale('hr');
-            $entityManager->persist($tag);
-            $entityManager->flush();
+            $contentTranslationService->setEditTranslatableFields($form, $tag);
 
             $this->addFlash('success', 'Tag has been updated.');
             return $this->redirectToRoute('admin_tag_index');
         }
 
-        return $this->renderForm(
-            'admin/tags/edit.html.twig',
-            ['form' => $form, 'tag' => $tag]
-        );
+        $responseData = [
+            'form' => $form,
+            'tag' => $tag,
+            'locales' => $contentTranslationService->getSupportedLocales()
+        ];
+        return $this->renderForm('admin/tags/edit.html.twig', $responseData);
     }
 
     /**

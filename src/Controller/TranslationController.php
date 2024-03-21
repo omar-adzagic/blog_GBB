@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\TranslationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,10 +13,10 @@ class TranslationController extends AbstractController
     /**
      * @Route("/change-locale/{_locale}", name="change_locale", requirements={"_locale"="en|hr"})
      */
-    public function changeLocale(Request $request, $_locale): RedirectResponse
+    public function changeLocale(Request $request, $_locale, TranslationService $translationService): RedirectResponse
     {
         // Check if the requested locale is supported
-        if (!in_array($_locale, $this->getParameter('supported_locales_list'))) {
+        if (!in_array($_locale, $translationService->getSupportedLocales())) {
             throw $this->createNotFoundException('The language does not exist');
         }
 

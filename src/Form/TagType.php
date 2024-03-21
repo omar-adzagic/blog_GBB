@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Tag;
+use App\Service\TranslationService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -15,42 +16,38 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TagType extends AbstractType
 {
-    private $translator;
-    private $locale;
-
-    public function __construct(TranslatorInterface $translator, RequestStack $requestStack)
+    private $translationService;
+    public function __construct(TranslationService $translationService)
     {
-        $this->translator = $translator;
-        $session = $requestStack->getSession();
-        $this->locale = $session->get('_locale', 'en');
+        $this->translationService = $translationService;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('name_en', TextType::class, [
-                'label' => 'Tag Name in English',
+                'label' => $this->translationService->sessionTranslate('tag.name_en', 'validators'),
                 'mapped' => false,
                 'constraints' => [
                     new NotBlank([
-                        'message' => $this->translator->trans('name_not_empty', [], 'validators', $this->locale),
+                        'message' => $this->translationService->sessionTranslate('name_not_empty', 'validators'),
                     ]),
                     new Length([
                         'max' => 255,
-                        'maxMessage' => $this->translator->trans('tag.name_max_length', [], 'validators', $this->locale),
+                        'maxMessage' => $this->translationService->sessionTranslate('tag.name_max_length', 'validators'),
                     ]),
                 ],
             ])
             ->add('name_hr', TextType::class, [
-                'label' => 'Tag Name in Croatian',
+                'label' => $this->translationService->sessionTranslate('tag.name_hr', 'validators'),
                 'mapped' => false,
                 'constraints' => [
                     new NotBlank([
-                        'message' => $this->translator->trans('name_not_empty', [], 'validators', $this->locale),
+                        'message' => $this->translationService->sessionTranslate('name_not_empty','validators'),
                     ]),
                     new Length([
                         'max' => 255,
-                        'maxMessage' => $this->translator->trans('tag.name_max_length', [], 'validators', $this->locale),
+                        'maxMessage' => $this->translationService->sessionTranslate('tag.name_max_length', 'validators'),
                     ]),
                 ],
             ])

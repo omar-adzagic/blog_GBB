@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Comment;
+use App\Service\TranslationService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -14,14 +15,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CommentType extends AbstractType
 {
-    private $translator;
-    private $locale;
-
-    public function __construct(TranslatorInterface $translator, RequestStack $requestStack)
+    private $translationService;
+    public function __construct(TranslationService $translationService)
     {
-        $this->translator = $translator;
-        $session = $requestStack->getSession();
-        $this->locale = $session->get('_locale', 'en');
+        $this->translationService = $translationService;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -30,11 +27,11 @@ class CommentType extends AbstractType
             ->add('content', TextareaType::class, [
                 'constraints' => [
                     new NotBlank([
-                        'message' => $this->translator->trans('content_not_empty', [], 'validators', $this->locale),
+                        'message' => $this->translationService->sessionTranslate('content_not_empty', 'validators'),
                     ]),
                     new Length([
                         'max' => 5000,
-                        'maxMessage' => $this->translator->trans('comment.content_max_length', [], 'validators', $this->locale),
+                        'maxMessage' => $this->translationService->sessionTranslate('comment.content_max_length', 'validators'),
                     ]),
                 ],
             ]);

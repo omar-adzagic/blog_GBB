@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\DTO\PostDTO;
+use App\DTO\UserFavoriteDTO;
 use App\Entity\User;
 use App\Entity\UserProfile;
 use App\Form\ProfileImageType;
@@ -10,6 +12,10 @@ use App\Repository\PostRepository;
 use App\Repository\UserFavoriteRepository;
 use App\Repository\UserLikeRepository;
 use App\Repository\UserRepository;
+use App\Service\ContentTranslationService;
+use App\Service\HelperService;
+use App\Service\TranslationService;
+use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -24,7 +30,7 @@ class SettingsProfileController extends AbstractController
      * @Route("/profile", name="app_profile")
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function profile(Request $request, UserRepository $users): Response
+    public function profile(Request $request, EntityManagerInterface $entityManager): Response
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -36,9 +42,10 @@ class SettingsProfileController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $userProfile = $form->getData();
             $user->setUserProfile($userProfile);
-            $users->add($user, true);
-            $this->addFlash('success', 'Your user profile settings were saved.');
+            $entityManager->persist($user);
+            $entityManager->flush();
 
+            $this->addFlash('success', 'Your user profile settings were saved.');
             return $this->redirectToRoute('app_profile');
         }
 
@@ -49,44 +56,9 @@ class SettingsProfileController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/profile-image", name="app_profile_image")
-     * @IsGranted("IS_AUTHENTICATED_FULLY")
-     */
-    public function profileImage(Request $request, SluggerInterface $slugger, UserRepository $users): Response
+    public function show()
     {
-        $form = $this->createForm(ProfileImageType::class);
-        /** @var User $user */
-        $user = $this->getUser();
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $profileImageFile = $form->get('profileImage')->getData();
-
-            if ($profileImageFile) {
-                $originalFileName = pathinfo($profileImageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFileName);
-                $newFileName = $safeFilename.'-'.uniqid().'.'.$profileImageFile->guessExtension();
-
-                try {
-                    $profileImageFile->move($this->getParameter('images_directory'), $newFileName);
-                } catch (FileException $e) {
-                    // Handle exception if something happens during file upload
-                }
-
-                $profile = $user->getUserProfile() ?? new UserProfile();
-                $profile->setImage($newFileName);
-                $user->setUserProfile($profile);
-                $users->add($user, true);
-                $this->addFlash('success', 'Your profile image was updated.');
-
-                return $this->redirectToRoute('app_profile_image');
-            }
-        }
-
-        return $this->render('settings_profile/profile_image.html.twig', [
-            'form' => $form->createView(),
-        ]);
+        
     }
 
     /**
@@ -95,8 +67,8 @@ class SettingsProfileController extends AbstractController
      */
     public function favoritePosts(
         UserFavoriteRepository $userFavoriteRepository,
-        PostRepository $postRepository,
-        UserLikeRepository $userLikeRepository
+        UserLikeRepository $userLikeRepository,
+        ContentTranslationService $contentTranslationService
     ): Response
     {
         /** @var User $user */
@@ -104,23 +76,24 @@ class SettingsProfileController extends AbstractController
         $userId = $user->getId();
 
         $userFavorites = $userFavoriteRepository->findFavoritePostsByUserId($userId);
+        $userFavoriteDTOs = UserFavoriteDTO::createFromEntities($userFavorites, $contentTranslationService);
         $userFavoritePostIds = array_map(function($userFavorite) {
             return $userFavorite->getPost()->getId();
         }, $userFavorites);
 
-        $likedAndFavored = $userFavoriteRepository->findLikedAndFavoredPostsByUserId($userId, $userFavoritePostIds);
-        $likedAndFavoredIdsMap = [];
-        foreach ($likedAndFavored as $likeAndFavor) {
-            $likedAndFavoredIdsMap[$likeAndFavor['id']] = true;
-        }
+        $likedAndFavoredIdsMap = $userFavoriteRepository->findLikedAndFavoredPostsByUserId($userId, $userFavoritePostIds);
+
         $totalLikesMap = $userLikeRepository->countLikesForPostIds($userFavoritePostIds);
+        foreach ($userFavoriteDTOs as $userFavoriteDTO) {
+            $userFavoriteDTO->post->setLikesCount($totalLikesMap[$userFavoriteDTO->post->id]);
+            $userFavoriteDTO->post->setIsFavorite(true);
+            $userFavoriteDTO->post->setIsLiked($likedAndFavoredIdsMap[$userFavoriteDTO->post->id]);
+        }
 
         return $this->render('settings_profile/profile.html.twig', [
             'tab' => 'favorite-posts',
             'templatePart' => 'post/_favorite_posts.html.twig',
-            'userFavorites' => $userFavorites,
-            'likedAndFavoredIdsMap' => $likedAndFavoredIdsMap,
-            'totalLikesMap' => $totalLikesMap
+            'userFavorites' => $userFavoriteDTOs,
         ]);
     }
 
@@ -128,13 +101,14 @@ class SettingsProfileController extends AbstractController
      * @Route("/user-activities", name="app_user_activities")
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function userActivities(UserRepository $userRepository): Response
+    public function userActivities(UserRepository $userRepository, TranslationService $translationService): Response
     {
         /** @var User $user */
         $user = $this->getUser();
         $userId = $user->getId();
 
-        $activities = $userRepository->findUserActivities($userId);
+        $locale = $translationService->getSessionLocale();
+        $activities = $userRepository->findUserActivities($userId, $locale);
 
         return $this->render('settings_profile/profile.html.twig', [
             'tab' => 'user-activities',

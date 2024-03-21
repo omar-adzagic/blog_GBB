@@ -22,6 +22,8 @@ profile:
   website_url_max_length: 'Website URL must not exceed 255 characters.'
   location_max_length: 'Location must not exceed 255 characters.'
 tag:
+  name_en: 'Tag name in English'
+  name_hr: 'Tag name in Croatian'
   name_max_length: 'Naziv ne smije biti duži od 255 znakova.'
 user:
   username_not_empty: 'The username cannot be empty.'
