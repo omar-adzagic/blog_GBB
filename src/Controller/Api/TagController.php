@@ -6,7 +6,6 @@ use App\DTO\TagDTO;
 use App\Repository\TagRepository;
 use App\Repository\TagTranslationRepository;
 use App\Service\ContentTranslationService;
-use App\Service\TranslationService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;

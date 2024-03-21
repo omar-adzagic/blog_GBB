@@ -2,11 +2,11 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Tag;
 use App\Entity\TagTranslation;
 use App\Service\ContentTranslationService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use App\Entity\Tag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Yaml\Yaml;
 

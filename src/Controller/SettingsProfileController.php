@@ -2,27 +2,21 @@
 
 namespace App\Controller;
 
-use App\DTO\PostDTO;
 use App\DTO\UserFavoriteDTO;
 use App\Entity\User;
 use App\Entity\UserProfile;
-use App\Form\ProfileImageType;
 use App\Form\UserProfileType;
-use App\Repository\PostRepository;
 use App\Repository\UserFavoriteRepository;
 use App\Repository\UserLikeRepository;
 use App\Repository\UserRepository;
 use App\Service\ContentTranslationService;
-use App\Service\HelperService;
 use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 class SettingsProfileController extends AbstractController
 {
@@ -82,7 +76,6 @@ class SettingsProfileController extends AbstractController
         }, $userFavorites);
 
         $likedAndFavoredIdsMap = $userFavoriteRepository->findLikedAndFavoredPostsByUserId($userId, $userFavoritePostIds);
-
         $totalLikesMap = $userLikeRepository->countLikesForPostIds($userFavoritePostIds);
         foreach ($userFavoriteDTOs as $userFavoriteDTO) {
             $userFavoriteDTO->post->setLikesCount($totalLikesMap[$userFavoriteDTO->post->id]);

@@ -14,8 +14,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Length;
 
 class PostType extends AbstractType
@@ -50,7 +48,7 @@ class PostType extends AbstractType
 
         $builder
             ->add('title_en', TextType::class, [
-                'label' => $this->translationService->sessionTranslate('post.title_en','messages'),
+                'label' => $this->translationService->sessionTranslate('post.title_en'),
                 'mapped' => false,
                 'constraints' => [
                     new NotBlank([
@@ -89,7 +87,7 @@ class PostType extends AbstractType
                 ],
             ])
             ->add('content_hr', TextareaType::class, [
-                'label' => $this->translationService->sessionTranslate('post.content_hr','messages'),
+                'label' => $this->translationService->sessionTranslate('post.content_hr'),
                 'mapped' => false,
                 'constraints' => [
                     new NotBlank([

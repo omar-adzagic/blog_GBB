@@ -4,7 +4,6 @@ namespace App\DTO;
 
 namespace App\DTO;
 
-use DateTimeImmutable;
 use DateTimeInterface;
 
 class UserFavoriteDTO {

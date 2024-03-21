@@ -2,9 +2,6 @@
 
 namespace App\Service;
 
-use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-
 class RequestService
 {
     public static function getIdsMapFromArray(array $idsSelectResult): array

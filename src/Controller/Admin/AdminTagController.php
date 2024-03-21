@@ -10,7 +10,6 @@ use App\Repository\TagRepository;
 use App\Service\ContentTranslationService;
 use App\Service\PaginationService;
 use App\Service\TagManager;
-use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

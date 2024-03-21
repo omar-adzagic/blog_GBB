@@ -2,8 +2,6 @@
 
 namespace App\DTO;
 
-use DateTimeInterface;
-
 class UserProfileDTO {
     public ?int $id;
     public ?string $name;

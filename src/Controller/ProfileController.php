@@ -7,7 +7,6 @@ use App\Entity\User;
 use App\Entity\UserProfile;
 use App\Form\UserProfileType;
 use App\Repository\PostRepository;
-use App\Service\FileUploader;
 use App\Service\ProfileManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
