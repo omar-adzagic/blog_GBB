@@ -83,6 +83,7 @@ class PostController extends AbstractController
     /**
      * @Route("/post/create", name="app_post_create", priority=2)
      * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @IsGranted("ROLE_ADMIN")
      */
     public function create(
         Request $request,
@@ -130,6 +131,7 @@ class PostController extends AbstractController
     /**
      * @Route("/post/{post}/edit", name="app_post_edit")
      * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @IsGranted("ROLE_ADMIN")
      */
     public function edit(
         Post $post, Request $request,

@@ -79,7 +79,7 @@ class PostController extends AbstractController
             'page' => $pagination->getCurrentPageNumber(),
             'limit' => $limit,
             'is_authenticated' => $this->isGranted('IS_AUTHENTICATED_FULLY'),
-            'auth_id' => $userId,
+            'is_admin' => $this->isGranted('ROLE_ADMIN'),
             'translations' => $translations,
         ];
 
