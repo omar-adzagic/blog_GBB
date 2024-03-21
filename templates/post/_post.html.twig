@@ -16,6 +16,13 @@
     <div class="lead text-justify my-2">
         {{ post.content }}
     </div>
+    <div class="mt-1 mb-3">
+        {% for tag in post.postTags %}
+            <span class="badge border border-info mr-1 text-info" style="user-select: none;">
+                {{ tag.name }}
+            </span>
+        {% endfor %}
+    </div>
     <div class="px-3 py-2 border rounded">
         <div class="my-2">
             <div class="small text-secondary">
@@ -60,9 +67,6 @@
                         </button>
                     </form>
                 {% else %}
-                    <a href="{{ path('app_favorite', { id: post.id }) }}" class="text-decoration-none d-flex align-items-center">
-
-                    </a>
                     <form action="{{ path('app_favorite', { id: post.id }) }}" method="post" class="d-flex align-items-center">
                         <button type="submit" class="btn btn-link text-decoration-none px-2 py-1 border border-secondary">
                             {{ 'add_to_favorites'|trans_session }}

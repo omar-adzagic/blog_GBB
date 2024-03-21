@@ -29,10 +29,17 @@ class UserFavoriteRepository extends ServiceEntityRepository
     public function findFavoritePostsByUserIdQB(int $userId): QueryBuilder
     {
         return $this->createQueryBuilder('uf')
+            ->innerJoin('uf.user', 'ufu')
             ->innerJoin('uf.post', 'p')
+            ->leftJoin('ufu.userProfile', 'ufup')
             ->leftJoin('p.comments', 'c')
-            ->leftJoin('p.user', 'u')
-            ->addSelect('p', 'c', 'u')
+            ->leftJoin('p.user', 'pu')
+            ->leftJoin('p.translations', 'ptr')
+            ->leftJoin('pu.userProfile', 'puup')
+            ->leftJoin('p.postTags', 'pt')
+            ->leftJoin('pt.tag', 'ptt')
+            ->leftJoin('ptt.translations', 'pttttr')
+            ->addSelect('p', 'pu', 'puup', 'c', 'ufu', 'ufup', 'pt', 'ptr', 'ptt', 'pttttr')
             ->where('uf.user = :userId')
             ->setParameter('userId', $userId);
     }
