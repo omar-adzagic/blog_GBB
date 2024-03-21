@@ -98,8 +98,14 @@ class PostRepository extends ServiceEntityRepository
     private function findAllWithCommentCountQB(): QueryBuilder
     {
         return $this->createQueryBuilder('p')
-            ->leftJoin('p.translations', 'pt')
-            ->select('p', 'pt')
+            ->leftJoin('p.user', 'u')
+            ->leftJoin('u.userProfile', 'up')
+            ->leftJoin('p.translations', 'ptr')
+            ->leftJoin('p.likedByUsers', 'ul')
+            ->leftJoin('p.postTags', 'pt')
+            ->leftJoin('pt.tag', 't')
+            ->leftJoin('t.translations', 'ttr')
+            ->select('p', 'pt', 'u', 'up', 'ptr', 't', 'ttr')
             ->where('p.is_published = 1');
     }
     public function findAllWithCommentCountQueryBuilder($title): QueryBuilder
