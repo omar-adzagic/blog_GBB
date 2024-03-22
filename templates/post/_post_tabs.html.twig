@@ -5,7 +5,7 @@
                 {% block content %}
                     <li class="nav-item" role="presentation">
                         <a class="nav-link active" id="all-posts-tab" data-toggle="tab" href="#allPosts" role="tab" aria-controls="allPosts" aria-selected="true">
-                            {{ 'posts.all'|trans_session }}
+                            {{ 'posts.all'|trans_session|capitalize }}
                         </a>
                     </li>
                 {% endblock %}

@@ -13,7 +13,7 @@ class LoginController extends AbstractController
     /**
      * @Route("/login", name="app_login")
      */
-    public function index(AuthenticationUtils $utils, Request $request): Response
+    public function index(AuthenticationUtils $utils): Response
     {
         if ($this->isGranted("IS_AUTHENTICATED_FULLY")) {
             return $this->redirectToRoute('app_post');
@@ -23,10 +23,11 @@ class LoginController extends AbstractController
 
         $lastUsername = $utils->getLastUsername();
 
-        return $this->render('login/index.html.twig', [
+        $responseData = [
             'lastUsername' => $lastUsername,
             'error' => $error,
-        ]);
+        ];
+        return $this->render('login/index.html.twig', $responseData);
     }
 
     /**

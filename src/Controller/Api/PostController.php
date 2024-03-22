@@ -11,7 +11,6 @@ use App\Service\ContentTranslationService;
 use App\Service\HelperService;
 use App\Service\PaginationService;
 use App\Service\TranslationService;
-use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +28,6 @@ class PostController extends AbstractController
     public function getPosts(
         Request $request,
         PostRepository $postRepository,
-        PaginatorInterface $paginator,
         UserLikeRepository $userLikeRepository,
         UserFavoriteRepository $userFavoriteRepository,
         TranslationService $translationService,

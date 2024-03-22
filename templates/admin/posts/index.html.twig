@@ -1,11 +1,11 @@
 {% extends 'admin/admin_base.html.twig' %}
 
 {% block title %}
-    {{ 'admin'|trans_session }} - {{ 'the_posts'|trans_session }}
+    {{ 'admin'|trans_session|title }} - {{ 'the_posts'|trans_session|title }}
 {% endblock %}
 
 {% block header_text %}
-    {{ 'posts.management'|trans_session }}
+    {{ 'posts.management'|trans_session|title }}
 {% endblock %}
 
 {% block body %}
@@ -13,7 +13,7 @@
         <div class="d-flex justify-content-end">
             <a href="{{ path('admin_post_create') }}">
                 <button class="btn btn-primary">
-                    {{ 'post.create'|trans_session }}
+                    {{ 'post.create'|trans_session|title }}
                 </button>
             </a>
         </div>
@@ -22,13 +22,13 @@
         <table id="postsTable" class="mt-3 table table-striped" style="width:100%">
             <thead>
             <tr>
-                <th>{{ 'title'|trans_session }}</th>
-                <th>{{ 'author'|trans_session }}</th>
-                <th>{{ 'the_tags'|trans_session }}</th>
-                <th>{{ 'the_comments'|trans_session }}</th>
-                <th>{{ 'status'|trans_session }}</th>
-                <th>{{ 'created'|trans_session }}</th>
-                <th>{{ 'the_actions'|trans_session }}</th>
+                <th>{{ 'title'|trans_session|capitalize }}</th>
+                <th>{{ 'author'|trans_session|capitalize }}</th>
+                <th>{{ 'the_tags'|trans_session|capitalize }}</th>
+                <th>{{ 'the_comments'|trans_session|capitalize }}</th>
+                <th>{{ 'status'|trans_session|capitalize }}</th>
+                <th>{{ 'actions.created'|trans_session|capitalize }}</th>
+                <th>{{ 'the_actions'|trans_session|capitalize }}</th>
             </tr>
             </thead>
             <tbody>
@@ -48,11 +48,11 @@
                         <td>
                             {% if post.isPublished %}
                                 <span class="py-2 px-3 badge bg-success text-white">
-                                    {{ 'published'|trans_session }}
+                                    {{ 'post.published'|trans_session|capitalize }}
                                 </span>
                             {% else %}
                                 <span class="py-2 px-3 badge bg-warning text-dark">
-                                    {{ 'unpublished'|trans_session }}
+                                    {{ 'post.unpublished'|trans_session|capitalize }}
                                 </span>
                             {% endif %}
                         </td>
@@ -62,7 +62,7 @@
                                 <a href="{{ path('admin_post_edit', {post: post.id}) }}">
                                     <span class="text-primary">
                                         <i class="bi bi-pencil-square"></i>
-                                        {{ 'actions.edit'|trans_session }}
+                                        {{ 'actions.edit'|trans_session|capitalize }}
                                     </span>
                                 </a>
                             </div>
@@ -70,7 +70,7 @@
                                 <a href="{{ path('admin_post_delete', {post: post.id}) }}">
                                     <span class="text-danger" >
                                         <i class="bi bi-archive delete-comment"></i>
-                                        {{ 'actions.delete'|trans_session }}
+                                        {{ 'actions.delete'|trans_session|capitalize }}
                                     </span>
                                 </a>
                             </div>
@@ -87,7 +87,7 @@
 
         {% else %}
             <div class="d-flex justify-content-center lead">
-                {{ 'no_data'|trans_session }}
+                {{ 'no_data'|trans_session|capitalize }}
             </div>
         {% endif %}
     </div>

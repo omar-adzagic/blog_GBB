@@ -27,7 +27,7 @@
 
 {% if is_granted('ROLE_ADMIN') %}
     <div class="mb-3">
-        {% set labelTranslation = 'publish?'|trans_session %}
+        {% set labelTranslation = 'publish?'|trans_session|capitalize %}
         {{ form_label(
             form.is_published,
             labelTranslation,
@@ -42,7 +42,7 @@
 
 <div class="row mb-2 d-flex flex-column">
     <div class="mb-2">
-        {{ 'post.image'|trans_session }}
+        {{ 'post.image'|trans_session|capitalize }}
     </div>
     <div class="mr-2">
         {% if post.image %}
@@ -56,7 +56,7 @@
 
     <div class="col-4 mt-3 d-flex flex-column">
         <label for="{{ form.image.vars.id }}" class="btn btn-secondary">
-            {{ 'actions.change'|trans_session }}
+            {{ 'actions.change'|trans_session|title }}
             {{ form_widget(form.image, {'attr': {'class': 'visually-hidden'}}) }}
         </label>
         {{ form_errors(form.image) }}
@@ -65,7 +65,7 @@
 
 <div class="col-6 px-0">
     <button type="submit" class="btn btn-primary w-100 mt-4 mb-2">
-        {{ 'save'|trans_session }}
+        {{ 'actions.save'|trans_session|title }}
     </button>
 </div>
 {{ form_end(form) }}

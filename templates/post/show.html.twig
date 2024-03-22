@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ 'the_post'|trans_session }} - {{ post.title|crop_text(40) }}
+    {{ 'the_post'|trans_session|title }} - {{ post.title|crop_text(40)|capitalize }}
 {% endblock %}
 
 {% block bread %}
-    → {{ 'the_post'|trans_session }}
+    → {{ 'the_post'|trans_session|title }}
 {% endblock %}
 
 {% block body %}
@@ -34,10 +34,9 @@
             {{ form_start(commentForm) }}
             <div>{{ form_errors(commentForm)}}</div>
             <div class="my-3">
-                {% set labelTranslation = 'comment.enter'|trans_session %}
                 {{ form_label(
                     commentForm.content,
-                    labelTranslation,
+                    'comment.enter'|trans_session|capitalize,
                     {'label_attr': {'class': 'form-label'}}
                 ) }}
                 {{ form_widget(commentForm.content, {'attr': {'class': 'form-control shadow-sm'}}) }}
@@ -46,7 +45,7 @@
 
             <div class="col-6 px-0 my-3">
                 <button type="submit" class="btn btn-primary w-100">
-                    {{ 'comment.add'|trans_session }}
+                    {{ 'comment.add'|trans_session|title }}
                 </button>
             </div>
             {{ form_end(commentForm) }}

@@ -1,14 +1,14 @@
 {% extends 'base.html.twig' %}
 
 {% block bread %}
-    → {{ 'login'|trans_session }}
+    → {{ 'auth.login'|trans_session|title }}
 {% endblock %}
 
 {% block body %}
     <form action="{{ path('app_login') }}" method="POST">
         <div class="mb-3">
             <label for="username" class="form-label">
-                {{ 'user.email'|trans_session }}
+                {{ 'user.email'|trans_session|capitalize }}
             </label>
             <input type="email"
                    class="form-control"
@@ -25,7 +25,7 @@
 
         <div class="mb-3">
             <label for="password" class="form-label">
-                {{ 'user.password'|trans_session }}
+                {{ 'user.password'|trans_session|capitalize }}
             </label>
             <input type="password"
                    id="password"
@@ -35,7 +35,7 @@
 
         <div class="mb-3">
             <label for="remember_me">
-                {{ 'remember_me'|trans_session }}
+                {{ 'auth.remember_me'|trans_session|capitalize }}
             </label>
             <input id="remember_me" type="checkbox" name="_remember_me" checked />
         </div>
@@ -46,15 +46,15 @@
 
         <div>
             <button type="submit" class="btn btn-primary w-100 mt-2 mb-2">
-                {{ 'login'|trans_session }}
+                {{ 'auth.login'|trans_session|capitalize }}
             </button>
         </div>
     </form>
 
     <div class="mt-2 text-center">
-        {{ 'dont_have_account'|trans_session }}
+        {{ 'auth.dont_have_account'|trans_session|capitalize }}
         <a href="{{ path('app_register') }}" class="text-decoration-none">
-            {{ 'register_here'|trans_session }}
+            {{ 'auth.register_here'|trans_session|capitalize }}
         </a>
     </div>
 {% endblock %}

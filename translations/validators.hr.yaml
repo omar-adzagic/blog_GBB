@@ -1,8 +1,9 @@
-agree_terms_fail: 'Trebali biste se složiti s našim uvjetima.'
 title_not_empty: 'Naslov ne može biti prazan.'
 name_not_empty: 'Ime ne može biti prazno.'
 content_not_empty: 'Sadržaj ne može biti prazan.'
 past_date: 'Datum mora biti u prošlosti.'
+auth:
+  agree_terms_fail: 'Trebali biste se složiti s našim uvjetima.'
 comment:
   content_max_length: 'Sadržaj komentara ne smije premašiti 5000 znakova.'
 image:

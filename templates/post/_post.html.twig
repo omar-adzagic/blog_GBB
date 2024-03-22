@@ -25,14 +25,14 @@
     </div>
     <div class="px-3 py-2 border rounded">
         <div class="my-2">
-            <div class="small text-secondary">
-                {{ 'author'|trans_session }}:
+            <div class="small">
+                {{ 'author'|trans_session|capitalize }}:
                 <a href="{{ path('app_profile_show', { id: post.user.id }) }}" class="text-decoration-none">
                     {{ post.user.email }}
                 </a>
             </div>
-            <div class="small text-secondary">
-                {{ 'written'|trans_session }}: {{ post.createdAt }}
+            <div class="small">
+                {{ 'written'|trans_session|capitalize }}: {{ post.createdAt }}
             </div>
         </div>
         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
@@ -41,7 +41,7 @@
                 {% if post.isLiked %}
                     <form action="{{ path('app_unlike', { id: post.id }) }}" method="post" class="d-flex align-items-center">
                         <button type="submit" class="btn btn-link text-decoration-none px-2 py-1 border border-secondary">
-                            {{ 'unlike'|trans_session }}
+                            {{ 'post.unlike'|trans_session|title }}
                             <span class="px-2 rounded bg-light">{{ post.likesCount }}</span>
                             <i class="bi bi-heart-fill text-danger"></i>
                         </button>
@@ -49,7 +49,7 @@
                 {% else %}
                     <form action="{{ path('app_like', { id: post.id }) }}" method="post" class="d-flex align-items-center">
                         <button type="submit" class="btn btn-link text-decoration-none  px-2 py-1 border border-secondary">
-                            {{ 'like'|trans_session }}
+                            {{ 'post.like'|trans_session|title }}
                             <span class="px-2 rounded bg-light">{{ post.likesCount }}</span>
                             <i class="bi bi-heart text-danger"></i>
                         </button>
@@ -60,7 +60,7 @@
                 {% if post.isFavorite %}
                     <form action="{{ path('app_remove_favorite', { id: post.id }) }}" method="post" class="d-flex align-items-center">
                         <button type="submit" class="btn btn-link text-decoration-none px-2 py-1 border border-secondary">
-                            {{ 'remove_from_favorites'|trans_session }}
+                            {{ 'post.remove_from_favorites'|trans_session|title }}
                             <span class="ml-2">
                                 <i class="bi bi-star-fill text-warning"></i>
                             </span>
@@ -69,7 +69,7 @@
                 {% else %}
                     <form action="{{ path('app_favorite', { id: post.id }) }}" method="post" class="d-flex align-items-center">
                         <button type="submit" class="btn btn-link text-decoration-none px-2 py-1 border border-secondary">
-                            {{ 'add_to_favorites'|trans_session }}
+                            {{ 'post.add_to_favorites'|trans_session|title }}
                             <span class="ml-2">
                                 <i class="bi bi-star text-warning"></i>
                             </span>
@@ -81,14 +81,14 @@
                 {% if post.user.id == app.user.id %}
                     <div>
                         <a href="{{ path('app_post_edit', { post: post.id }) }}" class="mr-2 text-decoration-none">
-                            {{ 'actions.edit'|trans_session }}
+                            {{ 'actions.edit'|trans_session|title }}
                             <i class="bi bi-pencil-square text-primary"></i>
                         </a>
                     </div>
                 {% endif %}
             </div>
             <div class="my-2">
-                {{ 'the_comments'|trans_session }}:
+                {{ 'the_comments'|trans_session|capitalize }}:
                 <span class="px-1 rounded bg-light">{{ post.comments|length }}</span>
             </div>
         {% endif %}

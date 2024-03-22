@@ -6,13 +6,13 @@
                     {% if activity.type == 'like' %}
                         <i class="bi bi-heart-fill text-danger mr-1"></i>
                         <span>
-                            {{ 'you_liked'|trans_session }}
+                            {{ 'post.you_liked'|trans_session|capitalize }}
                         </span>
                     {% endif %}
                     {% if activity.type == 'favorite' %}
                         <i class="bi bi-star-fill text-warning mr-1"></i>
                         <span>
-                            {{ 'you_favored'|trans_session }}
+                            {{ 'post.you_favored'|trans_session|capitalize }}
                         </span>
                     {% endif %}
                 </span>
@@ -27,7 +27,7 @@
         {% endfor %}
     {% else %}
         <div class="col">
-            {{ 'nothing_here'|trans_session }}
+            {{ 'nothing_here'|trans_session|capitalize }}
         </div>
     {% endif %}
 </div>

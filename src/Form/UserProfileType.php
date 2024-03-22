@@ -5,17 +5,14 @@ namespace App\Form;
 use App\Entity\UserProfile;
 use App\Service\TranslationService;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\LessThan;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserProfileType extends AbstractType
 {
@@ -32,7 +29,7 @@ class UserProfileType extends AbstractType
                 'constraints' => [
                     new Length([
                         'max' => 255,
-                        'maxMessage' => $this->translationService->sessionTranslate('user.name_max_length','validators'),
+                        'maxMessage' => $this->translationService->validatorTranslate('user.name_max_length'),
                     ]),
                 ],
             ])
@@ -41,7 +38,7 @@ class UserProfileType extends AbstractType
                 'constraints' => [
                     new Length([
                         'max' => 1024,
-                        'maxMessage' => $this->translationService->sessionTranslate('user.bio_max_length','validators'),
+                        'maxMessage' => $this->translationService->validatorTranslate('user.bio_max_length'),
                     ]),
                 ],
             ])
@@ -49,7 +46,7 @@ class UserProfileType extends AbstractType
                 'constraints' => [
                     new Length([
                         'max' => 255,
-                        'maxMessage' => $this->translationService->sessionTranslate('profile.website_url_max_length','validators'),
+                        'maxMessage' => $this->translationService->validatorTranslate('profile.website_url_max_length'),
                     ]),
                 ],
             ])
@@ -57,7 +54,7 @@ class UserProfileType extends AbstractType
                 'constraints' => [
                     new Length([
                         'max' => 255,
-                        'maxMessage' => $this->translationService->sessionTranslate('profile.location_max_length','validators'),
+                        'maxMessage' => $this->translationService->validatorTranslate('profile.location_max_length'),
                     ]),
                 ],
             ])
@@ -70,7 +67,7 @@ class UserProfileType extends AbstractType
                     'constraints' => [
                         new LessThan([
                             'value' => 'today',
-                            'message' => $this->translationService->sessionTranslate('past_date','validators'),
+                            'message' => $this->translationService->validatorTranslate('past_date'),
                         ]),
                     ],
                 ]
@@ -86,7 +83,7 @@ class UserProfileType extends AbstractType
                             'image/jpeg',
                             'image/png',
                         ],
-                        'mimeTypesMessage' => $this->translationService->sessionTranslate('image.valid_format','validators'),
+                        'mimeTypesMessage' => $this->translationService->validatorTranslate('image.valid_format'),
                     ]),
                 ]
             ]);

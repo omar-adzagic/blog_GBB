@@ -10,7 +10,7 @@
 
 <div class="row mb-2 d-flex flex-column">
     <div class="mb-2">
-        {{ 'profile.image'|trans_session }}
+        {{ 'profile.image'|trans_session|capitalize }}
     </div>
     {% if app.user.userProfile.image is defined %}
         {{ include('shared/_avatar.html.twig', {size: 128, profile: app.user.userProfile}) }}
@@ -21,7 +21,7 @@
     {% if not readonly %}
         <div class="col-md-6 mt-3 d-flex flex-column">
             <label for="{{ form.image.vars.id }}" class="btn btn-secondary">
-                {{ 'actions.change'|trans_session }}
+                {{ 'actions.change'|trans_session|title }}
                 {{ form_widget(form.image, {'attr': {'class': 'visually-hidden'}}) }}
             </label>
             {{ form_errors(form.image) }}
@@ -33,26 +33,31 @@
 
 <div class="row mb-2">
     <div class="col-md-6">
-        {% set labelTranslation = 'profile.name'|trans_session %}
-        {{ form_label(form.name, labelTranslation, {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_label(
+            form.name,
+            'profile.name'|trans_session|capitalize,
+            {'label_attr': {'class': 'form-label'}}
+        ) }}
         {{ form_widget(form.name, {'attr': {'readonly': readonly, 'class': 'form-control'}}) }}
     </div>
 </div>
 
 <div class="row mb-2">
     <div class="col-md-6">
-        {% set labelTranslation = 'profile.bio'|trans_session %}
-        {{ form_label(form.bio, labelTranslation, {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_label(
+            form.bio,
+            'profile.bio'|trans_session|capitalize,
+            {'label_attr': {'class': 'form-label'}}
+        ) }}
         {{ form_widget(form.bio, {'attr': {'readonly': readonly, 'class': 'form-control'}}) }}
     </div>
 </div>
 
 <div class="row mb-2">
     <div class="col-md-6">
-        {% set labelTranslation = 'profile.date_of_birth'|trans_session %}
         {{ form_label(
             form.dateOfBirth,
-            labelTranslation,
+            'profile.date_of_birth'|trans_session|capitalize,
             {'label_attr': {'class': 'form-label'}}
         ) }}
         {{ form_widget(form.dateOfBirth, {'attr': {'readonly': readonly, 'class': 'form-control mb-3'}}) }}
@@ -61,10 +66,9 @@
 
 <div class="row mb-2">
     <div class="col-md-6">
-        {% set labelTranslation = 'profile.website_url'|trans_session %}
         {{ form_label(
             form.websiteUrl,
-            labelTranslation,
+            'profile.website_url'|trans_session,
             {'label_attr': {'class': 'form-label'}}
         ) }}
         {{ form_widget(form.websiteUrl, {'attr': {'readonly': readonly, 'class': 'form-control'}}) }}
@@ -73,10 +77,9 @@
 
 <div class="row mb-2">
     <div class="col-md-6">
-        {% set labelTranslation = 'profile.location'|trans_session %}
         {{ form_label(
             form.location,
-            labelTranslation,
+            'profile.location'|trans_session|capitalize,
             {'label_attr': {'class': 'form-label'}}
         ) }}
         {{ form_widget(form.location, {'attr': {'readonly': readonly, 'class': 'form-control'}}) }}

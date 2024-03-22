@@ -14,27 +14,33 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class LikeController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
     /**
      * @Route("/like/{id}", name="app_like", methods={"POST"})
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function like(
-        Post $post,
-        Request $request,
-        UserLikeRepository $userLikeRepository,
-        EntityManagerInterface $entityManager
-    ): Response {
+    public function like(Post $post, Request $request, UserLikeRepository $userLikeRepository): Response {
         $currentUser = $this->getUser();
 
+        $userLike = $userLikeRepository->findOneBy([
+            'user' => $currentUser,
+            'post' => $post
+        ]);
         // Check if the user already liked the post
-        if (!$userLikeRepository->findOneBy(['user' => $currentUser, 'post' => $post])) {
+        if (!$userLike) {
             $userLike = new UserLike();
             $userLike->setUser($currentUser);
             $userLike->setPost($post);
 
             // EntityManager is used to persist the UserLike entity
-            $entityManager->persist($userLike);
-            $entityManager->flush();
+            $this->entityManager->persist($userLike);
+            $this->entityManager->flush();
         }
 
         return $this->redirect($request->headers->get('referer') ?: '/');
@@ -44,23 +50,19 @@ class LikeController extends AbstractController
      * @Route("/unlike/{id}", name="app_unlike")
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function unlike(
-        Post $post,
-        Request $request,
-        EntityManagerInterface $entityManager
-    ): Response {
+    public function unlike(Post $post, Request $request, UserLikeRepository $userLikeRepository): Response {
         $currentUser = $this->getUser();
 
         // Find the specific UserLike instance for the current user and the post
-        $userLike = $entityManager->getRepository(UserLike::class)->findOneBy([
+        $userLike = $userLikeRepository->findOneBy([
             'user' => $currentUser,
             'post' => $post
         ]);
 
         // If a UserLike instance is found, remove it
         if ($userLike) {
-            $entityManager->remove($userLike);
-            $entityManager->flush();
+            $this->entityManager->remove($userLike);
+            $this->entityManager->flush();
         }
 
         return $this->redirect($request->headers->get('referer') ?: '/');

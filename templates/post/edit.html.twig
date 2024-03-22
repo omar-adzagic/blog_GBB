@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ 'post.edit'|trans_session }}
+    {{ 'post.edit'|trans_session|title }}
 {% endblock %}
 
 {% block bread %}
     → <a href="{{ path('app_post_show', {slug: post.slug}) }}">
-    {{ 'the_post'|trans_session }}
-</a> → {{ 'actions.edit'|trans_session }}
+    {{ 'the_post'|trans_session|title }}
+</a> → {{ 'actions.edit'|trans_session|title }}
 {% endblock %}
 
 {% block body %}

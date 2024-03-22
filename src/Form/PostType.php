@@ -8,13 +8,13 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class PostType extends AbstractType
 {
@@ -36,71 +36,71 @@ class PostType extends AbstractType
                     'image/jpeg',
                     'image/png',
                 ],
-                'mimeTypesMessage' => $this->translationService->sessionTranslate('image.valid_format','validators'),
+                'mimeTypesMessage' => $this->translationService->validatorTranslate('image.valid_format'),
             ]),
         ];
 
         if (!$isUpdate) {
             $imageConstraints[] = new NotBlank([
-                'message' => $this->translationService->sessionTranslate('image.not_empty','validators'),
+                'message' => $this->translationService->validatorTranslate('image.not_empty'),
             ]);
         }
 
         $builder
             ->add('title_en', TextType::class, [
-                'label' => $this->translationService->sessionTranslate('post.title_en'),
+                'label' => ucfirst($this->translationService->messageTranslate('post.title_en')),
                 'mapped' => false,
                 'constraints' => [
                     new NotBlank([
-                        'message' => $this->translationService->sessionTranslate('title_not_empty','validators'),
+                        'message' => $this->translationService->validatorTranslate('title_not_empty'),
                     ]),
                     new Length([
                         'max' => 255,
-                        'maxMessage' => $this->translationService->sessionTranslate('post.title_max_length','validators'),
+                        'maxMessage' => $this->translationService->validatorTranslate('post.title_max_length'),
                     ]),
                 ],
             ])
             ->add('title_hr', TextType::class, [
-                'label' => $this->translationService->sessionTranslate('post.title_hr','messages'),
+                'label' => ucfirst($this->translationService->messageTranslate('post.title_hr')),
                 'mapped' => false,
                 'constraints' => [
                     new NotBlank([
-                        'message' => $this->translationService->sessionTranslate('title_not_empty','validators'),
+                        'message' => $this->translationService->validatorTranslate('title_not_empty'),
                     ]),
                     new Length([
                         'max' => 255,
-                        'maxMessage' => $this->translationService->sessionTranslate('post.title_max_length','validators'),
+                        'maxMessage' => $this->translationService->validatorTranslate('post.title_max_length'),
                     ]),
                 ],
             ])
             ->add('content_en', TextareaType::class, [
-                'label' => $this->translationService->sessionTranslate('post.content_en','messages'),
+                'label' => ucfirst($this->translationService->messageTranslate('post.content_en')),
                 'mapped' => false,
                 'constraints' => [
                     new NotBlank([
-                        'message' => $this->translationService->sessionTranslate('content_not_empty','validators'),
+                        'message' => $this->translationService->validatorTranslate('content_not_empty'),
                     ]),
                     new Length([
                         'max' => 10000,
-                        'maxMessage' => $this->translationService->sessionTranslate('post.content_max_length','validators'),
+                        'maxMessage' => $this->translationService->validatorTranslate('post.content_max_length'),
                     ]),
                 ],
             ])
             ->add('content_hr', TextareaType::class, [
-                'label' => $this->translationService->sessionTranslate('post.content_hr'),
+                'label' => ucfirst($this->translationService->messageTranslate('post.content_hr')),
                 'mapped' => false,
                 'constraints' => [
                     new NotBlank([
-                        'message' => $this->translationService->sessionTranslate('content_not_empty','validators'),
+                        'message' => $this->translationService->validatorTranslate('content_not_empty'),
                     ]),
                     new Length([
                         'max' => 10000,
-                        'maxMessage' => $this->translationService->sessionTranslate('post.content_max_length','validators'),
+                        'maxMessage' => $this->translationService->validatorTranslate('post.content_max_length'),
                     ]),
                 ],
             ])
             ->add('is_published', CheckboxType::class, [
-                'label' => 'Published?',
+                'label' => ucfirst($this->translationService->messageTranslate('post.publish?')),
                 'required' => false,
             ])
             ->add('image', FileType::class, [

@@ -20,6 +20,12 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SettingsProfileController extends AbstractController
 {
+    private $translationService;
+    public function __construct(TranslationService $translationService)
+    {
+        $this->translationService = $translationService;
+    }
+
     /**
      * @Route("/profile", name="app_profile")
      * @IsGranted("IS_AUTHENTICATED_FULLY")
@@ -34,25 +40,43 @@ class SettingsProfileController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $userProfile = $form->getData();
-            $user->setUserProfile($userProfile);
-            $entityManager->persist($user);
-            $entityManager->flush();
+            $entityManager->beginTransaction();
+            try {
+                $userProfile = $form->getData();
+                $user->setUserProfile($userProfile);
+                $entityManager->persist($user);
+                $entityManager->flush();
 
-            $this->addFlash('success', 'Your user profile settings were saved.');
+                $entityManager->commit();
+
+                $this->addFlash(
+                    'success',
+                    $this->translationService->messageTranslate(
+                        'flash_messages.operation_success',
+                        ['{{entity}}' => 'the_user_profile', '{{action}}' => 'actions.saved']
+                    )
+                );
+            } catch (\Exception $e) {
+                $entityManager->rollback();
+
+                $this->addFlash(
+                    'error',
+                    $this->translationService->messageTranslate(
+                        'flash_messages.operation_failed',
+                        ['{{entity}}' => 'the_user_profile', '{{action}}' => 'actions.updated']
+                    )
+                );
+            }
+
             return $this->redirectToRoute('app_profile');
         }
 
-        return $this->render('settings_profile/profile.html.twig', [
+        $responseData = [
             'form' => $form->createView(),
             'tab' => 'basic',
             'templatePart' => 'settings_profile/_profile_form.html.twig'
-        ]);
-    }
-
-    public function show()
-    {
-        
+        ];
+        return $this->render('settings_profile/profile.html.twig', $responseData);
     }
 
     /**
@@ -83,11 +107,12 @@ class SettingsProfileController extends AbstractController
             $userFavoriteDTO->post->setIsLiked($likedAndFavoredIdsMap[$userFavoriteDTO->post->id]);
         }
 
-        return $this->render('settings_profile/profile.html.twig', [
+        $responseData = [
             'tab' => 'favorite-posts',
             'templatePart' => 'post/_favorite_posts.html.twig',
             'userFavorites' => $userFavoriteDTOs,
-        ]);
+        ];
+        return $this->render('settings_profile/profile.html.twig', $responseData);
     }
 
     /**
@@ -103,10 +128,11 @@ class SettingsProfileController extends AbstractController
         $locale = $translationService->getSessionLocale();
         $activities = $userRepository->findUserActivities($userId, $locale);
 
-        return $this->render('settings_profile/profile.html.twig', [
+        $responseData = [
             'tab' => 'user-activities',
             'templatePart' => 'settings_profile/user_activities.html.twig',
             'activities' => $activities,
-        ]);
+        ];
+        return $this->render('settings_profile/profile.html.twig', $responseData);
     }
 }

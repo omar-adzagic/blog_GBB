@@ -5,13 +5,11 @@ namespace App\Form;
 use App\Entity\Comment;
 use App\Service\TranslationService;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CommentType extends AbstractType
 {
@@ -27,11 +25,11 @@ class CommentType extends AbstractType
             ->add('content', TextareaType::class, [
                 'constraints' => [
                     new NotBlank([
-                        'message' => $this->translationService->sessionTranslate('content_not_empty', 'validators'),
+                        'message' => $this->translationService->validatorTranslate('content_not_empty'),
                     ]),
                     new Length([
                         'max' => 5000,
-                        'maxMessage' => $this->translationService->sessionTranslate('comment.content_max_length', 'validators'),
+                        'maxMessage' => $this->translationService->validatorTranslate('comment.content_max_length'),
                     ]),
                 ],
             ]);

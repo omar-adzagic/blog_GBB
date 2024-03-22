@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ 'profile.show'|trans_session }}{% endblock %}
+{% block title %}{{ 'profile.show'|trans_session|title }}{% endblock %}
 
 {% block bread %}
- → {{ 'profile.show'|trans_session }}
+ → {{ 'profile.show'|trans_session|title }}
 {% endblock %}
 
 {% block body %}
@@ -15,28 +15,28 @@
             </div>
             {% if profile.name %}
                 <div class="card-text my-2">
-                    <strong>{{ 'profile.name'|trans_session }}:</strong>
+                    <strong>{{ 'profile.name'|trans_session|capitalize }}:</strong>
                     <span>{{ profile.name }}</span>
                 </div>
             {% endif %}
             {% if profile.bio %}
                 <div class="card-text my-2">
-                    <strong>{{ 'profile.bio'|trans_session }}:</strong> {{ profile.bio }}
+                    <strong>{{ 'profile.bio'|trans_session|capitalize }}:</strong> {{ profile.bio }}
                 </div>
             {% endif %}
             {% if profile.websiteUrl %}
                 <div class="card-text my-2">
-                    <strong>{{ 'profile.website_url'|trans_session }}:</strong> {{ profile.websiteUrl }}
+                    <strong>{{ 'profile.website_url'|trans_session|capitalize }}:</strong> {{ profile.websiteUrl }}
                 </div>
             {% endif %}
             {% if profile.location %}
                 <div class="card-text my-2">
-                    <strong>{{ 'profile.location'|trans_session }}:</strong> {{ profile.location }}
+                    <strong>{{ 'profile.location'|trans_session|capitalize }}:</strong> {{ profile.location }}
                 </div>
             {% endif %}
             {% if profile.dateOfBirth %}
                 <div class="card-text my-2">
-                    <strong>{{ 'profile.date_of_birth'|trans_session }}:</strong> {{ profile.dateOfBirth }}
+                    <strong>{{ 'profile.date_of_birth'|trans_session|capitalize }}:</strong> {{ profile.dateOfBirth }}
                 </div>
             {% endif %}
         </div>

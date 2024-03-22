@@ -1,26 +1,26 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ 'register'|trans_session }}
+    {{ 'auth.register'|trans_session|title }}
 {% endblock %}
 
 {% block bread %}
-    → {{ 'register'|trans_session }}
+    → {{ 'auth.register'|trans_session|title }}
 {% endblock %}
 
 {% block body %}
     {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
     <div class="h5 mb-3">
-        {{ 'basic_info'|trans_session }}
+        {{ 'basic_info'|trans_session|title }}
     </div>
     <div class="text-secondary mb-4 pb-2 border-bottom">
-        {{ 'enter_your_credentials'|trans_session }}
+        {{ 'auth.enter_your_credentials'|trans_session|capitalize }}
     </div>
 
     <div>
         {{ form_label(
             registrationForm.username,
-            'user.username'|trans_session,
+            'user.username'|trans_session|capitalize,
             {'label_attr': {'class': 'form-label'}}
         ) }}
         {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control mb-2'}})}}
@@ -30,7 +30,7 @@
     <div>
         {{ form_label(
             registrationForm.email,
-            'user.email'|trans_session,
+            'user.email'|trans_session|capitalize,
             {'label_attr': {'class': 'form-label'}}
         ) }}
         {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control mb-2'}})}}
@@ -41,7 +41,7 @@
         <div class="col-md-6">
             {{ form_label(
                 registrationForm.plainPassword.first,
-                'user.password'|trans_session,
+                'user.password'|trans_session|capitalize,
                 {'label_attr': {'class': 'form-label'}}
             ) }}
             {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control mb-2'}})}}
@@ -50,7 +50,7 @@
         <div class="col-md-6">
             {{ form_label(
                 registrationForm.plainPassword.second,
-                'repeated_password'|trans_session,
+                'repeated_password'|trans_session|capitalize,
                 {'label_attr': {'class': 'form-label'}}
             ) }}
             {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control mb-2'}})}}
@@ -62,32 +62,32 @@
         {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input mb-2'}}) }}
         {{ form_label(
             registrationForm.agreeTerms,
-            'agree_to_terms'|trans_session,
+            'auth.agree_to_terms'|trans_session|capitalize,
             {'label_attr': {'class': 'form-label'}}
         ) }}
         {{ form_errors(registrationForm.agreeTerms) }}
     </div>
 
     <div class="h5 mt-4 mb-3">
-        {{ 'your_profile'|trans_session }}
+        {{ 'your_profile'|trans_session|title }}
     </div>
     <div class="text-secondary mb-4 pb-2 border-bottom">
-        {{ 'more_optional_details'|trans_session }}
+        {{ 'user.more_optional_details'|trans_session|capitalize }}
     </div>
 
     {{ include ('/settings_profile/_profile_form.html.twig', { form: registrationForm.userProfile, readonly: false }) }}
 
     <div>
         <button type="submit" class="btn btn-primary w-100 mt-3 mb-2">
-            {{ 'register_2'|trans_session }}
+            {{ 'auth.register'|trans_session|title }}
         </button>
     </div>
     {{ form_end(registrationForm) }}
 
     <div class="mt-2 text-center text-secondary">
-        {{ 'already_have_account'|trans_session }}
+        {{ 'auth.already_have_account'|trans_session|capitalize }}
         <a href="{{ path('app_login') }}" class="link-primary">
-            {{ 'login_here'|trans_session }}
+            {{ 'auth.login_here'|trans_session|capitalize }}
         </a>
     </div>
 {% endblock %}

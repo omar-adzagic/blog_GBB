@@ -6,14 +6,14 @@
 
 {% block body %}
     <h1>
-        {{ 'admin_panel'|trans_session }}
+        {{ 'admin_panel'|trans_session|title }}
     </h1>
     <div class="mt-4">
         <p class="lead">
-            {{ 'admin_panel_text_1'|trans_session }}
+            {{ 'admin_panel_text_1'|trans_session|capitalize }}
         </p>
         <p class="lead">
-            {{ 'admin_panel_text_2'|trans_session }}
+            {{ 'admin_panel_text_2'|trans_session|capitalize }}
         </p>
     </div>
 {% endblock %}

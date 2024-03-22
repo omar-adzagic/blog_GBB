@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ 'the_profile'|trans_session }}
+    {{ 'the_profile'|trans_session|title }}
 {% endblock %}
 
 {% block bread %}
-    → {{ 'the_profile'|trans_session }}
+    → {{ 'the_profile'|trans_session|title }}
 {% endblock %}
 
 {% block body %}
@@ -15,11 +15,6 @@
         {% if tab in ['basic', 'image'] %}
             {{ form_start(form) }}
             {{ include(templatePart, {'readonly': true}) }}
-{#            <div>#}
-{#                <button type="submit" class="btn btn-primary btn-block shadow-sm mt-4 mb-2">#}
-{#                    Save Settings#}
-{#                </button>#}
-{#            </div>#}
             {{ form_end(form) }}
         {% else %}
             {{ include(templatePart) }}

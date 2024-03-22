@@ -10,6 +10,7 @@ use App\Repository\TagRepository;
 use App\Service\ContentTranslationService;
 use App\Service\PaginationService;
 use App\Service\TagManager;
+use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,19 +25,26 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class AdminTagController extends AbstractController
 {
+    private $translationService;
+    private $contentTranslationService;
+    public function __construct(TranslationService $translationService, ContentTranslationService $contentTranslationService)
+    {
+        $this->translationService = $translationService;
+        $this->contentTranslationService = $contentTranslationService;
+    }
+
     /**
      * @Route("/tags", name="admin_tag_index")
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
     public function index(
         TagRepository $tagRepository,
-        PaginationService $paginationService,
-        ContentTranslationService $contentTranslationService
+        PaginationService $paginationService
     ): Response
     {
         $queryBuilder = $tagRepository->findAllLatestQB();
         $pagination = $paginationService->paginate($queryBuilder);
-        $tagDTOs = TagDTO::createFromTags($pagination->getItems(), $contentTranslationService);
+        $tagDTOs = TagDTO::createFromTags($pagination->getItems(), $this->contentTranslationService);
         $pagination->setItems($tagDTOs);
 
         return $this->render('admin/tags/index.html.twig', ['pagination' => $pagination]);
@@ -46,33 +54,45 @@ class AdminTagController extends AbstractController
      * @Route("/tags/create", name="admin_tag_create")
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function create(
-        Request $request,
-        TagManager $tagManager,
-        ContentTranslationService $contentTranslationService
-    )
+    public function create(Request $request, TagManager $tagManager)
     {
         $newTag = new Tag();
         $form = $this->createForm(TagType::class, $newTag);
-        $contentTranslationService->setLocaleCreateFormFields($form, ['name']);
+        $this->contentTranslationService->setLocaleCreateFormFields($form, ['name']);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $tag = $form->getData();
-            $tagManager->saveTagCreate($tag);
+            try {
+                $tag = $form->getData();
+                $tagManager->saveTagCreate($tag);
 
-            $contentTranslationService->setCreateTranslatableFormFields(
-                $form, $tag, ['name'], TagTranslation::class
-            );
+                $this->contentTranslationService->setCreateTranslatableFormFields(
+                    $form, $tag, ['name'], TagTranslation::class
+                );
 
-            $this->addFlash('success', 'Tag has been created.');
-            return $this->redirectToRoute('admin_tag_index');
+                $this->addFlash(
+                    'success',
+                    $this->translationService->messageTranslate(
+                        'flash_messages.operation_success',
+                        ['{{entity}}' => 'the_tag', '{{action}}' => 'actions.created']
+                    )
+                );
+                return $this->redirectToRoute('admin_tag_index');
+            } catch (\Exception $e) {
+                $this->addFlash(
+                    'error',
+                    $this->translationService->messageTranslate(
+                        'flash_messages.operation_failed',
+                        ['{{entity}}' => 'the_tag', '{{action}}' => 'actions.created']
+                    )
+                );
+            }
         }
 
         $responseData = [
             'tag' => $newTag,
             'form' => $form,
-            'locales' => $contentTranslationService->getSupportedLocales()
+            'locales' => $this->contentTranslationService->getSupportedLocales()
         ];
         return $this->renderForm('admin/tags/create.html.twig', $responseData);
     }
@@ -81,9 +101,9 @@ class AdminTagController extends AbstractController
      * @Route("/tags/{tag}", name="admin_tag_show")
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function show(Tag $tag, ContentTranslationService $contentTranslationService): Response
+    public function show(Tag $tag): Response
     {
-        $tagDTO = TagDTO::createFromTag($tag, $contentTranslationService);
+        $tagDTO = TagDTO::createFromTag($tag, $this->contentTranslationService);
         return $this->render('admin/tags/show.html.twig', [
             'tag' => $tagDTO
         ]);
@@ -93,27 +113,39 @@ class AdminTagController extends AbstractController
      * @Route("/tags/{tag}/edit", name="admin_tag_edit")
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function edit(
-        Tag $tag,
-        Request $request,
-        ContentTranslationService $contentTranslationService
-    )
+    public function edit(Tag $tag, Request $request)
     {
         $form = $this->createForm(TagType::class, $tag);
-        $contentTranslationService->setLocaleEditFormFields($form, $tag);
+        $this->contentTranslationService->setLocaleEditFormFields($form, $tag);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $contentTranslationService->setEditTranslatableFields($form, $tag);
+            try {
+                $this->contentTranslationService->setEditTranslatableFields($form, $tag);
 
-            $this->addFlash('success', 'Tag has been updated.');
-            return $this->redirectToRoute('admin_tag_index');
+                $this->addFlash(
+                    'success',
+                    $this->translationService->messageTranslate(
+                        'flash_messages.operation_success',
+                        ['{{entity}}' => 'the_tag', '{{action}}' => 'actions.updated']
+                    )
+                );
+                return $this->redirectToRoute('admin_tag_index');
+            } catch (\Exception $e) {
+                $this->addFlash(
+                    'error',
+                    $this->translationService->messageTranslate(
+                        'flash_messages.operation_failed',
+                        ['{{entity}}' => 'the_tag', '{{action}}' => 'actions.updated']
+                    )
+                );
+            }
         }
 
         $responseData = [
             'form' => $form,
             'tag' => $tag,
-            'locales' => $contentTranslationService->getSupportedLocales()
+            'locales' => $this->contentTranslationService->getSupportedLocales(),
         ];
         return $this->renderForm('admin/tags/edit.html.twig', $responseData);
     }
@@ -124,10 +156,26 @@ class AdminTagController extends AbstractController
      */
     public function delete(Tag $tag, EntityManagerInterface $entityManager): RedirectResponse
     {
-        $entityManager->remove($tag);
-        $entityManager->flush();
+        try {
+            $entityManager->remove($tag);
+            $entityManager->flush();
 
-        $this->addFlash('success', 'Tag has been deleted.');
+            $this->addFlash(
+                'success',
+                $this->translationService->messageTranslate(
+                    'flash_messages.operation_success',
+                    ['{{entity}}' => 'the_tag', '{{action}}' => 'actions.deleted']
+                )
+            );
+        } catch (\Exception $e) {
+            $this->addFlash(
+                'error',
+                $this->translationService->messageTranslate(
+                    'flash_messages.operation_failed',
+                    ['entity' => 'the_tag', 'action' => 'actions.deleted']
+                )
+            );
+        }
 
         return $this->redirectToRoute('admin_tag_index');
     }

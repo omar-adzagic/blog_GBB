@@ -8,11 +8,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TagType extends AbstractType
 {
@@ -26,28 +24,28 @@ class TagType extends AbstractType
     {
         $builder
             ->add('name_en', TextType::class, [
-                'label' => $this->translationService->sessionTranslate('tag.name_en', 'validators'),
+                'label' => $this->translationService->validatorTranslate('tag.name_en'),
                 'mapped' => false,
                 'constraints' => [
                     new NotBlank([
-                        'message' => $this->translationService->sessionTranslate('name_not_empty', 'validators'),
+                        'message' => $this->translationService->validatorTranslate('name_not_empty'),
                     ]),
                     new Length([
                         'max' => 255,
-                        'maxMessage' => $this->translationService->sessionTranslate('tag.name_max_length', 'validators'),
+                        'maxMessage' => $this->translationService->validatorTranslate('tag.name_max_length'),
                     ]),
                 ],
             ])
             ->add('name_hr', TextType::class, [
-                'label' => $this->translationService->sessionTranslate('tag.name_hr', 'validators'),
+                'label' => $this->translationService->validatorTranslate('tag.name_hr'),
                 'mapped' => false,
                 'constraints' => [
                     new NotBlank([
-                        'message' => $this->translationService->sessionTranslate('name_not_empty','validators'),
+                        'message' => $this->translationService->validatorTranslate('name_not_empty'),
                     ]),
                     new Length([
                         'max' => 255,
-                        'maxMessage' => $this->translationService->sessionTranslate('tag.name_max_length', 'validators'),
+                        'maxMessage' => $this->translationService->validatorTranslate('tag.name_max_length'),
                     ]),
                 ],
             ])

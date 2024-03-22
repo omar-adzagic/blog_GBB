@@ -43,11 +43,10 @@
         {% endfor %}
     </div>
 
-    <div class="col-6 mb-3">
-        {% set labelTranslation = 'publish?'|trans_session %}
+    <div class="col-6 mb-3 px-0">
         {{ form_label(
             form.is_published,
-            labelTranslation,
+            'publish?'|trans_session|capitalize,
             {'label_attr': {'class': 'form-label'}}
         ) }}
         {{ form_widget(form.is_published) }}
@@ -59,7 +58,7 @@
     <div class="col-5 px-0">
         <div id="tags-container" class="mb-3" data-post-tags-json="{{ postTagsJson ?? '[]' }}"></div>
         <div>
-            <input type="text" id="tag-input" class="form-control" placeholder="{{ 'tag.add'|trans_session }}" />
+            <input type="text" id="tag-input" class="form-control" placeholder="{{ 'tag.add'|trans_session|capitalize }}" />
         </div>
         <div id="tag-suggestions" class="list-group"></div>
         <input type="hidden" id="tag-ids" name="postTags" value="">
@@ -67,6 +66,6 @@
 </div>
 
 <button type="submit" class="col-6 btn btn-primary w-100 mt-4 mb-2">
-    {{ 'save'|trans_session }}
+    {{ 'actions.save'|trans_session|capitalize }}
 </button>
 {{ form_end(form) }}

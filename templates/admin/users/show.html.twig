@@ -1,29 +1,29 @@
 {% extends 'admin/admin_base.html.twig' %}
 
 {% block title %}
-    {{ 'post.details'|trans_session }}
+    {{ 'post.details'|trans_session|title }}
 {% endblock %}
 
 {% block bread %}
     → <a href="{{ path('admin_tag_index') }}">
-    {{ 'the_tags'|trans_session }}
-</a> → {{ 'show'|trans_session }}
+    {{ 'the_tags'|trans_session|title }}
+</a> → {{ 'show'|trans_session|title }}
 {% endblock %}
 
 {% block body %}
     <div class="card" style="width: 33%; margin-left: auto; margin-right: auto; margin-top: 10%">
         <h4 class="card-title my-3 mx-auto">
-            {{ 'user.details'|trans_session }}
+            {{ 'user.details'|trans_session|title }}
         </h4>
         <div class="card-body rounded bg-light border">
             <div class="card-text my-2">
-                <strong>{{ 'user.username'|trans_session }}:</strong> {{ user.username }}
+                <strong>{{ 'user.username'|trans_session|capitalize }}:</strong> {{ user.username }}
             </div>
             <div class="card-text my-2">
-                <strong>{{ 'user.email'|trans_session }}:</strong> {{ user.email }}
+                <strong>{{ 'user.email'|trans_session|capitalize }}:</strong> {{ user.email }}
             </div>
             <div class="card-text my-2">
-                <strong>{{ 'user.roles'|trans_session }}:</strong>
+                <strong>{{ 'user.roles'|trans_session|capitalize }}:</strong>
                 {% for role in user.roles %}
                     <span class="badge bg-success px-2 py-1">{{ role }}</span>
                 {% endfor %}

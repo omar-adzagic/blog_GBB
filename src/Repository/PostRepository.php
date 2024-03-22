@@ -167,6 +167,7 @@ class PostRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('p')
             ->join('p.user', 'u')
+            ->leftJoin('u.userProfile', 'up')
             ->leftJoin('p.postTags', 'pt')
             ->leftJoin('pt.tag', 'ptt')
             ->leftJoin('ptt.translations', 'pttr')
@@ -174,7 +175,6 @@ class PostRepository extends ServiceEntityRepository
             ->leftJoin('p.translations', 'ptr')
             ->leftJoin('p.likedByUsers', 'l', 'WITH', 'l.user = :userId')
             ->leftJoin('p.favoredByUsers', 'f', 'WITH', 'f.user = :userId')
-            ->leftJoin('u.userProfile', 'up')
             ->leftJoin('c.author', 'ca')
             ->leftJoin('ca.userProfile', 'caup')
             ->addSelect('p', 'c', 'l', 'f', 'u', 'up', 'pt', 'ptr', 'ca', 'caup', 'ptt', 'pttr')

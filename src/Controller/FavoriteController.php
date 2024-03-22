@@ -15,28 +15,38 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FavoriteController extends AbstractController
 {
+    private $entityManager;
+    private $userFavoriteRepository;
+
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        UserFavoriteRepository $userFavoriteRepository
+    )
+    {
+        $this->entityManager = $entityManager;
+        $this->userFavoriteRepository = $userFavoriteRepository;
+    }
+
     /**
      * @Route("/favorite/{id}", name="app_favorite")
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function addToFavorites(
-        Post $post,
-        Request $request,
-        UserFavoriteRepository $userFavoriteRepository,
-        EntityManagerInterface $entityManager
-    ): Response {
+    public function addToFavorites(Post $post, Request $request): Response {
         $currentUser = $this->getUser();
 
         // Check if the user already favored the post
-        $alreadyFavored = $userFavoriteRepository->findOneBy(['user' => $currentUser, 'post' => $post]);
+        $alreadyFavored = $this->userFavoriteRepository->findOneBy([
+            'user' => $currentUser,
+            'post' => $post
+        ]);
         if (!$alreadyFavored) {
             $userFavorite = new UserFavorite();
             $userFavorite->setUser($currentUser);
             $userFavorite->setPost($post);
 
             // EntityManager is used to persist the UserFavorite entity
-            $entityManager->persist($userFavorite);
-            $entityManager->flush();
+            $this->entityManager->persist($userFavorite);
+            $this->entityManager->flush();
         }
 
         return $this->redirect($request->headers->get('referer') ?: '/');
@@ -46,25 +56,19 @@ class FavoriteController extends AbstractController
      * @Route("/remove-favorite/{id}", name="app_remove_favorite")
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function removeFromFavorites(
-        Post $post,
-        PostRepository $posts,
-        Request $request,
-        UserFavoriteRepository $userFavoriteRepository,
-        EntityManagerInterface $entityManager
-    ): Response {
+    public function removeFromFavorites(Post $post, Request $request): Response {
         $currentUser = $this->getUser();
 
         // Find the specific UserFavorite instance for the current user and the post
-        $userFavorite = $userFavoriteRepository->findOneBy([
+        $userFavorite = $this->userFavoriteRepository->findOneBy([
             'user' => $currentUser,
             'post' => $post
         ]);
 
         // If a UserFavorite instance is found, remove it
         if ($userFavorite) {
-            $entityManager->remove($userFavorite);
-            $entityManager->flush();
+            $this->entityManager->remove($userFavorite);
+            $this->entityManager->flush();
         }
 
         return $this->redirect($request->headers->get('referer') ?: '/');

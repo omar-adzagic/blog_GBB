@@ -14,6 +14,7 @@ use App\Service\CommentManager;
 use App\Service\ContentTranslationService;
 use App\Service\EmailService;
 use App\Service\PostManager;
+use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,6 +25,23 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class PostController extends AbstractController
 {
+    private $translationService;
+    private $contentTranslationService;
+    private $postManager;
+    private $entityManager;
+    public function __construct(
+        TranslationService $translationService,
+        ContentTranslationService $contentTranslationService,
+        PostManager $postManager,
+        EntityManagerInterface $entityManager
+    )
+    {
+        $this->translationService = $translationService;
+        $this->contentTranslationService = $contentTranslationService;
+        $this->entityManager = $entityManager;
+        $this->postManager = $postManager;
+    }
+
     /**
      * @Route("/", name="app_post")
      */
@@ -40,8 +58,7 @@ class PostController extends AbstractController
         Request $request,
         PostRepository $postRepository,
         CommentManager $commentManager,
-        EmailService $emailService,
-        ContentTranslationService $contentTranslationService
+        EmailService $emailService
     ): Response
     {
         /** @var User $user */
@@ -50,7 +67,12 @@ class PostController extends AbstractController
         $post = $postRepository->findOneBySlugWithRelationships($slug, $userId);
 
         if (!$post) {
-            throw $this->createNotFoundException('No post found for slug ' . $slug);
+            throw $this->createNotFoundException(
+                $this->translationService->messageTranslate(
+                    'exceptions.no_slug_post',
+                    ['{{slug}}' => $slug]
+                )
+            );
         }
 
         $commentForm = $this->createForm(CommentType::class, new Comment());
@@ -62,11 +84,17 @@ class PostController extends AbstractController
 
             $emailService->sendAdminNewCommentNotification($post, $comment);
 
-            $this->addFlash('success', 'Your comment has been added.');
+            $this->addFlash(
+                'success',
+                $this->translationService->messageTranslate(
+                    'flash_messages.operation_success',
+                    ['{{entity}}' => 'the_comment', '{{action}}' => 'actions.added']
+                )
+            );
             return $this->redirectToRoute('app_post_show', ['slug' => $post->getSlug()]);
         }
 
-        $postDTO = PostDTO::createFromEntity($post, $contentTranslationService);
+        $postDTO = PostDTO::createFromEntity($post, $this->contentTranslationService);
         if ($user) {
             $postDTO->setIsLiked($post->isLikedByUser($user));
             $postDTO->setIsFavorite($post->isFavoredByUser($user));
@@ -85,45 +113,52 @@ class PostController extends AbstractController
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @IsGranted("ROLE_ADMIN")
      */
-    public function create(
-        Request $request,
-        PostManager $postManager,
-        ContentTranslationService $contentTranslationService,
-        EntityManagerInterface $entityManager
-    ): Response
+    public function create(Request $request): Response
     {
         $newPost = new Post();
 
         $form = $this->createForm(PostType::class, $newPost);
-        $contentTranslationService->setLocaleCreateFormFields($form, ['title', 'content']);
+        $this->contentTranslationService->setLocaleCreateFormFields($form, ['title', 'content']);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->beginTransaction();
+            $this->entityManager->beginTransaction();
             try {
                 $post = $form->getData();
-                $postManager->saveCreatePost($post, $form);
-                $postManager->savePostImage($post, $form);
-                $contentTranslationService->setCreateTranslatableFormFields(
+                $this->postManager->saveCreatePost($post, $form);
+                $this->postManager->savePostImage($post, $form);
+                $this->contentTranslationService->setCreateTranslatableFormFields(
                     $form, $post, ['title', 'content'], PostTranslation::class
                 );
 
-                $entityManager->flush();
-                $entityManager->commit();
+                $this->entityManager->flush();
+                $this->entityManager->commit();
 
-                $this->addFlash('success', 'Your post has been added.');
+                $this->addFlash(
+                    'success',
+                    $this->translationService->messageTranslate(
+                        'flash_messages.operation_success',
+                        ['{{entity}}' => 'the_post', '{{action}}' => 'actions.created']
+                    )
+                );
 
                 return $this->redirectToRoute('app_post');
             } catch (\Exception $e) {
-                $entityManager->rollback();
-                $this->addFlash('error', 'An error occurred. The post could not be created.');
+                $this->entityManager->rollback();
+                $this->addFlash(
+                    'error',
+                    $this->translationService->messageTranslate(
+                        'flash_messages.operation_failed',
+                        ['{{entity}}' => 'the_post', '{{action}}' => 'actions.created']
+                    )
+                );
             }
         }
 
         $responseData = [
             'form' => $form,
             'post' => $newPost,
-            'locales' => $contentTranslationService->getSupportedLocales()
+            'locales' => $this->contentTranslationService->getSupportedLocales()
         ];
         return $this->renderForm('post/create.html.twig', $responseData);
     }
@@ -133,36 +168,47 @@ class PostController extends AbstractController
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @IsGranted("ROLE_ADMIN")
      */
-    public function edit(
-        Post $post, Request $request,
-        PostManager $postManager,
-        ContentTranslationService $contentTranslationService
-    ): Response
+    public function edit(Post $post, Request $request): Response
     {
-        $authUserId = $this->getUser()->getId();
-
-        if ($post->getUser()->getId() !== $authUserId) {
-            // Throw an AccessDeniedException
-            throw new AccessDeniedException('You do not have permission to edit this post.');
-        }
-
         $form = $this->createForm(PostType::class, $post);
-        $contentTranslationService->setLocaleEditFormFields($form, $post);
+        $this->contentTranslationService->setLocaleEditFormFields($form, $post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $postManager->saveEditPost($post, $form);
-            $postManager->updatePostImage($post, $form);
-            $contentTranslationService->setEditTranslatableFields($form, $post);
+            $this->entityManager->beginTransaction();
 
-            $this->addFlash('success', 'Your post has been updated.');
+            try {
+                $this->postManager->saveEditPost($post, $form);
+                $this->postManager->updatePostImage($post, $form);
+                $this->contentTranslationService->setEditTranslatableFields($form, $post);
+
+                $this->entityManager->commit();
+
+                $this->addFlash(
+                    'success',
+                    $this->translationService->messageTranslate(
+                        'flash_messages.operation_success',
+                        ['{{entity}}' => 'the_post', '{{action}}' => 'actions.updated']
+                    )
+                );
+            } catch (\Exception $e) {
+                $this->entityManager->rollback();
+                $this->addFlash(
+                    'error',
+                    $this->translationService->messageTranslate(
+                        'flash_messages.operation_failed',
+                        ['{{entity}}' => 'the_post', '{{action}}' => 'actions.created']
+                    )
+                );
+            }
+
             return $this->redirectToRoute('app_post');
         }
 
         $responseData = [
             'form' => $form,
             'post' => $post,
-            'locales' => $contentTranslationService->getSupportedLocales()
+            'locales' => $this->contentTranslationService->getSupportedLocales()
         ];
         return $this->renderForm('post/edit.html.twig', $responseData);
     }

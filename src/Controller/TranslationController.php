@@ -10,6 +10,12 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class TranslationController extends AbstractController
 {
+    private $translationService;
+    public function __construct(TranslationService $translationService)
+    {
+        $this->translationService = $translationService;
+    }
+
     /**
      * @Route("/change-locale/{_locale}", name="change_locale", requirements={"_locale"="en|hr"})
      */
@@ -17,7 +23,11 @@ class TranslationController extends AbstractController
     {
         // Check if the requested locale is supported
         if (!in_array($_locale, $translationService->getSupportedLocales())) {
-            throw $this->createNotFoundException('The language does not exist');
+            throw $this->createNotFoundException(
+                $this->translationService->messageTranslate(
+                    'exceptions.invalid_language',
+                )
+            );
         }
 
         // Set the locale for the current and future requests

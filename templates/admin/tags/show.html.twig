@@ -1,19 +1,19 @@
 {% extends 'admin/admin_base.html.twig' %}
 
-{% block title %}{{ 'edit_tag'|trans_session }}{% endblock %}
+{% block title %}{{ 'edit_tag'|trans_session|title }}{% endblock %}
 
 {% block bread %}
     → <a href="{{ path('admin_tag_index') }}">
-    {{ 'the_tags'|trans_session }}
-</a> → {{ 'show'|trans_session }}
+    {{ 'the_tags'|trans_session|title }}
+</a> → {{ 'show'|trans_session|title }}
 {% endblock %}
 
 {% block body %}
     <div class="card" style="width: 33%; margin-left: auto; margin-right: auto; margin-top: 10%">
-        <h4 class="card-title my-3 mx-auto">{{ 'tag.details'|trans_session }}</h4>
+        <h4 class="card-title my-3 mx-auto">{{ 'tag.details'|trans_session|title }}</h4>
         <div class="card-body rounded bg-light border">
             <p class="card-text">
-                <strong>{{ 'tag.name'|trans_session }}:</strong> {{ tag.name|crop_text(40) }}
+                <strong>{{ 'tag.name'|trans_session|capitalize }}:</strong> {{ tag.name|crop_text(40) }}
             </p>
         </div>
     </div>

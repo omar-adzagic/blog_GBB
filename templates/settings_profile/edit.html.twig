@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ 'profile_edit'|trans_session }}
+    {{ 'profile_edit'|trans_session|title }}
 {% endblock %}
 
 {% block bread %}
     → <a href="{{ path('app_profile') }}" class="text-decoration-none">
-    {{ 'the_profile'|trans_session }}
-</a> → {{ 'actions.edit'|trans_session }}
+    {{ 'the_profile'|trans_session|title }}
+</a> → {{ 'actions.edit'|trans_session|title }}
 {% endblock %}
 
 {% block body %}
@@ -17,7 +17,7 @@
 <div class="row">
     <div class="col-12 col-md-6 mt-2">
         <button type="submit" class="btn btn-primary btn-block shadow-sm">
-            {{ 'save'|trans_session }}
+            {{ 'actions.save'|trans_session|title }}
         </button>
     </div>
 </div>

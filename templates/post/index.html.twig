@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ 'posts.all'|trans_session }}
+    {{ 'posts.all'|trans_session|title }}
 {% endblock %}
 
 {% block body %}
@@ -13,7 +13,7 @@
             <div class="mx-2">
                 <a href="{{ path('app_post_create') }}" class="text-decoration-none">
                     <button class="btn btn-light text-primary border border-primary">
-                        {{ 'post.add_new'|trans_session }}
+                        {{ 'post.add_new'|trans_session|title }}
                     </button>
                 </a>
             </div>

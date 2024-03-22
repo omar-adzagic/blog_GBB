@@ -8,6 +8,7 @@ use App\Entity\UserProfile;
 use App\Form\UserProfileType;
 use App\Repository\PostRepository;
 use App\Service\ProfileManager;
+use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,6 +18,12 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ProfileController extends AbstractController
 {
+    private $translationService;
+    public function __construct(TranslationService $translationService)
+    {
+        $this->translationService = $translationService;
+    }
+
     /**
      * @Route("/profile/{id}", name="app_profile_show", requirements={"id"="\d+"})
      */
@@ -25,9 +32,9 @@ class ProfileController extends AbstractController
         if ($userProfile) {
             $userProfile = UserProfileDTO::createFromEntity($userProfile);
         }
-        return $this->render('settings_profile/show.html.twig', [
-            'profile' => $userProfile
-        ]);
+
+        $responseData = ['profile' => $userProfile];
+        return $this->render('settings_profile/show.html.twig', $responseData);
     }
 
     /**
@@ -58,10 +65,22 @@ class ProfileController extends AbstractController
                 $entityManager->flush();
 
                 $entityManager->commit();
-                $this->addFlash('success', 'Your user profile settings were saved.');
+                $this->addFlash(
+                    'success',
+                    $this->translationService->messageTranslate(
+                        'flash_messages.operation_success',
+                        ['{{entity}}' => 'the_user_profile', '{{action}}' => 'actions.saved']
+                    )
+                );
             } catch (\Exception $e) {
                 $entityManager->rollback();
-                $this->addFlash('error', 'An error occurred. Your user profile could not be updated.');
+                $this->addFlash(
+                    'error',
+                    $this->translationService->messageTranslate(
+                        'flash_messages.operation_failed',
+                        ['{{entity}}' => 'the_user_profile', '{{action}}' => 'actions.updated']
+                    )
+                );
             }
 
             return $this->redirectToRoute('app_profile');

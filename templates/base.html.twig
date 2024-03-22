@@ -28,7 +28,7 @@
 <div class="container my-4 d-flex justify-content-between align-items-center">
     <div class="h1">
         <a href="{{ path('app_post') }}" class="text-decoration-none">
-            {{ 'home'|trans_session }}
+            {{ 'home'|trans_session|title }}
         </a>
         {% block bread %}
         {% endblock %}
@@ -39,19 +39,19 @@
             {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                 <div class="mx-2">
                     <a href="{{ path('app_profile') }}" class="text-decoration-none">
-                        {{ 'the_profile'|trans_session }}
+                        {{ 'the_profile'|trans_session|title }}
                     </a>
                 </div>
                 {% if is_granted('ROLE_ADMIN') %}
                     <div class="mx-2">
                         <a href="{{ path('admin_panel_index') }}" class="text-decoration-none">
-                            {{ 'admin_panel'|trans_session }}
+                            {{ 'admin_panel'|trans_session|title }}
                         </a>
                     </div>
                 {% endif %}
                 <div class="mx-2 text-primary">
                     <a href="{{ path('app_logout') }}" class="text-decoration-none">
-                        {{ 'logout'|trans_session }}
+                        {{ 'auth.logout'|trans_session|title }}
                         <i class="bi bi-box-arrow-right"></i>
                     </a>
                 </div>
@@ -59,13 +59,13 @@
                 {% if app.request.attributes.get('_route') not in ['app_login', 'app_register'] %}
                     <div class="mx-2 text-primary">
                         <a href="{{ path('app_login') }}" class="text-decoration-none">
-                            {{ 'login'|trans_session }}
+                            {{ 'auth.login'|trans_session|title }}
                             <i class="bi bi-box-arrow-in-right"></i>
                         </a>
                     </div>
                     <div class="mx-2">
                         <a href="{{ path('app_register') }}" class="text-decoration-none">
-                            {{ 'register'|trans_session }}
+                            {{ 'auth.register'|trans_session|title }}
                         </a>
                     </div>
                 {% endif %}
