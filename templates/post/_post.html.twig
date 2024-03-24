@@ -77,16 +77,16 @@
                     </form>
                 {% endif %}
             </div>
-            <div class="my-2 d-flex">
-                {% if post.user.id == app.user.id %}
+            {% if is_granted('ROLE_ADMIN') %}
+                <div class="my-2 d-flex">
                     <div>
                         <a href="{{ path('app_post_edit', { post: post.id }) }}" class="mr-2 text-decoration-none">
                             {{ 'actions.edit'|trans_session|title }}
                             <i class="bi bi-pencil-square text-primary"></i>
                         </a>
                     </div>
-                {% endif %}
-            </div>
+                </div>
+            {% endif %}
             <div class="my-2">
                 {{ 'the_comments'|trans_session|capitalize }}:
                 <span class="px-1 rounded bg-light">{{ post.comments|length }}</span>

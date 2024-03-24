@@ -33,6 +33,7 @@ actions:
   deleted: 'izbrisano'
   edit: 'uredi'
   save: 'spremi'
+  saved: 'sačuvan'
   save_changes: 'spremi promjene'
   updated: 'ažurirano'
 auth:

@@ -44,6 +44,7 @@ class SettingsProfileController extends AbstractController
             try {
                 $userProfile = $form->getData();
                 $user->setUserProfile($userProfile);
+//                $profileManager->saveProfileImage($form, $profile, $existingUserProfile);
                 $entityManager->persist($user);
                 $entityManager->flush();
 

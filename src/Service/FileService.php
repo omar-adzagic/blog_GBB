@@ -2,11 +2,13 @@
 
 namespace App\Service;
 
+use Intervention\Image\Constraint;
+use Intervention\Image\ImageManagerStatic as Image;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-class FileUploader
+class FileService
 {
     private $targetDirectory;
     private $slugger;
@@ -58,5 +60,23 @@ class FileUploader
     public function getTargetDirectory(): string
     {
         return $this->targetDirectory;
+    }
+
+    public function resizeImage(string $path, int $width = 1024, int $height = 768): void
+    {
+        $filePath = $this->getTargetDirectory() . $path;
+
+        if (!file_exists($filePath)) {
+            return;
+        }
+
+        $image = Image::make($filePath);
+
+        $image->resize($width, $height, function (Constraint $constraint) {
+            $constraint->aspectRatio();
+            $constraint->upsize();
+        });
+
+        $image->save();
     }
 }

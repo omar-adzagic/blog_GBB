@@ -2,64 +2,72 @@
 <div>{{ form_errors(form) }}</div>
 
 <div class="mb-3">
-    {% for locale in locales %}
-        <div class="d-flex my-2">
-            <div class="w-100">
-                {{ form_label(form['title_' ~ locale]) }}
-                {{ form_widget(form['title_' ~ locale], {attr: {'class': 'form-control'}}) }}
-                {{ form_errors(form['title_' ~ locale]) }}
-            </div>
+    <div class="row mb-2 d-flex flex-column">
+        <div class="mb-2">
+            {{ 'post.image'|trans_session|capitalize }}
         </div>
-    {% endfor %}
-</div>
-
-<div class="mb-3">
-    {% for locale in locales %}
-        <div class="d-flex my-2">
-            <div class="w-100">
-                {{ form_label(form['content_' ~ locale]) }}
-                {{ form_widget(form['content_' ~ locale], {attr: {'class': 'form-control'}}) }}
-                {{ form_errors(form['content_' ~ locale]) }}
-            </div>
+        <div class="mr-2">
+            {% if post.image %}
+                <img src="{{ asset(images_public_path ~ 'post_images/' ~ post.image) }}"
+                     style="width: 256px;"
+                     class="d-inline-block rounded border border-2 border-white"
+                     alt="Post image"
+                />
+            {% endif %}
         </div>
-    {% endfor %}
-</div>
 
-{% if is_granted('ROLE_ADMIN') %}
-    <div class="mb-3">
-        {% set labelTranslation = 'publish?'|trans_session|capitalize %}
+        <div class="col-4 mt-3 d-flex flex-column">
+            <label for="{{ form.image.vars.id }}" class="btn btn-secondary">
+                {{ 'actions.change'|trans_session|title }}
+                {{ form_widget(form.image, {'attr': {'class': 'visually-hidden'}}) }}
+            </label>
+            {{ form_errors(form.image) }}
+        </div>
+    </div>
+
+    <div class="col-6 px-0 mb-3">
+        {% for locale in locales %}
+            <div class="d-flex my-2">
+                <div class="w-100">
+                    {{ form_label(form['title_' ~ locale]) }}
+                    {{ form_widget(form['title_' ~ locale], {attr: {'class': 'form-control'}}) }}
+                    {{ form_errors(form['title_' ~ locale]) }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="col-6 mb-3 px-0">
+        {% for locale in locales %}
+            <div class="d-flex my-2">
+                <div class="w-100">
+                    {{ form_label(form['content_' ~ locale]) }}
+                    {{ form_widget(form['content_' ~ locale], {attr: {'class': 'form-control'}}) }}
+                    {{ form_errors(form['content_' ~ locale]) }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="col-6 mb-3 px-0">
         {{ form_label(
             form.is_published,
-            labelTranslation,
+            'publish?'|trans_session|capitalize,
             {'label_attr': {'class': 'form-label'}}
         ) }}
         {{ form_widget(form.is_published) }}
         {{ form_errors(form.is_published) }}
     </div>
-{% else %}
-    {{ form_widget(form.is_published, {'attr': {'style': 'display: none;'}}) }}
-{% endif %}
 
-<div class="row mb-2 d-flex flex-column">
-    <div class="mb-2">
-        {{ 'post.image'|trans_session|capitalize }}
-    </div>
-    <div class="mr-2">
-        {% if post.image %}
-            <img src="{{ asset(images_public_path ~ 'post_images/' ~ post.image) }}"
-                 style="width: 256px;"
-                 class="d-inline-block rounded border border-2 border-white"
-                 alt="Post image"
-            />
-        {% endif %}
-    </div>
+    {{ form_row(form.postTags, {'attr': {'style': 'display: none;'}}) }}
 
-    <div class="col-4 mt-3 d-flex flex-column">
-        <label for="{{ form.image.vars.id }}" class="btn btn-secondary">
-            {{ 'actions.change'|trans_session|title }}
-            {{ form_widget(form.image, {'attr': {'class': 'visually-hidden'}}) }}
-        </label>
-        {{ form_errors(form.image) }}
+    <div class="col-5 px-0">
+        <div id="tags-container" class="mb-3" data-post-tags-json="{{ postTagsJson ?? '[]' }}"></div>
+        <div>
+            <input type="text" id="tag-input" class="form-control" placeholder="{{ 'tag.add'|trans_session|capitalize }}" />
+        </div>
+        <div id="tag-suggestions" class="list-group"></div>
+        <input type="hidden" id="tag-ids" name="postTags" value="">
     </div>
 </div>
 

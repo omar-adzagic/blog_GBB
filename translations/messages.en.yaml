@@ -34,6 +34,7 @@ actions:
   edit: 'edit'
   save: 'save'
   save_changes: 'save Changes'
+  saved: 'saved'
   updated: 'updated'
 auth:
   agree_to_terms: 'agree to terms'

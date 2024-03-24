@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
-use App\Service\FileUploader;
+use App\Service\FileService;
 use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,7 +28,7 @@ class RegistrationController extends AbstractController
         Request $request,
         UserPasswordHasherInterface $userPasswordHasher,
         EntityManagerInterface $entityManager,
-        FileUploader $fileUploader
+        FileService $fileService
     ): Response
     {
         $user = new User();
@@ -48,7 +48,7 @@ class RegistrationController extends AbstractController
 
                 $imageFile = $form->get('userProfile')->get('image')->getData();
                 if ($imageFile) {
-                    $newFileName = $fileUploader->upload($imageFile, '/profile_images');
+                    $newFileName = $fileService->upload($imageFile, '/profile_images');
                     $user->getUserProfile()->setImage($newFileName);
                 }
 

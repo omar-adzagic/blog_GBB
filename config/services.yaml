@@ -27,7 +27,7 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    App\Service\FileUploader:
+    App\Service\FileService:
         public: true
         arguments:
             $targetDirectory: '%images_directory%'

@@ -17,8 +17,7 @@ class PostManager
     private EntityManagerInterface $entityManager;
     private $slugify;
     private AuthorizationCheckerInterface $authorizationChecker;
-
-    private FileUploader $fileUploader;
+    private FileService $fileService;
     private ?UserInterface $authUser;
     private $userLikeRepository;
     private $userFavoriteRepository;
@@ -27,7 +26,7 @@ class PostManager
     public function __construct(
         EntityManagerInterface $entityManager,
         AuthorizationCheckerInterface $authorizationChecker,
-        FileUploader $fileUploader,
+        FileService $fileService,
         Security $security,
         UserLikeRepository $userLikeRepository,
         UserFavoriteRepository $userFavoriteRepository,
@@ -37,7 +36,7 @@ class PostManager
         $this->entityManager = $entityManager;
         $this->slugify = new Slugify();
         $this->authorizationChecker = $authorizationChecker;
-        $this->fileUploader = $fileUploader;
+        $this->fileService = $fileService;
         $this->authUser = $security->getUser();
         $this->userLikeRepository = $userLikeRepository;
         $this->userFavoriteRepository = $userFavoriteRepository;
@@ -73,8 +72,9 @@ class PostManager
         $postImageFile = $form->get('image')->getData();
         if ($postImageFile) {
             $callback();
-            $newFileName = $this->fileUploader->upload($postImageFile, 'post_images/');
+            $newFileName = $this->fileService->upload($postImageFile, 'post_images/');
             $post->setImage($newFileName);
+            $this->fileService->resizeImage('post_images/' . $post->getImage());
         }
     }
 
@@ -104,7 +104,7 @@ class PostManager
     {
         $oldFilename = $post->getImage();
         if ($oldFilename) {
-            $this->fileUploader->deleteFile($oldFilename, '/post_images');
+            $this->fileService->deleteFile($oldFilename, '/post_images');
         }
     }
 

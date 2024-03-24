@@ -36,17 +36,18 @@ class TagTranslation extends AbstractPersonalTranslation
         $this->setContent($value);
     }
 
-    private $name;
-
-    public function getName(): ?string
+    public function getLocale(): ?string
     {
-        return $this->name;
+        return $this->locale;
     }
 
-    public function setName($name): self
+    public function getField(): ?string
     {
-        $this->name = $name;
+        return $this->field;
+    }
 
-        return $this;
+    public function getContent(): ?string
+    {
+        return $this->content;
     }
 }

@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block body %}
-    {{ include('admin/posts/_form.html.twig') }}
+    {{ include('admin/posts/_form.html.twig', {post: post}) }}
 {% endblock %}
 
 {% block body_javascripts %}

@@ -9,16 +9,16 @@ class ProfileManager
 {
     private $entityManager;
     private $authUser;
-    private $fileUploader;
+    private $fileService;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         Security $security,
-        FileUploader $fileUploader
+        FileService $fileService
     )
     {
         $this->entityManager = $entityManager;
-        $this->fileUploader = $fileUploader;
+        $this->fileService = $fileService;
         $this->authUser = $security->getUser();
     }
 
@@ -30,13 +30,14 @@ class ProfileManager
             if ($existingUserProfile) {
                 $oldFilename = $existingUserProfile->getImage();
                 if ($oldFilename) {
-                    $this->fileUploader->deleteFile($oldFilename, '/profile_images');
+                    $this->fileService->deleteFile($oldFilename, '/profile_images');
                 }
             }
 
-            $newFileName = $this->fileUploader->upload($profileImageFile, '/profile_images');
+            $newFileName = $this->fileService->upload($profileImageFile, '/profile_images');
             $profile->setImage($newFileName);
             $this->entityManager->flush();
+            $this->fileService->resizeImage($profile->getImage(), 400, 400);
         }
     }
 

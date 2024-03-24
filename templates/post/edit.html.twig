@@ -13,3 +13,7 @@
 {% block body %}
     {{ include ('post/_form.html.twig') }}
 {% endblock %}
+
+{% block body_javascripts %}
+    <script src="{{ asset('js/tag-management.js') }}" defer></script>
+{% endblock %}

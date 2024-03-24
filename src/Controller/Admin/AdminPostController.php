@@ -78,7 +78,6 @@ class AdminPostController extends AbstractController
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function create(Request $request) {
-        $user = $this->getUser();
         $form = $this->createForm(PostType::class, new Post());
         $this->contentTranslationService->setLocaleCreateFormFields($form, ['title', 'content']);
         $form->handleRequest($request);
@@ -88,7 +87,7 @@ class AdminPostController extends AbstractController
             $this->entityManager->beginTransaction();
             try {
                 $this->postManager->saveCreatePost($post, $form);
-
+                $this->postManager->savePostImage($post, $form);
                 $this->contentTranslationService->setCreateTranslatableFormFields(
                     $form, $post, ['title', 'content'], PostTranslation::class
                 );
@@ -193,17 +192,16 @@ class AdminPostController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->beginTransaction();
+
             try {
-                $this->postManager->saveCreatePost($post, $form);
+                $this->postManager->saveEditPost($post, $form);
+                $this->postManager->updatePostImage($post, $form);
                 $this->contentTranslationService->setEditTranslatableFields($form, $post);
 
                 $requestTagIdsString = $request->request->get('postTags', '');
                 $submittedTagIds = $this->postManager->extractTagIdsFromRequestData($requestTagIdsString);
-                if (count($submittedTagIds)) {
-                    $this->tagManager->updatePostTags($post, $submittedTagIds);
-                }
+                $this->tagManager->updatePostTags($post, $submittedTagIds);
 
-                $this->entityManager->flush();
                 $this->entityManager->commit();
 
                 $this->addFlash(
@@ -227,8 +225,7 @@ class AdminPostController extends AbstractController
             }
         }
 
-        $postTagIds = HelperService::getIdsFromDoctrine($post->getPostTags()->toArray());
-        $postTags = $postTagRepository->findPostTagByIdsWithRelations($postTagIds);
+        $postTags = $post->getPostTags()->toArray();
         $tagDTOs = TagDTO::createFromPostTags($postTags, $this->contentTranslationService);
         $postTagsJson = $serializer->serialize($tagDTOs, 'json');
 

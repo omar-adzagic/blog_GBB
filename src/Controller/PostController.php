@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\PostDTO;
+use App\DTO\TagDTO;
 use App\Entity\Comment;
 use App\Entity\Post;
 use App\Entity\PostTranslation;
@@ -14,6 +15,7 @@ use App\Service\CommentManager;
 use App\Service\ContentTranslationService;
 use App\Service\EmailService;
 use App\Service\PostManager;
+use App\Service\TagManager;
 use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -21,25 +23,28 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class PostController extends AbstractController
 {
     private $translationService;
     private $contentTranslationService;
-    private $postManager;
     private $entityManager;
+    private $postManager;
+    private $tagManager;
     public function __construct(
         TranslationService $translationService,
         ContentTranslationService $contentTranslationService,
+        EntityManagerInterface $entityManager,
         PostManager $postManager,
-        EntityManagerInterface $entityManager
+        TagManager $tagManager
     )
     {
         $this->translationService = $translationService;
         $this->contentTranslationService = $contentTranslationService;
         $this->entityManager = $entityManager;
         $this->postManager = $postManager;
+        $this->tagManager = $tagManager;
     }
 
     /**
@@ -160,7 +165,7 @@ class PostController extends AbstractController
             'post' => $newPost,
             'locales' => $this->contentTranslationService->getSupportedLocales()
         ];
-        return $this->renderForm('post/create.html.twig', $responseData);
+        return $this->renderForm('admin/posts/create.html.twig', $responseData);
     }
 
     /**
@@ -168,7 +173,7 @@ class PostController extends AbstractController
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @IsGranted("ROLE_ADMIN")
      */
-    public function edit(Post $post, Request $request): Response
+    public function edit(Post $post, Request $request, SerializerInterface $serializer): Response
     {
         $form = $this->createForm(PostType::class, $post);
         $this->contentTranslationService->setLocaleEditFormFields($form, $post);
@@ -181,6 +186,10 @@ class PostController extends AbstractController
                 $this->postManager->saveEditPost($post, $form);
                 $this->postManager->updatePostImage($post, $form);
                 $this->contentTranslationService->setEditTranslatableFields($form, $post);
+
+                $requestTagIdsString = $request->request->get('postTags', '');
+                $submittedTagIds = $this->postManager->extractTagIdsFromRequestData($requestTagIdsString);
+                $this->tagManager->updatePostTags($post, $submittedTagIds);
 
                 $this->entityManager->commit();
 
@@ -205,9 +214,14 @@ class PostController extends AbstractController
             return $this->redirectToRoute('app_post');
         }
 
+        $postTags = $post->getPostTags()->toArray();
+        $tagDTOs = TagDTO::createFromPostTags($postTags, $this->contentTranslationService);
+        $postTagsJson = $serializer->serialize($tagDTOs, 'json');
+
         $responseData = [
             'form' => $form,
             'post' => $post,
+            'postTagsJson' => $postTagsJson,
             'locales' => $this->contentTranslationService->getSupportedLocales()
         ];
         return $this->renderForm('post/edit.html.twig', $responseData);

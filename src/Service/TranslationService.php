@@ -28,10 +28,19 @@ class TranslationService extends TranslationAbstract
     private function translateParameters(array $params): array
     {
         if (count($params) > 0) {
-            return array_map(function($param) {
-                return $this->sessionTranslate($param);
-            }, $params);
+            $translatedParams = [];
+            $counter = 0;
+            foreach ($params as $key => $param) {
+                $translation = $this->sessionTranslate($param);
+                if ($counter === 0) {
+                    $translation = ucfirst($translation);
+                }
+                $translatedParams[$key] = $translation;
+                $counter++;
+            }
+            return $translatedParams;
         }
+
         return $params;
     }
 
@@ -50,14 +59,14 @@ class TranslationService extends TranslationAbstract
     public function getPostIndexTranslations(): array
     {
         return [
-            'author' => $this->sessionTranslate('author'),
-            'written' => $this->sessionTranslate('written'),
+            'author' => ucfirst($this->sessionTranslate('author')),
+            'written' => ucfirst($this->sessionTranslate('written')),
             'like' => $this->sessionTranslate('post.like'),
             'unlike' => $this->sessionTranslate('post.unlike'),
             'add_to_favorites' => $this->sessionTranslate('post.add_to_favorites'),
             'remove_from_favorites' => $this->sessionTranslate('post.remove_from_favorites'),
-            'edit' => $this->sessionTranslate('actions.edit'),
-            'comments' => $this->sessionTranslate('the_comments'),
+            'edit' => ucfirst($this->sessionTranslate('actions.edit')),
+            'comments' => ucfirst($this->sessionTranslate('the_comments')),
         ];
     }
 }
