@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>
         {% block title %}
-            !
+            {{ 'welcome'|trans_session|title }}!
         {% endblock %}
     </title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><text y='1.2em' font-size='96'>⚫️</text></svg>">
@@ -76,11 +76,11 @@
 </div>
 
 <div class="container">
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success" role="alert">{{ message }}</div>
-    {% endfor %}
+    {{ include('shared/_flash_messages.html.twig') }}
 
     {% block body %}{% endblock %}
+
+    <script src="{{ asset('js/flash-messages-management.js') }}" defer></script>
     {% block body_javascripts %}{% endblock %}
 </div>
 </body>

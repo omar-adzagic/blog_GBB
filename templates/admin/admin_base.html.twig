@@ -75,22 +75,7 @@
     </div>
 
     <main>
-        {% set succssMessages = app.flashes('success') %}
-        {% if succssMessages|length > 0 %}
-            <div class="alert alert-success my-2 py-2 border border-success flash-message" role="alert">
-                {% for message in succssMessages %}
-                    {{ message }}
-                {% endfor %}
-            </div>
-        {% endif %}
-        {% set errorMessages = app.flashes('error') %}
-        {% if errorMessages|length > 0 %}
-            <div class="alert alert-danger my-2 py-2 border border-danger flash-message" role="alert">
-                {% for message in errorMessages %}
-                    {{ message }}
-                {% endfor %}
-            </div>
-        {% endif %}
+        {{ include('shared/_flash_messages.html.twig') }}
 
         <header class="mt-3 mb-4">
             <h2>{% block header_text %}{% endblock %}</h2>

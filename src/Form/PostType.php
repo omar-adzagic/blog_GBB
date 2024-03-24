@@ -31,7 +31,7 @@ class PostType extends AbstractType
 
         $imageConstraints = [
             new File([
-                'maxSize' => '2024k',
+                'maxSize' => '2048k',
                 'mimeTypes' => [
                     'image/jpeg',
                     'image/png',

@@ -36,8 +36,7 @@ class ProfileManager
 
             $newFileName = $this->fileService->upload($profileImageFile, '/profile_images');
             $profile->setImage($newFileName);
-            $this->entityManager->flush();
-            $this->fileService->resizeImage($profile->getImage(), 400, 400);
+            $this->fileService->resizeImage('profile_images/' . $profile->getImage(), 400, 400);
         }
     }
 

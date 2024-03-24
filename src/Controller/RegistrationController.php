@@ -48,8 +48,10 @@ class RegistrationController extends AbstractController
 
                 $imageFile = $form->get('userProfile')->get('image')->getData();
                 if ($imageFile) {
+                    $userProfile = $user->getUserProfile();
                     $newFileName = $fileService->upload($imageFile, '/profile_images');
-                    $user->getUserProfile()->setImage($newFileName);
+                    $userProfile->setImage($newFileName);
+                    $fileService->resizeImage('profile_images/' . $userProfile->getImage(), 400, 400);
                 }
 
                 $entityManager->persist($user);
@@ -59,9 +61,9 @@ class RegistrationController extends AbstractController
 
                 $this->addFlash(
                     'success',
-                    $this->translationService->messageTranslate(
+                    ucfirst($this->translationService->messageTranslate(
                         'flash_messages.registration_success',
-                    )
+                    ))
                 );
 
                 return $this->redirectToRoute('app_post');
